@@ -12,6 +12,7 @@ paper's proof depends on, starting with:
 | P1 | Lemma 5.4 positive-part + 2-integrality toolkit | `CatalanSun/TwoAdic.lean` | proved (partial) |
 | P2 | Cauchy `n≤2` + odd-denom applicability | `CatalanSun/Cauchy.lean` | proved |
 | P3 | Thm 2.1 polynomial / constant-denom fragment | `CatalanSun/FunctionalEq.lean` | proved (partial) |
+| eq. 1.4 | Catalan tail `T_m + T_{m+1} = 1/(2m+1)²` | `CatalanSun/Tail.lean` | proved |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -33,7 +34,8 @@ Toolchain: Lean 4.32.2 / Mathlib v4.32.2 (same pin as `aria-moebius`).
 
 ## Incoming (not on the default target)
 
-`incoming/TailRecurrence.lean` defines the Catalan tail `T_m` / weighted tail `u_m` and sketches Sun eq. 1.4. It extends this slice but is **not kernel-green** (two `sorry`s: summability, positivity). lean-proof-forge forbids `sorry`, so it stays out of `CatalanSun.lean` until those are discharged.
+Sun eq. 1.4 (Catalan tail recurrence) lives in `CatalanSun/Tail.lean` (sorry-free).
+The original Downloads draft is archived as a stub under `incoming/`.
 
 Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catalan.md`.
 

@@ -17,6 +17,7 @@ import CatalanSun.Ledger
 import CatalanSun.TwoAdic
 import CatalanSun.Cauchy
 import CatalanSun.FunctionalEq
+import CatalanSun.Tail
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -32,3 +33,7 @@ import CatalanSun.FunctionalEq
 #print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
 #print axioms CatalanSun.FunctionalEq.no_polynomial_cleared_solution
 #print axioms CatalanSun.Cauchy.lemma_4_2_S_one
+#print axioms CatalanSun.Tail.summable_tailTerm
+#print axioms CatalanSun.Tail.tail_pos
+#print axioms CatalanSun.Tail.tail_add_succ
+#print axioms CatalanSun.Tail.tail_lt_inv_sq
