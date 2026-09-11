@@ -39,4 +39,4 @@ The original Downloads draft is archived as a stub under `incoming/`.
 
 Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catalan.md`.
 
-Repo: https://github.com/chokmah-me/catalan-sun-lean (private).
+Repo: https://github.com/chokmah-me/catalan-sun-lean (public).
