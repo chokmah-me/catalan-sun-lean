@@ -18,6 +18,7 @@ import CatalanSun.TwoAdic
 import CatalanSun.Cauchy
 import CatalanSun.FunctionalEq
 import CatalanSun.Tail
+import CatalanSun.Residual
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -37,3 +38,8 @@ import CatalanSun.Tail
 #print axioms CatalanSun.Tail.tail_pos
 #print axioms CatalanSun.Tail.tail_add_succ
 #print axioms CatalanSun.Tail.tail_lt_inv_sq
+#print axioms CatalanSun.Residual.ratWitness_eq
+#print axioms CatalanSun.Residual.ratWitness_twoIntegral
+#print axioms CatalanSun.Residual.RmatrixRatWitness_eq
+#print axioms CatalanSun.Residual.RmatrixRatWitness_twoIntegral
+#print axioms CatalanSun.Residual.lemma_5_4_entry

@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 4125,
+  "build_ms": 3369,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -135,10 +135,50 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.Residual.ratWitness_eq",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Residual.ratWitness_twoIntegral",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Residual.RmatrixRatWitness_eq",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Residual.RmatrixRatWitness_twoIntegral",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Residual.lemma_5_4_entry",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-11T19:42:16.674423+00:00",
+  "timestamp_utc": "2026-09-11T22:14:42.994885+00:00",
   "status": "pass"
 }

@@ -13,10 +13,13 @@ paper's proof depends on, starting with:
 | P2 | Cauchy `n≤2` + odd-denom applicability | `CatalanSun/Cauchy.lean` | proved |
 | P3 | Thm 2.1 polynomial / constant-denom fragment | `CatalanSun/FunctionalEq.lean` | proved (partial) |
 | eq. 1.4 | Catalan tail `T_m + T_{m+1} = 1/(2m+1)²` | `CatalanSun/Tail.lean` | proved |
+| P1 (5.4, entry-level) | `R_{α,j}` from `weightedTail` (eq. 2.1); `q·R_{α,j}` 2-integral when `G∈ℚ` | `CatalanSun/Residual.lean` | proved (entry-level; not the det-level Lemma 5.4) |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
-Deferred: full RatFunc pole-chain; general-`n` Cauchy; Props 6.3/7.4; Mertens/PNT; Thm 1.1.
+Deferred: det-level Lemma 5.4 / Theorem 5.1 (needs Pascal–Cauchy factorization,
+§§2–4); full RatFunc pole-chain; general-`n` Cauchy; Props 6.3/7.4; Mertens/PNT;
+Thm 1.1.
 
 ## Build
 

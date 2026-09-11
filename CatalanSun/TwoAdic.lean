@@ -78,6 +78,48 @@ theorem isTwoIntegral_mul {a b : ℚ} (ha : a ≠ 0) (hb : b ≠ 0)
   rw [padicValRat.mul (p := 2) ha hb]
   linarith
 
+/-- Zero-safe product: no nonvanishing hypotheses needed. -/
+theorem isTwoIntegral_mul' {a b : ℚ} (haI : IsTwoIntegral a) (hbI : IsTwoIntegral b) :
+    IsTwoIntegral (a * b) := by
+  rcases eq_or_ne a 0 with ha | ha
+  · simp [ha, IsTwoIntegral, padicValRat.zero]
+  rcases eq_or_ne b 0 with hb | hb
+  · simp [hb, IsTwoIntegral, padicValRat.zero]
+  exact isTwoIntegral_mul ha hb haI hbI
+
+theorem isTwoIntegral_zero : IsTwoIntegral 0 := by
+  simp [IsTwoIntegral, padicValRat.zero]
+
+theorem isTwoIntegral_neg {a : ℚ} (haI : IsTwoIntegral a) : IsTwoIntegral (-a) := by
+  unfold IsTwoIntegral at *
+  rwa [padicValRat.neg (p := 2)]
+
+/-- Ultrametric closure: 2-integrality is preserved under addition. -/
+theorem isTwoIntegral_add {a b : ℚ} (haI : IsTwoIntegral a) (hbI : IsTwoIntegral b) :
+    IsTwoIntegral (a + b) := by
+  rcases eq_or_ne (a + b) 0 with hab | hab
+  · rw [hab]; exact isTwoIntegral_zero
+  unfold IsTwoIntegral at *
+  exact le_trans (le_min haI hbI) (padicValRat.min_le_padicValRat_add (p := 2) hab)
+
+theorem isTwoIntegral_sub {a b : ℚ} (haI : IsTwoIntegral a) (hbI : IsTwoIntegral b) :
+    IsTwoIntegral (a - b) := by
+  rw [sub_eq_add_neg]
+  exact isTwoIntegral_add haI (isTwoIntegral_neg hbI)
+
+/-- Finite sums of 2-integral rationals are 2-integral. -/
+theorem isTwoIntegral_sum {ι : Type*} {s : Finset ι} {f : ι → ℚ}
+    (h : ∀ i ∈ s, IsTwoIntegral (f i)) : IsTwoIntegral (∑ i ∈ s, f i) := by
+  classical
+  revert h
+  refine s.induction_on (motive := fun t => (∀ i ∈ t, IsTwoIntegral (f i)) →
+    IsTwoIntegral (∑ i ∈ t, f i)) ?base ?step
+  · intro _; simpa using isTwoIntegral_zero
+  · intro a s ha ih h
+    rw [Finset.sum_insert ha]
+    exact isTwoIntegral_add (h a (Finset.mem_insert_self _ _))
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+
 /-- Division by an odd positive natural preserves 2-integrality. -/
 theorem isTwoIntegral_div_odd {q : ℚ} {d : ℕ} (hd : Odd d) (hdpos : 0 < d)
     (hq : IsTwoIntegral q) : IsTwoIntegral (q / d) := by
