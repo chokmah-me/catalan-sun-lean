@@ -1,0 +1,112 @@
+{
+  "ok": true,
+  "project": "C:\\Users\\Elke Shayna\\Documents\\00Dev\\catalan-sun-lean",
+  "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
+  "target": null,
+  "build_exit": 0,
+  "build_ms": 3577,
+  "sorry_hits": [],
+  "native_decide_hits": [],
+  "axiom_entries": [
+    {
+      "theorem": "CatalanSun.Ledger.rawQuadratic_at_one_twentieth",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Ledger.deltaLarge_at_one_twentieth",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.TwoAdic.lemma_5_4_positive_part",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.TwoAdic.isTwoIntegral_of_odd_den",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.TwoAdic.odd_PiFactor",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Cauchy.det_cauchy_fin_one",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Cauchy.det_cauchy_fin_two",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Cauchy.oddDenom_cast_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.FunctionalEq.no_constant_denom_solution",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.FunctionalEq.no_polynomial_cleared_solution",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Cauchy.lemma_4_2_S_one",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "axiom_violations": [],
+  "errors": [],
+  "timestamp_utc": "2026-09-11T18:44:24.451952+00:00",
+  "status": "pass"
+}

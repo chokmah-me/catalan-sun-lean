@@ -1,0 +1,34 @@
+/-
+  CatalanSun.lean
+
+  Lean-first slice of Zhi-Wei Sun, "Catalan's constant is irrational"
+  (arXiv:2609.04176v1). This library formalizes high-ROI structural lemmas
+  from §§2–5 and the exact rational ledger identities — it does **not** claim
+  Theorem 1.1 (G irrational).
+
+  Scope of this pass:
+  * P4 — exact identities Δ_{>B} = 83/2400 and 4ρ − 2ρ² = 39/200 at ρ = 1/20
+  * P1 — Lemma 5.4–style 2-adic positive-part collapse + 2-integrality toolkit
+
+  Deferred: Props 6.3 / 7.4 interval arithmetic; Mertens/PNT; full Thm 1.1.
+-/
+
+import CatalanSun.Ledger
+import CatalanSun.TwoAdic
+import CatalanSun.Cauchy
+import CatalanSun.FunctionalEq
+
+/-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
+
+#print axioms CatalanSun.Ledger.rawQuadratic_at_one_twentieth
+#print axioms CatalanSun.Ledger.deltaLarge_at_one_twentieth
+#print axioms CatalanSun.TwoAdic.lemma_5_4_positive_part
+#print axioms CatalanSun.TwoAdic.isTwoIntegral_of_odd_den
+#print axioms CatalanSun.TwoAdic.odd_PiFactor
+#print axioms CatalanSun.Cauchy.det_cauchy_fin_one
+#print axioms CatalanSun.Cauchy.det_cauchy_fin_two
+#print axioms CatalanSun.Cauchy.oddDenom_cast_ne_zero
+#print axioms CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment
+#print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
+#print axioms CatalanSun.FunctionalEq.no_polynomial_cleared_solution
+#print axioms CatalanSun.Cauchy.lemma_4_2_S_one

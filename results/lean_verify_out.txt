@@ -1,0 +1,27 @@
+lean-proof-forge verify  ok=True  exit=0
+project: C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean
+lake: C:\Users\Elke Shayna\.elan\bin\lake.EXE
+target: (default)
+build_exit: 0
+build_ms: 3577
+sorry_hits: 0
+native_decide_hits: 0
+axiom_entries: 12
+axiom_violations: 0
+
+--- lake log (tail) ---
+ℹ [1498/1499] Replayed CatalanSun
+info: CatalanSun.lean:23:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:24:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:25:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:26:0: 'CatalanSun.TwoAdic.isTwoIntegral_of_odd_den' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:27:0: 'CatalanSun.TwoAdic.odd_PiFactor' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:28:0: 'CatalanSun.Cauchy.det_cauchy_fin_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:29:0: 'CatalanSun.Cauchy.det_cauchy_fin_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:30:0: 'CatalanSun.Cauchy.oddDenom_cast_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:31:0: 'CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:32:0: 'CatalanSun.FunctionalEq.no_constant_denom_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:33:0: 'CatalanSun.FunctionalEq.no_polynomial_cleared_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:34:0: 'CatalanSun.Cauchy.lemma_4_2_S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1499 jobs).
+warning: mathlib: repository 'C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean\.lake/packages\mathlib' has local changes
