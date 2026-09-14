@@ -23,6 +23,7 @@ import CatalanSun.Rank
 import CatalanSun.NewtonDiff
 import CatalanSun.NewtonCompletion
 import CatalanSun.Thm21
+import CatalanSun.Qhat
 import CatalanSun.Structure
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
@@ -34,6 +35,7 @@ import CatalanSun.Structure
 #print axioms CatalanSun.TwoAdic.odd_PiFactor
 #print axioms CatalanSun.Cauchy.det_cauchy_fin_one
 #print axioms CatalanSun.Cauchy.det_cauchy_fin_two
+#print axioms CatalanSun.Cauchy.det_cauchyMatrix
 #print axioms CatalanSun.Cauchy.oddDenom_cast_ne_zero
 #print axioms CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment
 #print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
@@ -103,3 +105,4 @@ import CatalanSun.Structure
 #print axioms CatalanSun.NewtonCompletion.AtildeDiff_submatrix_eq_outerBlock
 #print axioms CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R
 #print axioms CatalanSun.NewtonCompletion.prop_3_1_det_Atilde
+#print axioms CatalanSun.NewtonCompletion.qhat_ne_zero

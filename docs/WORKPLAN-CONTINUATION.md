@@ -5,6 +5,19 @@
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 
+## Next session pointer
+
+**Landed:** `qhat_ne_zero`; general-`n` Cauchy **`det_cauchyMatrix`** (C0–C3 PASS)
+in `CatalanSun/Cauchy.lean`. Scratchpad: `.scratchpad/geneval-cauchy-general-n/`.
+
+Start here next:
+
+1. This file (`docs/WORKPLAN-CONTINUATION.md`)
+2. **Cauchy–Binet** (not in Mathlib v4.32.2) toward det-level Lemma 5.4 /
+   Pascal–Cauchy factorization (paper §4)
+3. Evidence: `.scratchpad/geneval-cauchy-general-n/`, `.scratchpad/geneval-qhat/`,
+   `.scratchpad/geneval-prop31-finish/`
+
 ## What landed
 
 Sorry-free prefix toward Theorem 2.1 (adversarial verifier PASS; lake build green;
@@ -51,8 +64,8 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
 
 - `CatalanSun/Ledger.lean` — P4, exact rational ledger identities. Done.
 - `CatalanSun/TwoAdic.lean` — P1, 2-adic toolkit. Done (toolkit only).
-- `CatalanSun/Cauchy.lean` — P2, Cauchy determinant for `n ≤ 2` only.
-  **General-`n` Cauchy determinant is NOT proved.**
+- `CatalanSun/Cauchy.lean` — P2, general-`n` Cauchy determinant
+  (`det_cauchyMatrix` / Remark 4.1). Done.
 - `CatalanSun/FunctionalEq.lean` — P3, full `no_rational_solution` + M7 ClearedEq23. Done.
 - `CatalanSun/Tail.lean` — Sun eq. 1.4. Done, sorry-free.
 - `CatalanSun/Residual.lean` — residual entries `R_{α,j}` (eq. 2.1); **entry-level**
@@ -77,11 +90,15 @@ Scratchpad: `.scratchpad/geneval-m8/`.
 `prop_3_1_det_Atilde` — `det Atilde = ± F_B · det (RmatrixFin.submatrix selectedRows id)`,
 via `M = DiffMat * Atilde`, column facts, reindex to nested `fromBlocks`,
 `det_fromBlocks_zero₂₁` / `det_fromBlocks_zero₁₂`, then `det_mul` back to `Atilde`.
-Optional stretch `qhat_ne_zero` not landed this pass.
+**`qhat_ne_zero` proved** in `CatalanSun/Qhat.lean`: some injective omitted-row
+map `o` has `(Ahat B S o).det ≠ 0`.
 
-Det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2) has **no
-Cauchy–Binet** and **no general-`n` Cauchy determinant**. Those each need
-substantial from-scratch work — treat as separate multi-session efforts.
+**General-`n` Cauchy proved** in `CatalanSun/Cauchy.lean`: `det_cauchyMatrix`
+(Remark 4.1 product form).
+
+Det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2) still has **no
+Cauchy–Binet**. That is the next multi-session effort toward Pascal–Cauchy
+factorization.
 
 ## Process notes
 

@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 39121,
+  "build_ms": 4749,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -58,6 +58,14 @@
     },
     {
       "theorem": "CatalanSun.Cauchy.det_cauchy_fin_two",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Cauchy.det_cauchyMatrix",
       "axioms": [
         "propext",
         "Classical.choice",
@@ -615,10 +623,18 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.qhat_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T21:09:41.777249+00:00",
+  "timestamp_utc": "2026-09-14T23:13:37.606202+00:00",
   "status": "pass"
 }

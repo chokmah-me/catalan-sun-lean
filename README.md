@@ -14,7 +14,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 |------------|---------|------|--------------|
 | P4 | `4ρ−2ρ² = 39/200`, `Δ_{>B} = 83/2400` at `ρ=1/20` | `CatalanSun/Ledger.lean` | proved |
 | P1 | Lemma 5.4 positive-part + 2-integrality toolkit | `CatalanSun/TwoAdic.lean` | proved (toolkit) |
-| P2 | Cauchy `n≤2` + odd-denom applicability | `CatalanSun/Cauchy.lean` | proved |
+| P2 | Cauchy determinant (general `n`) + odd-denom applicability | `CatalanSun/Cauchy.lean` | proved |
 | P3 | Full `no_rational_solution` for cleared `1/(4X²)` form | `CatalanSun/FunctionalEq.lean` | proved |
 | P3 / M7 | Cleared `(2X+3)²` form → ClearedEq; no-solution over ℚ/ℂ/ℝ | `CatalanSun/FunctionalEq.lean` | proved |
 | eq. 1.4 | Catalan tail `T_m + T_{m+1} = 1/(2m+1)²` | `CatalanSun/Tail.lean` | proved |
@@ -30,6 +30,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | `Thm21.lean` | proved |
 | **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | `Thm21.lean` | proved |
 | **Prop 3.1** | `det Atilde = ± F_B · det R[A,J]` via DiffMat + fromBlocks | `NewtonCompletion.lean` | proved |
+| **`qhat_ne_zero`** | ∃ injective `o` with `det (Ahat B S o) ≠ 0` | `Qhat.lean` | proved |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -39,9 +40,8 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Deferred (later sessions)
 
-Optional `qhat_ne_zero` (Cor 2.1 + Prop 3.1 + `F_B_ne_zero` + `Π ≠ 0`);
+Cauchy–Binet (not in Mathlib v4.32.2);
 det-level Lemma 5.4 / Theorem 5.1 (needs Pascal–Cauchy factorization, §§2–4);
-general-`n` Cauchy determinant; Cauchy–Binet (not in Mathlib v4.32.2);
 Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
