@@ -33,6 +33,7 @@ import CatalanSun.Residual
 #print axioms CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment
 #print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
 #print axioms CatalanSun.FunctionalEq.no_polynomial_cleared_solution
+#print axioms CatalanSun.FunctionalEq.no_rational_solution
 #print axioms CatalanSun.Cauchy.lemma_4_2_S_one
 #print axioms CatalanSun.Tail.summable_tailTerm
 #print axioms CatalanSun.Tail.tail_pos
