@@ -4,8 +4,9 @@ Lean 4 / Mathlib formalization of **high-ROI structural lemmas** from
 Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
-and linear-algebra facts that the paper's proof depends on. It also does **not**
-yet claim Theorem 2.1 (full column rank) or absolute Corollary 2.1.
+and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
+column rank) and absolute Corollary 2.1 are proved; det-level Lemma 5.4 /
+Theorem 5.1 / Theorem 1.1 remain open.
 
 ## Status
 
@@ -24,19 +25,16 @@ yet claim Theorem 2.1 (full column rank) or absolute Corollary 2.1.
 | Thm 2.1 / M1–M2 | Finite-diff alternating sum vanishing; `paperFwdDiff` | `CatalanSun/NewtonDiff.lean` | proved |
 | Thm 2.1 / M3 | Column dependence ⇒ vanishing high Δ of `fSeq` | `CatalanSun/Thm21.lean` | proved |
 | Thm 2.1 / M4 | `f_i = −T_{i+1} D_λ(i) + P_λ(i)`; deg bounds (`Structure.lean`) | `Structure` / `Thm21` | proved (revised vs paper’s written `T_i` form) |
-| **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | — | **open** (M5–M6 remain) |
-| **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | — | **open** (needs Thm 2.1) |
+| Thm 2.1 / M5 | Newton interpolant of `fSeq` has deg ≤ 2B−1; `A = P − f = T_{i+1} D` | `NewtonDiff` / `Thm21` | proved |
+| Thm 2.1 / M6 | `Kpoly ≡ 0` under column dep (ℕ zeros + `G0 ∣ K` + `K(−3/2)=0`) | `Structure` / `Thm21` | proved |
+| **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | `Thm21.lean` | proved |
+| **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | `Thm21.lean` | proved |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
-### Next toward Theorem 2.1
-
-1. **M5–M6**: Newton degree ≤ 2B−1; build `K(X)` with `A(i) = −T_{i+1} D_λ(i)`; prove `K ≡ 0`
-2. Assemble `thm_2_1_full_column_rank`, then absolute Cor 2.1 via the existing bridge
-
-**Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form (also matches ClearedEq23).
+**Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign.
 
 ### Deferred (later sessions)
 

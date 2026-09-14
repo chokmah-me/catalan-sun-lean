@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a0d8-3187-7021-a0eb-850ec0d6e8c2",
+  "project": "C:\\Users\\Elke Shayna\\Documents\\00Dev\\catalan-sun-lean",
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 5998,
+  "build_ms": 63842,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -343,10 +343,162 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonDiff.newtonInterpolant",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonDiff.eval_newtonInterpolant",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonDiff.natDegree_newtonInterpolant_of_high_vanishing",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.natDegree_G0",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.G0_dvd_Dlam",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.G0_dvd_shiftPoly_Dlam",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.Dlam_eval_neg_three_halves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.exists_poly_natDegree_le_two_B_sub_one_of_column_dep",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.exists_Apoly_of_column_dep",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.Kpoly_eq_zero_of_column_dep",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.oddLin_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.Lpoly_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.Epoly_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.eval_Pstar_at_oddLin_root",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.Pstar_ne_zero_of_lam_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.Dlam_ne_zero_of_lam_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.clearedEq23_of_Kpoly_eq_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.thm_2_1_full_column_rank",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.cor_2_1",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T17:25:12.242710+00:00",
+  "timestamp_utc": "2026-09-14T19:29:46.427926+00:00",
   "status": "pass"
 }

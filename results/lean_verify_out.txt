@@ -1,16 +1,23 @@
 lean-proof-forge verify  ok=True  exit=0
-project: C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a0d8-3187-7021-a0eb-850ec0d6e8c2
+project: C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean
 lake: C:\Users\Elke Shayna\.elan\bin\lake.EXE
 target: (default)
 build_exit: 0
-build_ms: 5998
+build_ms: 63842
 sorry_hits: 0
 native_decide_hits: 0
-axiom_entries: 42
+axiom_entries: 61
 axiom_violations: 0
 
 --- lake log (tail) ---
-ℹ [2897/2898] Replayed CatalanSun
+⚠ [2893/2898] Replayed CatalanSun.NewtonDiff
+warning: CatalanSun/NewtonDiff.lean:201:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2894/2898] Built CatalanSun.Rank (18s)
+✔ [2895/2898] Built CatalanSun.Structure (24s)
+✔ [2896/2898] Built CatalanSun.Thm21 (19s)
+ℹ [2897/2898] Built CatalanSun (13s)
 info: CatalanSun.lean:29:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:30:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:31:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -57,4 +64,28 @@ info: CatalanSun.lean:67:0: 'CatalanSun.Structure.natDegree_Plam_le' depends on 
 info: CatalanSun.lean:68:0: 'CatalanSun.Structure.eval_Plam' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:69:0: 'CatalanSun.Structure.eval_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:70:0: 'CatalanSun.Thm21.fSeq_eq_neg_tail_succ_mul_Dlam_add_Plam' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:71:0: 'CatalanSun.NewtonDiff.newtonInterpolant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:72:0: 'CatalanSun.NewtonDiff.eval_newtonInterpolant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:73:0: 'CatalanSun.NewtonDiff.natDegree_newtonInterpolant_of_high_vanishing' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CatalanSun.lean:74:0: 'CatalanSun.Structure.natDegree_G0' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:75:0: 'CatalanSun.Structure.G0_dvd_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:76:0: 'CatalanSun.Structure.G0_dvd_shiftPoly_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:77:0: 'CatalanSun.Structure.Dlam_eval_neg_three_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:78:0: 'CatalanSun.Thm21.exists_poly_natDegree_le_two_B_sub_one_of_column_dep' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CatalanSun.lean:79:0: 'CatalanSun.Thm21.exists_Apoly_of_column_dep' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:80:0: 'CatalanSun.Thm21.Kpoly_eq_zero_of_column_dep' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:81:0: 'CatalanSun.Structure.oddLin_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:82:0: 'CatalanSun.Structure.Lpoly_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:83:0: 'CatalanSun.Structure.Epoly_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:84:0: 'CatalanSun.Structure.eval_Pstar_at_oddLin_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:85:0: 'CatalanSun.Structure.Pstar_ne_zero_of_lam_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:86:0: 'CatalanSun.Structure.Dlam_ne_zero_of_lam_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:87:0: 'CatalanSun.Thm21.clearedEq23_of_Kpoly_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:88:0: 'CatalanSun.Thm21.thm_2_1_full_column_rank' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:89:0: 'CatalanSun.Thm21.cor_2_1' depends on axioms: [propext, Classical.choice, Quot.sound]
 Build completed successfully (2898 jobs).
+warning: mathlib: repository 'C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean\.lake/packages\mathlib' has local changes

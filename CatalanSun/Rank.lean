@@ -9,8 +9,8 @@
   that turns Theorem 2.1 into Corollary 2.1.
 
   This file proves the bridge and the *conditional* Corollary 2.1 (assuming the
-  rank hypothesis). It does **not** prove Theorem 2.1 itself, nor the absolute
-  form of Corollary 2.1.
+  rank hypothesis). Absolute Theorem 2.1 / Corollary 2.1 live in `Thm21.lean`
+  (import cycle: `Thm21` already imports this file).
 -/
 
 import CatalanSun.Residual
@@ -143,9 +143,8 @@ theorem cor_2_1_of_thm_2_1 {B S : ℕ} (_h : S < B) (_hS : 0 < S)
 
 /-! ### Theorem 2.1 status
 
-Paper Theorem 2.1 (`thm_2_1_full_column_rank`) is **not** proved in this file.
-Intermediate milestones live in `NewtonDiff.lean`, `FunctionalEq.lean` (M7),
-and `Thm21.lean`. Absolute Corollary 2.1 remains open until the rank theorem
-is kernel-green. -/
+Paper Theorem 2.1 (`thm_2_1_full_column_rank`) and absolute Corollary 2.1
+(`cor_2_1`) are proved in `Thm21.lean` (M8 assembly). This file keeps the
+rank↔kernel bridge and the conditional `cor_2_1_of_thm_2_1`. -/
 
 end CatalanSun.Rank
