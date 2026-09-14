@@ -5,22 +5,27 @@
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 
-## What landed (rank bridge session)
+## What landed (Thm 2.1 milestone session)
 
-`CatalanSun/Rank.lean`:
+Sorry-free prefix toward Theorem 2.1 (adversarial verifier PASS; lake build green;
+axioms ⊆ classical three):
 
-- `RmatrixFin B S` — Mathlib packaging of `Residual.Rmatrix` as
-  `Matrix (Fin (S+3)) (Fin S) ℝ` with paper column indexing `j ↦ j+1`.
-- **Proved** (sorry-free): abstract bridge
-  `exists_nonvanishing_minor_of_full_column_rank` —
-  full column rank ⇒ injective row reindexing with nonzero square minor.
-- **Proved** (sorry-free): `cor_2_1_of_thm_2_1` — Corollary 2.1 **conditional**
-  on the rank hypothesis `(RmatrixFin B S).rank = Fintype.card (Fin S)`.
+- **M0** (`CatalanSun/Rank.lean`): `rank_eq_card_iff_mulVec_injective`,
+  `exists_nontrivial_column_dependence_of_rank_lt`
+- **M1–M2** (`CatalanSun/NewtonDiff.lean`, new): paper alternating binomial sum
+  vanishes for `natDegree p < n`; `paperFwdDiff`; Pochhammer/choose helpers
+- **M3** (`CatalanSun/Thm21.lean`, new): column dependence ⇒
+  `paperFwdDiff fSeq n = 0` for all `2B ≤ n ≤ 2B+S+2`
+- **M7** (`CatalanSun/FunctionalEq.lean`): `ClearedEq23` (cleared `(2X+3)²` form),
+  `clearedEq23_to_clearedEq` via `z = X+3/2`, and
+  `no_clearedEq23_solution` / `_complex` / `_real`
+
+Still present from prior session: `RmatrixFin`, rank→minor bridge,
+conditional `cor_2_1_of_thm_2_1`.
 
 **Explicit non-claims:** Theorem 2.1 (`thm_2_1_full_column_rank`) is **not**
-proved. Absolute Corollary 2.1 (existence of a nonvanishing minor without
-assuming rank) is **not** claimed. Do not write “Corollary 2.1 proved” in
-README/memory until Theorem 2.1 is kernel-green.
+proved. Absolute Corollary 2.1 is **not** claimed. Do not write “Corollary 2.1 proved”
+until Theorem 2.1 is kernel-green.
 
 ## Prior session context
 
@@ -31,7 +36,8 @@ theorem no_rational_solution (P Q : ℚ[X]) (hQ : Q ≠ 0) : ¬ ClearedEq P Q
 ```
 
 i.e. no nonzero rational function `P/Q` satisfies the cleared form of Sun's
-functional equation. This is the obstruction Theorem 2.1 will use.
+functional equation. This is the obstruction Theorem 2.1 will use (now also via
+`no_clearedEq23_solution_real` for the paper's `(2X+3)²` form).
 
 ## What's already in the repo
 
@@ -39,26 +45,29 @@ functional equation. This is the obstruction Theorem 2.1 will use.
 - `CatalanSun/TwoAdic.lean` — P1, 2-adic toolkit. Done (toolkit only).
 - `CatalanSun/Cauchy.lean` — P2, Cauchy determinant for `n ≤ 2` only.
   **General-`n` Cauchy determinant is NOT proved.**
-- `CatalanSun/FunctionalEq.lean` — P3, full `no_rational_solution`. Done.
+- `CatalanSun/FunctionalEq.lean` — P3, full `no_rational_solution` + M7 ClearedEq23. Done.
 - `CatalanSun/Tail.lean` — Sun eq. 1.4. Done, sorry-free.
 - `CatalanSun/Residual.lean` — residual entries `R_{α,j}` (eq. 2.1); **entry-level**
   Lemma 5.4. Done. **Det-level Lemma 5.4 is NOT here.**
-- `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1.
-  Done. **Theorem 2.1 / absolute Cor 2.1 are NOT here.**
+- `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1; M0. Done.
+- `CatalanSun/NewtonDiff.lean` — M1–M2 finite-diff / Newton helpers. Done.
+- `CatalanSun/Thm21.lean` — M3 dependence ⇒ vanishing Δ. Done.
+  **Theorem 2.1 / absolute Cor 2.1 are NOT here.**
 
-## Next increment: Theorem 2.1 (full column rank)
+## Next increment: finish Theorem 2.1 (M4–M6 + assemble)
 
-**Paper statement:** for integers `B > S > 0`,
+**Still open:** for integers `B > S > 0`,
 `(RmatrixFin B S).rank = Fintype.card (Fin S)`.
 
-Once that is proved, absolute Corollary 2.1 is the one-liner
-`cor_2_1_of_thm_2_1 h hS (thm_2_1_full_column_rank h hS)`.
+Remaining paper steps:
 
-Informal argument: a nontrivial column dependence of `R` would produce a
-nonzero rational function solving the functional equation ruled out by
-`no_rational_solution`. Intermediate paper steps (finite-diff vanishing for
-deg ≤ 2B−3 polys; `f_i` / `D_λ` / `P_λ`; Newton degree; `K(X)` zeros + deg ≤ 4B
-contradiction) are still open formalization work.
+1. **M4 (hardest):** structure `f_i = T_i D_λ(i) + P_λ(i)` with
+   `deg D_λ ≤ 2B−1`, `deg P_λ ≤ 2B−3`
+2. **M5:** Newton interpolant through `f_0..f_{2B+S+2}` has `deg ≤ 2B−1`
+3. **M6:** build `K(X)`; prove `K ≡ 0` (too many zeros vs deg ≤ 4B)
+4. **M8:** `K ≡ 0` + M7 ⇒ contradict nontrivial dependence ⇒
+   `thm_2_1_full_column_rank`; then absolute Cor 2.1 via
+   `cor_2_1_of_thm_2_1 h hS (thm_2_1_full_column_rank h hS)`
 
 **Target Lean statement** (document only until proved — no `sorry`):
 

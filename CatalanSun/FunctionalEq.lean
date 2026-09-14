@@ -20,6 +20,7 @@ import Mathlib.Data.Set.Finite.Lemmas
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.FieldSimp
 
 set_option linter.style.header false
 
@@ -303,5 +304,129 @@ theorem no_rational_solution (P Q : ℚ[X]) (hQ : Q ≠ 0) : ¬ ClearedEq P Q :=
     simpa [Polynomial.map_mul, Polynomial.map_add, Polynomial.map_pow,
       Polynomial.map_C, Polynomial.map_X, shiftPoly_map] using hh
   exact no_rational_solution_complex' (P.map f) (Q.map f) hQmap hClearedEqC
+
+/-! ## M7: `(2X+3)` form → existing `ClearedEq`
+
+Paper translation `z = X + 3/2` converts
+`R(X) + R(X+1) = 1/(2X+3)²` into `S₀(z) + S₀(z+1) = 1/(4z²)`.
+Cleared polynomial forms of both equations are related by composition with
+`X - 3/2`. -/
+
+/-- Cleared form of `A/D + A(X+1)/D(X+1) = 1/(2X+3)²`. -/
+def ClearedEq23 (A D : K[X]) : Prop :=
+  (2 * X + C (3 : K)) ^ 2 * (A * shiftPoly D + shiftPoly A * D) = D * shiftPoly D
+
+/-- Translation polynomial `X - 3/2`. -/
+noncomputable def translateHalf : K[X] := X - C (3 / 2 : K)
+
+omit [CharZero K] in
+theorem translateHalf_eq_X_add : translateHalf (K := K) = X + C (-(3 / 2) : K) := by
+  simp [translateHalf, sub_eq_add_neg]
+
+omit [CharZero K] in
+/-- Composition with `X - 3/2` is injective on polynomials. -/
+theorem comp_translateHalf_eq_zero_iff {p : K[X]} :
+    p.comp (translateHalf (K := K)) = 0 ↔ p = 0 := by
+  rw [translateHalf_eq_X_add]
+  exact Polynomial.comp_X_add_C_eq_zero_iff
+
+omit [CharZero K] in
+theorem comp_translateHalf_ne_zero_iff {p : K[X]} :
+    p.comp (translateHalf (K := K)) ≠ 0 ↔ p ≠ 0 :=
+  comp_translateHalf_eq_zero_iff.not
+
+private theorem two_mul_three_div_two : (2 : K) * (3 / 2) = 3 := by
+  field_simp
+
+/-- Linear factor pulls back: `(2X+3).comp (X - 3/2) = 2X`. -/
+theorem twoX_plus_three_comp_translateHalf :
+    (2 * X + C (3 : K)).comp (translateHalf (K := K)) = 2 * X := by
+  have h2 : (2 : K[X]) = C (2 : K) := (C_eq_natCast (R := K) 2).symm
+  have hcoeff : (2 : K) * (3 / 2) = 3 := two_mul_three_div_two (K := K)
+  rw [translateHalf]
+  conv_lhs => rw [h2]
+  rw [add_comp, mul_comp, X_comp, C_comp, C_comp, mul_sub, ← C_mul, hcoeff]
+  -- C 2 * X - C 3 + C 3 = C 2 * X = 2 * X
+  rw [h2]
+  ring
+
+/-- `(2X+3)²` pulls back under `X ↦ X - 3/2` to `4X²`. -/
+theorem twoX_plus_three_sq_comp_translateHalf :
+    ((2 * X + C (3 : K)) ^ 2).comp (translateHalf (K := K)) =
+      C (4 : K) * X ^ 2 := by
+  rw [pow_two, mul_comp, twoX_plus_three_comp_translateHalf]
+  -- (2X)*(2X) = 4 X², and `4 = C 4` as polynomials.
+  have h4 : (4 : K[X]) = C (4 : K) := (C_eq_natCast (R := K) 4).symm
+  rw [show (2 * X) * (2 * X) = (4 : K[X]) * X ^ 2 by ring, h4]
+
+omit [CharZero K] in
+/-- `shiftPoly` intertwines with composition by `translateHalf`. -/
+theorem shiftPoly_comp_translateHalf (p : K[X]) :
+    shiftPoly (p.comp (translateHalf (K := K))) =
+      (shiftPoly p).comp (translateHalf (K := K)) := by
+  simp only [shiftPoly, translateHalf, comp_assoc]
+  congr 1
+  simp [sub_comp, add_comp, X_comp, C_comp]
+  ring
+
+/-- **M7 bridge.** A `ClearedEq23` solution transports to a `ClearedEq` solution
+via `z = X + 3/2`. -/
+theorem clearedEq23_to_clearedEq {A D : K[X]} (h : ClearedEq23 A D) :
+    ClearedEq (A.comp (translateHalf (K := K))) (D.comp (translateHalf (K := K))) := by
+  unfold ClearedEq ClearedEq23 at *
+  have hh := congrArg (fun p : K[X] => p.comp (translateHalf (K := K))) h
+  simp only [mul_comp, add_comp] at hh
+  rw [twoX_plus_three_sq_comp_translateHalf] at hh
+  rw [← shiftPoly_comp_translateHalf A, ← shiftPoly_comp_translateHalf D] at hh
+  exact hh
+
+/-- No `ClearedEq23` solution over ℂ with nonzero denominator. -/
+theorem no_clearedEq23_solution_complex (A D : ℂ[X]) (hD : D ≠ 0) :
+    ¬ ClearedEq23 A D := by
+  intro h
+  have hClearedEq := clearedEq23_to_clearedEq (K := ℂ) h
+  have hQ : D.comp (translateHalf (K := ℂ)) ≠ 0 :=
+    comp_translateHalf_ne_zero_iff.mpr hD
+  exact no_rational_solution_complex' _ _ hQ hClearedEq
+
+/-- No `ClearedEq23` solution over ℚ with nonzero denominator. -/
+theorem no_clearedEq23_solution (A D : ℚ[X]) (hD : D ≠ 0) : ¬ ClearedEq23 A D := by
+  intro h
+  have hClearedEq := clearedEq23_to_clearedEq (K := ℚ) h
+  have hQ : D.comp (translateHalf (K := ℚ)) ≠ 0 :=
+    comp_translateHalf_ne_zero_iff.mpr hD
+  exact no_rational_solution _ _ hQ hClearedEq
+
+/-- ℝ → ℂ transport for `shiftPoly`. -/
+theorem shiftPoly_map_real (f : ℝ →+* ℂ) (p : ℝ[X]) :
+    (shiftPoly p).map f = shiftPoly (p.map f) := by
+  unfold shiftPoly
+  rw [Polynomial.map_comp]
+  congr 1
+  simp
+
+-- Mapping ClearedEq23 along ℝ→ℂ expands several polynomial maps (heavy `map_*`).
+set_option maxHeartbeats 800000 in
+-- reason: Polynomial.map unfolding on ClearedEq23 exceeds the default heartbeat budget
+theorem clearedEq23_map {A D : ℝ[X]} (h : ClearedEq23 A D) (f : ℝ →+* ℂ) :
+    ClearedEq23 (A.map f) (D.map f) := by
+  unfold ClearedEq23 at h ⊢
+  have hh := congrArg (Polynomial.map f) h
+  rw [Polynomial.map_mul, Polynomial.map_mul, Polynomial.map_add,
+    Polynomial.map_mul, Polynomial.map_mul, Polynomial.map_pow,
+    Polynomial.map_add, Polynomial.map_mul, Polynomial.map_X, Polynomial.map_C,
+    shiftPoly_map_real, shiftPoly_map_real] at hh
+  -- `map f (2 * X)` = `2 * X` over ℂ after casting the coefficient 2.
+  convert hh using 1
+  all_goals simp [map_ofNat]
+
+/-- No `ClearedEq23` solution over ℝ with nonzero denominator. -/
+theorem no_clearedEq23_solution_real (A D : ℝ[X]) (hD : D ≠ 0) :
+    ¬ ClearedEq23 A D := by
+  intro h
+  set f : ℝ →+* ℂ := algebraMap ℝ ℂ
+  have hfinj : Function.Injective f := FaithfulSMul.algebraMap_injective ℝ ℂ
+  have hDmap : D.map f ≠ 0 := (Polynomial.map_ne_zero_iff hfinj).mpr hD
+  exact no_clearedEq23_solution_complex (A.map f) (D.map f) hDmap (clearedEq23_map h f)
 
 end CatalanSun.FunctionalEq

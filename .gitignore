@@ -2,3 +2,5 @@
 /build/
 *.olean
 results/lake_build*.txt
+
+.scratchpad/

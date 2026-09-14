@@ -20,6 +20,8 @@ import CatalanSun.FunctionalEq
 import CatalanSun.Tail
 import CatalanSun.Residual
 import CatalanSun.Rank
+import CatalanSun.NewtonDiff
+import CatalanSun.Thm21
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -35,6 +37,8 @@ import CatalanSun.Rank
 #print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
 #print axioms CatalanSun.FunctionalEq.no_polynomial_cleared_solution
 #print axioms CatalanSun.FunctionalEq.no_rational_solution
+#print axioms CatalanSun.FunctionalEq.no_clearedEq23_solution
+#print axioms CatalanSun.FunctionalEq.no_clearedEq23_solution_real
 #print axioms CatalanSun.Cauchy.lemma_4_2_S_one
 #print axioms CatalanSun.Tail.summable_tailTerm
 #print axioms CatalanSun.Tail.tail_pos
@@ -47,3 +51,9 @@ import CatalanSun.Rank
 #print axioms CatalanSun.Residual.lemma_5_4_entry
 #print axioms CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank
 #print axioms CatalanSun.Rank.cor_2_1_of_thm_2_1
+#print axioms CatalanSun.Rank.rank_eq_card_iff_mulVec_injective
+#print axioms CatalanSun.Rank.exists_nontrivial_column_dependence_of_rank_lt
+#print axioms CatalanSun.NewtonDiff.alternating_binomial_sum_eval_eq_zero
+#print axioms CatalanSun.NewtonDiff.paperFwdDiff_eq_zero_of_poly
+#print axioms CatalanSun.Thm21.column_dep_high_fwdDiff_eq_zero
+#print axioms CatalanSun.Thm21.exists_column_dep_with_vanishing_fwdDiff

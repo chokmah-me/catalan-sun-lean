@@ -1,42 +1,51 @@
 lean-proof-forge verify  ok=True  exit=0
-project: C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean
+project: C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a072-da8e-75c0-bb44-5fbe01f26464
 lake: C:\Users\Elke Shayna\.elan\bin\lake.EXE
 target: (default)
 build_exit: 0
-build_ms: 32334
+build_ms: 4498
 sorry_hits: 0
 native_decide_hits: 0
-axiom_entries: 24
+axiom_entries: 32
 axiom_violations: 0
 
 --- lake log (tail) ---
-✔ [2892/2894] Built CatalanSun.Rank (13s)
-ℹ [2893/2894] Built CatalanSun (14s)
-info: CatalanSun.lean:26:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:27:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:28:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:29:0: 'CatalanSun.TwoAdic.isTwoIntegral_of_odd_den' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:30:0: 'CatalanSun.TwoAdic.odd_PiFactor' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:31:0: 'CatalanSun.Cauchy.det_cauchy_fin_one' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:32:0: 'CatalanSun.Cauchy.det_cauchy_fin_two' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:33:0: 'CatalanSun.Cauchy.oddDenom_cast_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:34:0: 'CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:35:0: 'CatalanSun.FunctionalEq.no_constant_denom_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:36:0: 'CatalanSun.FunctionalEq.no_polynomial_cleared_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:37:0: 'CatalanSun.FunctionalEq.no_rational_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:38:0: 'CatalanSun.Cauchy.lemma_4_2_S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:39:0: 'CatalanSun.Tail.summable_tailTerm' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:40:0: 'CatalanSun.Tail.tail_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:41:0: 'CatalanSun.Tail.tail_add_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:42:0: 'CatalanSun.Tail.tail_lt_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:43:0: 'CatalanSun.Residual.ratWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:44:0: 'CatalanSun.Residual.ratWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:45:0: 'CatalanSun.Residual.RmatrixRatWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:46:0: 'CatalanSun.Residual.RmatrixRatWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:47:0: 'CatalanSun.Residual.lemma_5_4_entry' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:48:0: 'CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank' depends on axioms: [propext,
+ℹ [2896/2897] Replayed CatalanSun
+info: CatalanSun.lean:28:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:29:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:30:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:31:0: 'CatalanSun.TwoAdic.isTwoIntegral_of_odd_den' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:32:0: 'CatalanSun.TwoAdic.odd_PiFactor' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:33:0: 'CatalanSun.Cauchy.det_cauchy_fin_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:34:0: 'CatalanSun.Cauchy.det_cauchy_fin_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:35:0: 'CatalanSun.Cauchy.oddDenom_cast_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:36:0: 'CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:37:0: 'CatalanSun.FunctionalEq.no_constant_denom_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:38:0: 'CatalanSun.FunctionalEq.no_polynomial_cleared_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:39:0: 'CatalanSun.FunctionalEq.no_rational_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:40:0: 'CatalanSun.FunctionalEq.no_clearedEq23_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:41:0: 'CatalanSun.FunctionalEq.no_clearedEq23_solution_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:42:0: 'CatalanSun.Cauchy.lemma_4_2_S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:43:0: 'CatalanSun.Tail.summable_tailTerm' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:44:0: 'CatalanSun.Tail.tail_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:45:0: 'CatalanSun.Tail.tail_add_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:46:0: 'CatalanSun.Tail.tail_lt_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:47:0: 'CatalanSun.Residual.ratWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:48:0: 'CatalanSun.Residual.ratWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:49:0: 'CatalanSun.Residual.RmatrixRatWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:50:0: 'CatalanSun.Residual.RmatrixRatWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:51:0: 'CatalanSun.Residual.lemma_5_4_entry' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:52:0: 'CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: CatalanSun.lean:49:0: 'CatalanSun.Rank.cor_2_1_of_thm_2_1' depends on axioms: [propext, Classical.choice, Quot.sound]
-Build completed successfully (2894 jobs).
-warning: mathlib: repository 'C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean\.lake/packages\mathlib' has local changes
+info: CatalanSun.lean:53:0: 'CatalanSun.Rank.cor_2_1_of_thm_2_1' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:54:0: 'CatalanSun.Rank.rank_eq_card_iff_mulVec_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:55:0: 'CatalanSun.Rank.exists_nontrivial_column_dependence_of_rank_lt' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CatalanSun.lean:56:0: 'CatalanSun.NewtonDiff.alternating_binomial_sum_eval_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:57:0: 'CatalanSun.NewtonDiff.paperFwdDiff_eq_zero_of_poly' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:58:0: 'CatalanSun.Thm21.column_dep_high_fwdDiff_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:59:0: 'CatalanSun.Thm21.exists_column_dep_with_vanishing_fwdDiff' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (2897 jobs).
+warning: mathlib: repository 'C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a072-da8e-75c0-bb44-5fbe01f26464\.lake/packages\mathlib' has local changes
