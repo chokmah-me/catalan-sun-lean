@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 63842,
+  "build_ms": 4021,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -495,10 +495,74 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.det_DiffMat",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.isUnit_det_DiffMat",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.det_powerDiffBlock_Dref",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.alternating_sum_choose",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.DiffMat_mulVec_binomCol",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.det_Atilde_eq_Pi_mul_det_Ahat",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.DiffMat_mulVec_Pi_u_eq_Rmatrix",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.F_B_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T19:29:46.427926+00:00",
+  "timestamp_utc": "2026-09-14T20:12:20.959805+00:00",
   "status": "pass"
 }

@@ -73,9 +73,15 @@ Scratchpad: `.scratchpad/geneval-m8/`.
 
 ## Known gap after Theorem 2.1
 
-Proposition 3.1 / det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2)
-has **no Cauchy–Binet** and **no general-`n` Cauchy determinant**. Those each
-need substantial from-scratch work — treat as separate multi-session efforts.
+**Prop 3.1 scaffolding landed** in `CatalanSun/NewtonCompletion.lean` (sorry-free
+prefix: `Ndim`/`Dref`/`F_B`, `DiffMat` + det ±1, power-block pivots ±r! with
+`det = (-1)^{B(2B-1)} F_B`, binomial → signed unit vectors, `OmittedRows` /
+`Atilde` / `Ahat` defs + row-scale det, optional residual-row bridge). The full
+identity `det Atilde = ± F_B · det R[A,J]` remains open.
+
+Det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2) has **no
+Cauchy–Binet** and **no general-`n` Cauchy determinant**. Those each need
+substantial from-scratch work — treat as separate multi-session efforts.
 
 ## Process notes
 

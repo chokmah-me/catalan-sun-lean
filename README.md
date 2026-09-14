@@ -29,6 +29,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | Thm 2.1 / M6 | `Kpoly ≡ 0` under column dep (ℕ zeros + `G0 ∣ K` + `K(−3/2)=0`) | `Structure` / `Thm21` | proved |
 | **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | `Thm21.lean` | proved |
 | **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | `Thm21.lean` | proved |
+| Prop 3.1 scaffolding | `DiffMat`, power pivots `±r!`, binom→signed unit, `Atilde`/`Ahat` defs + row-scale det | `NewtonCompletion.lean` | scaffolding (not full Prop 3.1) |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -38,7 +39,8 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Deferred (later sessions)
 
-Det-level Lemma 5.4 / Theorem 5.1 (needs Pascal–Cauchy factorization, §§2–4);
+Full Prop 3.1 identity `det Atilde = ± F_B · det R[A,J]` (permutation + 3× Laplace);
+det-level Lemma 5.4 / Theorem 5.1 (needs Pascal–Cauchy factorization, §§2–4);
 general-`n` Cauchy determinant; Cauchy–Binet (not in Mathlib v4.32.2);
 Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 

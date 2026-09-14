@@ -21,6 +21,7 @@ import CatalanSun.Tail
 import CatalanSun.Residual
 import CatalanSun.Rank
 import CatalanSun.NewtonDiff
+import CatalanSun.NewtonCompletion
 import CatalanSun.Thm21
 import CatalanSun.Structure
 
@@ -87,3 +88,11 @@ import CatalanSun.Structure
 #print axioms CatalanSun.Thm21.clearedEq23_of_Kpoly_eq_zero
 #print axioms CatalanSun.Thm21.thm_2_1_full_column_rank
 #print axioms CatalanSun.Thm21.cor_2_1
+#print axioms CatalanSun.NewtonCompletion.det_DiffMat
+#print axioms CatalanSun.NewtonCompletion.isUnit_det_DiffMat
+#print axioms CatalanSun.NewtonCompletion.det_powerDiffBlock_Dref
+#print axioms CatalanSun.NewtonCompletion.alternating_sum_choose
+#print axioms CatalanSun.NewtonCompletion.DiffMat_mulVec_binomCol
+#print axioms CatalanSun.NewtonCompletion.det_Atilde_eq_Pi_mul_det_Ahat
+#print axioms CatalanSun.NewtonCompletion.DiffMat_mulVec_Pi_u_eq_Rmatrix
+#print axioms CatalanSun.NewtonCompletion.F_B_ne_zero
