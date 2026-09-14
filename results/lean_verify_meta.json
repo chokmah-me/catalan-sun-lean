@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a072-da8e-75c0-bb44-5fbe01f26464",
+  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a0d8-3187-7021-a0eb-850ec0d6e8c2",
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 4498,
+  "build_ms": 5998,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -161,6 +161,38 @@
       ]
     },
     {
+      "theorem": "CatalanSun.Tail.tail_shift",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Tail.weightedTail_shift",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Tail.tail_shift_succ",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Tail.weightedTail_shift_succ",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
       "theorem": "CatalanSun.Residual.ratWitness_eq",
       "axioms": [
         "propext",
@@ -263,10 +295,58 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.natDegree_Dlam_le",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.PiFactor_eq_eval_Lpoly_mul_Epoly_sq",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.natDegree_Plam_le",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.eval_Plam",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Structure.eval_Dlam",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm21.fSeq_eq_neg_tail_succ_mul_Dlam_add_Plam",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T15:44:52.463248+00:00",
+  "timestamp_utc": "2026-09-14T17:25:12.242710+00:00",
   "status": "pass"
 }

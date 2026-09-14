@@ -207,4 +207,121 @@ theorem tail_recurrence_paper_form (m : ℕ) :
   unfold oddReal
   ring
 
+/-! ## Finite shift expansion (paper eq. (2.3))
+
+Iterating `tail_add_succ` yields the closed form used in Theorem 2.1's
+structure argument. -/
+
+private theorem neg_neg_one_pow_succ (n : ℕ) :
+    -((-1 : ℝ) ^ n) = (-1 : ℝ) ^ (n + 1) := by
+  rw [pow_succ]; ring
+
+/-- For `k < n`, `-(-1)^{n-1-k} = (-1)^{n-k}`. -/
+private theorem neg_neg_one_pow_sub {n k : ℕ} (hk : k < n) :
+    -((-1 : ℝ) ^ (n - 1 - k)) = (-1 : ℝ) ^ (n - k) := by
+  have h1 : n - 1 - k + 1 = n - k := by omega
+  calc -((-1 : ℝ) ^ (n - 1 - k))
+      = (-1 : ℝ) * (-1 : ℝ) ^ (n - 1 - k) := by ring
+    _ = (-1 : ℝ) ^ (n - 1 - k) * (-1 : ℝ) := by rw [mul_comm]
+    _ = (-1 : ℝ) ^ (n - 1 - k + 1) := by rw [← pow_succ]
+    _ = (-1 : ℝ) ^ (n - k) := by rw [h1]
+
+/-- Paper (2.3): `T_{i+j} = (-1)^j T_i + ∑_{k<j} (-1)^{j-1-k} / (2(i+k)+1)²`. -/
+theorem tail_shift (i j : ℕ) :
+    tail (i + j) =
+      (-1 : ℝ) ^ j * tail i +
+        ∑ k ∈ Finset.range j, (-1 : ℝ) ^ (j - 1 - k) / oddReal (i + k) ^ 2 := by
+  induction j with
+  | zero =>
+    simp
+  | succ j ih =>
+    have hsucc :
+        tail (i + j + 1) = 1 / oddReal (i + j) ^ 2 - tail (i + j) := by
+      linarith [tail_add_succ (i + j)]
+    have hidx : i + (j + 1) = i + j + 1 := by omega
+    rw [hidx, hsucc, ih]
+    set sOld := ∑ k ∈ Finset.range j,
+      (-1 : ℝ) ^ (j - 1 - k) / oddReal (i + k) ^ 2
+    set sNew := ∑ k ∈ Finset.range j,
+      (-1 : ℝ) ^ (j - k) / oddReal (i + k) ^ 2
+    have hsum : -sOld = sNew := by
+      dsimp [sOld, sNew]
+      rw [← Finset.sum_neg_distrib]
+      refine Finset.sum_congr rfl fun k hk => ?_
+      have hk' : k < j := Finset.mem_range.mp hk
+      calc -((-1 : ℝ) ^ (j - 1 - k) / oddReal (i + k) ^ 2)
+          = (-((-1 : ℝ) ^ (j - 1 - k))) / oddReal (i + k) ^ 2 := by ring
+        _ = (-1 : ℝ) ^ (j - k) / oddReal (i + k) ^ 2 := by
+              rw [neg_neg_one_pow_sub hk']
+    have hlast :
+        (-1 : ℝ) ^ (j - j) / oddReal (i + j) ^ 2 = 1 / oddReal (i + j) ^ 2 := by
+      simp
+    calc
+      1 / oddReal (i + j) ^ 2 - ((-1 : ℝ) ^ j * tail i + sOld)
+          = (-1 : ℝ) ^ (j + 1) * tail i + (sNew + 1 / oddReal (i + j) ^ 2) := by
+              have ht : -((-1 : ℝ) ^ j * tail i) =
+                  (-1 : ℝ) ^ (j + 1) * tail i := by
+                calc -((-1 : ℝ) ^ j * tail i)
+                    = (-((-1 : ℝ) ^ j)) * tail i := by ring
+                  _ = (-1 : ℝ) ^ (j + 1) * tail i := by
+                        rw [neg_neg_one_pow_succ]
+              -- 1/a² - (c + sOld) = 1/a² + (-c) + (-sOld)
+              calc
+                1 / oddReal (i + j) ^ 2 - ((-1 : ℝ) ^ j * tail i + sOld)
+                    = 1 / oddReal (i + j) ^ 2 +
+                        -((-1 : ℝ) ^ j * tail i) + -sOld := by ring
+                _ = 1 / oddReal (i + j) ^ 2 +
+                      (-1 : ℝ) ^ (j + 1) * tail i + sNew := by
+                        rw [ht, hsum]
+                _ = (-1 : ℝ) ^ (j + 1) * tail i +
+                      (sNew + 1 / oddReal (i + j) ^ 2) := by ring
+      _ = (-1 : ℝ) ^ (j + 1) * tail i +
+            ∑ k ∈ Finset.range (j + 1),
+              (-1 : ℝ) ^ (j - k) / oddReal (i + k) ^ 2 := by
+          dsimp [sNew]
+          rw [Finset.sum_range_succ, hlast]
+      -- `j + 1 - 1 - k = j - k` definitionally, matching the goal exponent
+      _ = (-1 : ℝ) ^ (j + 1) * tail i +
+            ∑ k ∈ Finset.range (j + 1),
+              (-1 : ℝ) ^ (j + 1 - 1 - k) / oddReal (i + k) ^ 2 := rfl
+
+/-- Weighted form of (2.3): expand `u_{i+j}` through `T_i` and a rational remainder. -/
+theorem weightedTail_shift (i j : ℕ) :
+    weightedTail (i + j) =
+      (-1 : ℝ) ^ j * tail i / oddReal (i + j) +
+        (1 / oddReal (i + j)) *
+          ∑ k ∈ Finset.range j, (-1 : ℝ) ^ (j - 1 - k) / oddReal (i + k) ^ 2 := by
+  unfold weightedTail
+  rw [tail_shift]
+  ring
+
+/-- Shift expansion based at `T_{i+1}` (for `j ≥ 1`).
+Remainder denominators are `oddReal (i+1+m)` with `m < j-1`, i.e. odd indices
+`≥ 2i+3`, matching factors inside `PiFactor` (`h ≥ 1`). -/
+theorem tail_shift_succ {i j : ℕ} (hj : 1 ≤ j) :
+    tail (i + j) =
+      (-1 : ℝ) ^ (j - 1) * tail (i + 1) +
+        ∑ m ∈ Finset.range (j - 1),
+          (-1 : ℝ) ^ (j - 2 - m) / oddReal (i + 1 + m) ^ 2 := by
+  -- Apply `tail_shift` at base `i+1` with length `j-1`
+  have hj' : j = j - 1 + 1 := (Nat.sub_add_cancel hj).symm
+  have hidx : i + j = (i + 1) + (j - 1) := by omega
+  rw [hidx, tail_shift (i + 1) (j - 1)]
+  -- Exponents: (j-1)-1-m = j-2-m when j ≥ 1
+  refine congrArg₂ _ rfl ?_
+  refine Finset.sum_congr rfl fun m hm => ?_
+  have : j - 1 - 1 - m = j - 2 - m := by omega
+  rw [this]
+
+/-- Weighted form of `tail_shift_succ`. -/
+theorem weightedTail_shift_succ {i j : ℕ} (hj : 1 ≤ j) :
+    weightedTail (i + j) =
+      (-1 : ℝ) ^ (j - 1) * tail (i + 1) / oddReal (i + j) +
+        (1 / oddReal (i + j)) *
+          ∑ m ∈ Finset.range (j - 1),
+            (-1 : ℝ) ^ (j - 2 - m) / oddReal (i + 1 + m) ^ 2 := by
+  unfold weightedTail
+  rw [tail_shift_succ hj]
+  ring
+
 end CatalanSun.Tail

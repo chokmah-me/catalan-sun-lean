@@ -23,7 +23,8 @@ yet claim Theorem 2.1 (full column rank) or absolute Corollary 2.1.
 | Thm 2.1 / M0 | Rank ↔ injective `mulVec` / nontrivial kernel | `CatalanSun/Rank.lean` | proved |
 | Thm 2.1 / M1–M2 | Finite-diff alternating sum vanishing; `paperFwdDiff` | `CatalanSun/NewtonDiff.lean` | proved |
 | Thm 2.1 / M3 | Column dependence ⇒ vanishing high Δ of `fSeq` | `CatalanSun/Thm21.lean` | proved |
-| **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | — | **open** (M4–M6 remain) |
+| Thm 2.1 / M4 | `f_i = −T_{i+1} D_λ(i) + P_λ(i)`; deg bounds (`Structure.lean`) | `Structure` / `Thm21` | proved (revised vs paper’s written `T_i` form) |
+| **Thm 2.1** | `(RmatrixFin B S).rank = S` for `B > S > 0` | — | **open** (M5–M6 remain) |
 | **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | — | **open** (needs Thm 2.1) |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
@@ -32,9 +33,10 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Next toward Theorem 2.1
 
-1. **M4** (hardest): structure `f_i = T_i D_λ(i) + P_λ(i)` with degree bounds
-2. **M5–M6**: Newton degree ≤ 2B−1; build `K(X)` and prove `K ≡ 0`
-3. Assemble `thm_2_1_full_column_rank`, then absolute Cor 2.1 via the existing bridge
+1. **M5–M6**: Newton degree ≤ 2B−1; build `K(X)` with `A(i) = −T_{i+1} D_λ(i)`; prove `K ≡ 0`
+2. Assemble `thm_2_1_full_column_rank`, then absolute Cor 2.1 via the existing bridge
+
+**Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form (also matches ClearedEq23).
 
 ### Deferred (later sessions)
 

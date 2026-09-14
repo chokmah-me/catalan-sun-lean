@@ -5,23 +5,28 @@
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 
-## What landed (Thm 2.1 milestone session)
+## What landed
 
 Sorry-free prefix toward Theorem 2.1 (adversarial verifier PASS; lake build green;
 axioms ⊆ classical three):
 
 - **M0** (`CatalanSun/Rank.lean`): `rank_eq_card_iff_mulVec_injective`,
   `exists_nontrivial_column_dependence_of_rank_lt`
-- **M1–M2** (`CatalanSun/NewtonDiff.lean`, new): paper alternating binomial sum
+- **M1–M2** (`CatalanSun/NewtonDiff.lean`): paper alternating binomial sum
   vanishes for `natDegree p < n`; `paperFwdDiff`; Pochhammer/choose helpers
-- **M3** (`CatalanSun/Thm21.lean`, new): column dependence ⇒
+- **M3** (`CatalanSun/Thm21.lean`): column dependence ⇒
   `paperFwdDiff fSeq n = 0` for all `2B ≤ n ≤ 2B+S+2`
-- **M7** (`CatalanSun/FunctionalEq.lean`): `ClearedEq23` (cleared `(2X+3)²` form),
-  `clearedEq23_to_clearedEq` via `z = X+3/2`, and
-  `no_clearedEq23_solution` / `_complex` / `_real`
+- **M4** (`CatalanSun/Structure.lean` + `Thm21` / `Tail`):
+  `Dlam`/`Plam`, deg bounds, and
+  `fSeq_eq_neg_tail_succ_mul_Dlam_add_Plam`:
+  `f_i = −T_{i+1} D_λ(i) + P_λ(i)`.
+  **Paper correction:** written `T_i` form is impossible for polynomial `P`
+  under `Π_i = ∏_{h=1}^B` (k=0 needs `(2i+1)²`); Lean uses `T_{i+1}`
+  (aligns with ClearedEq23 / `(2X+3)²`).
+- **M7** (`CatalanSun/FunctionalEq.lean`): `ClearedEq23`,
+  `clearedEq23_to_clearedEq`, `no_clearedEq23_solution_*`
 
-Still present from prior session: `RmatrixFin`, rank→minor bridge,
-conditional `cor_2_1_of_thm_2_1`.
+Still present: `RmatrixFin`, rank→minor bridge, conditional `cor_2_1_of_thm_2_1`.
 
 **Explicit non-claims:** Theorem 2.1 (`thm_2_1_full_column_rank`) is **not**
 proved. Absolute Corollary 2.1 is **not** claimed. Do not write “Corollary 2.1 proved”
@@ -51,23 +56,26 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
   Lemma 5.4. Done. **Det-level Lemma 5.4 is NOT here.**
 - `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1; M0. Done.
 - `CatalanSun/NewtonDiff.lean` — M1–M2 finite-diff / Newton helpers. Done.
-- `CatalanSun/Thm21.lean` — M3 dependence ⇒ vanishing Δ. Done.
+- `CatalanSun/Structure.lean` — M4 `Dlam`/`Plam` + degree bounds. Done.
+- `CatalanSun/Thm21.lean` — M3 + M4 structure identity (`−T_{i+1}` form). Done.
   **Theorem 2.1 / absolute Cor 2.1 are NOT here.**
 
-## Next increment: finish Theorem 2.1 (M4–M6 + assemble)
+## Next increment: finish Theorem 2.1 (M5–M6 + assemble)
 
 **Still open:** for integers `B > S > 0`,
 `(RmatrixFin B S).rank = Fintype.card (Fin S)`.
 
 Remaining paper steps:
 
-1. **M4 (hardest):** structure `f_i = T_i D_λ(i) + P_λ(i)` with
-   `deg D_λ ≤ 2B−1`, `deg P_λ ≤ 2B−3`
-2. **M5:** Newton interpolant through `f_0..f_{2B+S+2}` has `deg ≤ 2B−1`
-3. **M6:** build `K(X)`; prove `K ≡ 0` (too many zeros vs deg ≤ 4B)
-4. **M8:** `K ≡ 0` + M7 ⇒ contradict nontrivial dependence ⇒
+1. **M5:** Newton interpolant through `f_0..f_{2B+S+2}` has `deg ≤ 2B−1`
+   (use M3 vanishing + M4 structure)
+2. **M6:** set `A(i) = −T_{i+1} D_λ(i)` (or absorb sign into `D`);
+   build `K(X)` with `(2X+3)²`; prove `K ≡ 0` (too many zeros vs deg ≤ 4B)
+3. **M8:** `K ≡ 0` + M7 ⇒ contradict nontrivial dependence ⇒
    `thm_2_1_full_column_rank`; then absolute Cor 2.1 via
    `cor_2_1_of_thm_2_1 h hS (thm_2_1_full_column_rank h hS)`
+
+Scratchpad: `.scratchpad/geneval-m4/` (specs + verifier verdicts).
 
 **Target Lean statement** (document only until proved — no `sorry`):
 

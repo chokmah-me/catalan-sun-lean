@@ -22,6 +22,7 @@ import CatalanSun.Residual
 import CatalanSun.Rank
 import CatalanSun.NewtonDiff
 import CatalanSun.Thm21
+import CatalanSun.Structure
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -44,6 +45,10 @@ import CatalanSun.Thm21
 #print axioms CatalanSun.Tail.tail_pos
 #print axioms CatalanSun.Tail.tail_add_succ
 #print axioms CatalanSun.Tail.tail_lt_inv_sq
+#print axioms CatalanSun.Tail.tail_shift
+#print axioms CatalanSun.Tail.weightedTail_shift
+#print axioms CatalanSun.Tail.tail_shift_succ
+#print axioms CatalanSun.Tail.weightedTail_shift_succ
 #print axioms CatalanSun.Residual.ratWitness_eq
 #print axioms CatalanSun.Residual.ratWitness_twoIntegral
 #print axioms CatalanSun.Residual.RmatrixRatWitness_eq
@@ -57,3 +62,9 @@ import CatalanSun.Thm21
 #print axioms CatalanSun.NewtonDiff.paperFwdDiff_eq_zero_of_poly
 #print axioms CatalanSun.Thm21.column_dep_high_fwdDiff_eq_zero
 #print axioms CatalanSun.Thm21.exists_column_dep_with_vanishing_fwdDiff
+#print axioms CatalanSun.Structure.natDegree_Dlam_le
+#print axioms CatalanSun.Structure.PiFactor_eq_eval_Lpoly_mul_Epoly_sq
+#print axioms CatalanSun.Structure.natDegree_Plam_le
+#print axioms CatalanSun.Structure.eval_Plam
+#print axioms CatalanSun.Structure.eval_Dlam
+#print axioms CatalanSun.Thm21.fSeq_eq_neg_tail_succ_mul_Dlam_add_Plam
