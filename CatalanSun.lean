@@ -19,6 +19,7 @@ import CatalanSun.Cauchy
 import CatalanSun.FunctionalEq
 import CatalanSun.Tail
 import CatalanSun.Residual
+import CatalanSun.Rank
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -44,3 +45,5 @@ import CatalanSun.Residual
 #print axioms CatalanSun.Residual.RmatrixRatWitness_eq
 #print axioms CatalanSun.Residual.RmatrixRatWitness_twoIntegral
 #print axioms CatalanSun.Residual.lemma_5_4_entry
+#print axioms CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank
+#print axioms CatalanSun.Rank.cor_2_1_of_thm_2_1

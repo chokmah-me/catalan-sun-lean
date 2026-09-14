@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 3369,
+  "build_ms": 32334,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -97,6 +97,14 @@
       ]
     },
     {
+      "theorem": "CatalanSun.FunctionalEq.no_rational_solution",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
       "theorem": "CatalanSun.Cauchy.lemma_4_2_S_one",
       "axioms": [
         "propext",
@@ -175,10 +183,26 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Rank.cor_2_1_of_thm_2_1",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-11T22:14:42.994885+00:00",
+  "timestamp_utc": "2026-09-14T12:32:00.095218+00:00",
   "status": "pass"
 }
