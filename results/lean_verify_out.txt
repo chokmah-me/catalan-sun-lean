@@ -3,10 +3,10 @@ project: C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean
 lake: C:\Users\Elke Shayna\.elan\bin\lake.EXE
 target: (default)
 build_exit: 0
-build_ms: 4021
+build_ms: 39121
 sorry_hits: 0
 native_decide_hits: 0
-axiom_entries: 69
+axiom_entries: 76
 axiom_violations: 0
 
 --- lake log (tail) ---
@@ -14,7 +14,8 @@ axiom_violations: 0
 warning: CatalanSun/NewtonDiff.lean:201:4: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [2898/2899] Replayed CatalanSun
+✔ [2897/2899] Built CatalanSun.NewtonCompletion (19s)
+ℹ [2898/2899] Built CatalanSun (14s)
 info: CatalanSun.lean:30:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:31:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:32:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -92,5 +93,16 @@ info: CatalanSun.lean:95:0: 'CatalanSun.NewtonCompletion.DiffMat_mulVec_binomCol
 info: CatalanSun.lean:96:0: 'CatalanSun.NewtonCompletion.det_Atilde_eq_Pi_mul_det_Ahat' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:97:0: 'CatalanSun.NewtonCompletion.DiffMat_mulVec_Pi_u_eq_Rmatrix' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: CatalanSun.lean:98:0: 'CatalanSun.NewtonCompletion.F_B_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:99:0: 'CatalanSun.NewtonCompletion.selectedFinset_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:100:0: 'CatalanSun.NewtonCompletion.AtildeDiff_pow_ref' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:101:0: 'CatalanSun.NewtonCompletion.AtildeDiff_aux_at_omitted' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:102:0: 'CatalanSun.NewtonCompletion.AtildeDiff_target_selected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CatalanSun.lean:103:0: 'CatalanSun.NewtonCompletion.AtildeDiff_submatrix_eq_outerBlock' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CatalanSun.lean:104:0: 'CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CatalanSun.lean:105:0: 'CatalanSun.NewtonCompletion.prop_3_1_det_Atilde' depends on axioms: [propext, Classical.choice, Quot.sound]
 Build completed successfully (2899 jobs).
 warning: mathlib: repository 'C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean\.lake/packages\mathlib' has local changes

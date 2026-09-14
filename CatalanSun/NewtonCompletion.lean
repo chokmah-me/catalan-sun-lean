@@ -1,16 +1,21 @@
 /-
   CatalanSun/NewtonCompletion.lean
 
-  Sorry-free prefix of Proposition 3.1 (Newton completion / fixed scalar) from
-  Sun arXiv:2609.04176v1 §3. Does **not** prove the full identity
-  `det Atilde = ± F_B * det R[A,J]` (needs permutation + 3× Laplace expansion).
+  Proposition 3.1 (Newton completion / fixed scalar) from Sun arXiv:2609.04176v1 §3.
+  Spine: `M = DiffMat * Atilde` → column facts → reindex to fromBlocks →
+  `det_fromBlocks` → `det_mul` back to `Atilde`.
 -/
 
 import CatalanSun.NewtonDiff
 import CatalanSun.Residual
+import CatalanSun.Rank
 import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Algebra.Group.ForwardDiff
+import Mathlib.Algebra.Ring.Int.Units
+import Mathlib.Data.Finset.Sort
 import Mathlib.Data.Matrix.Basic
+import Mathlib.Data.Sum.Basic
+import Mathlib.Logic.Equiv.Fin.Basic
 import Mathlib.LinearAlgebra.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Tactic.Linarith
@@ -397,5 +402,490 @@ theorem DiffMat_mulVec_Pi_u_eq_Rmatrix (B S α j : ℕ) (hα : α ≤ S + 2) :
   have hiN : i < Ndim B S := by simp only [Ndim]; omega
   simp [hiN]
   ring
+
+/-! ## P0: selected residual rows and block index equivalences -/
+
+lemma Ndim_eq_Dref_add (B S : ℕ) : Dref B + (S + 3) = Ndim B S := by
+  simp only [Ndim, Dref]; omega
+
+/-- The three omitted residual-row indices as a finset. -/
+def omittedFinset {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Finset (Fin (S + 3)) :=
+  Finset.univ.map ⟨o, ho⟩
+
+theorem omittedFinset_card {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    (omittedFinset o ho).card = 3 := by
+  simp [omittedFinset, card_map, Fintype.card_fin]
+
+/-- Selected residual rows `A = {0,…,S+2} \ Ac`. -/
+def selectedFinset {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Finset (Fin (S + 3)) :=
+  Finset.univ \ omittedFinset o ho
+
+theorem selectedFinset_card {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    (selectedFinset o ho).card = S := by
+  simp only [selectedFinset]
+  rw [card_sdiff_of_subset (subset_univ _), omittedFinset_card]
+  simp [Fintype.card_fin]
+
+/-- Ordered enumeration of the selected residual rows (`Finset.orderEmbOfFin`). -/
+def selectedRows {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Fin S → Fin (S + 3) :=
+  (selectedFinset o ho).orderEmbOfFin (selectedFinset_card o ho)
+
+theorem selectedRows_mem {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (j : Fin S) : selectedRows o ho j ∈ selectedFinset o ho :=
+  (selectedFinset o ho).orderEmbOfFin_mem (selectedFinset_card o ho) j
+
+theorem selectedRows_not_omitted {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (j : Fin S) : selectedRows o ho j ∉ omittedFinset o ho := by
+  have h := selectedRows_mem o ho j
+  simp only [selectedFinset, mem_sdiff] at h
+  exact h.2
+
+theorem o_mem_omitted {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (t : Fin 3) : o t ∈ omittedFinset o ho :=
+  mem_map.mpr ⟨t, mem_univ t, rfl⟩
+
+theorem selectedRows_ne_o {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (j : Fin S) (t : Fin 3) : selectedRows o ho j ≠ o t := by
+  intro h
+  exact selectedRows_not_omitted o ho j (h ▸ o_mem_omitted o ho t)
+
+theorem selectedRows_injective {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Function.Injective (selectedRows o ho) :=
+  ((selectedFinset o ho).orderEmbOfFin (selectedFinset_card o ho)).injective
+
+/-- Embed a residual index `α ∈ Fin (S+3)` as matrix row `D+α`. -/
+def residualRow (B S : ℕ) (α : Fin (S + 3)) : Fin (Ndim B S) :=
+  ⟨α.val + Dref B, by simp only [Ndim, Dref]; omega⟩
+
+theorem residualRow_val (B S : ℕ) (α : Fin (S + 3)) :
+    (residualRow B S α).val = α.val + Dref B :=
+  rfl
+
+/-- `Fin S ⊕ Fin 3 ≃ Fin (S+3)` via selected rows and omitted map `o`. -/
+def selectedOmitEquiv {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Fin S ⊕ Fin 3 ≃ Fin (S + 3) := by
+  classical
+  refine Equiv.ofBijective (Sum.elim (selectedRows o ho) o) ⟨?inj, ?surj⟩
+  · exact (selectedRows_injective o ho).sumElim ho fun j t => selectedRows_ne_o o ho j t
+  · intro α
+    by_cases hα : α ∈ omittedFinset o ho
+    · obtain ⟨t, _, ht⟩ := mem_map.mp hα
+      exact ⟨Sum.inr t, ht⟩
+    · have hsel : α ∈ selectedFinset o ho := by
+        simp only [selectedFinset, mem_sdiff, mem_univ, true_and, hα, not_false_eq_true]
+      have hrang : α ∈ Set.range (selectedRows o ho) := by
+        change α ∈ Set.range ((selectedFinset o ho).orderEmbOfFin (selectedFinset_card o ho))
+        rw [(selectedFinset o ho).range_orderEmbOfFin (selectedFinset_card o ho)]
+        exact hsel
+      obtain ⟨j, hj⟩ := hrang
+      exact ⟨Sum.inl j, hj⟩
+
+theorem selectedOmitEquiv_inl {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (j : Fin S) : selectedOmitEquiv o ho (Sum.inl j) = selectedRows o ho j :=
+  rfl
+
+theorem selectedOmitEquiv_inr {S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (t : Fin 3) : selectedOmitEquiv o ho (Sum.inr t) = o t :=
+  rfl
+
+/-- Natural size-cast `Fin (D+(S+3)) ≃ Fin N`. -/
+def ndimCast (B S : ℕ) : Fin (Dref B + (S + 3)) ≃ Fin (Ndim B S) where
+  toFun i := ⟨i.val, by have := i.isLt; simp only [Ndim, Dref] at this ⊢; omega⟩
+  invFun i := ⟨i.val, by have := i.isLt; simp only [Ndim, Dref] at this ⊢; omega⟩
+  left_inv i := Fin.ext rfl
+  right_inv i := Fin.ext rfl
+
+theorem ndimCast_val (B S : ℕ) (i : Fin (Dref B + (S + 3))) :
+    (ndimCast B S i).val = i.val :=
+  rfl
+
+/-- Column index equiv matching `colKind` (powers / targets / aux). -/
+def colEquiv (B S : ℕ) :
+    Fin (Dref B) ⊕ (Fin S ⊕ Fin 3) ≃ Fin (Ndim B S) :=
+  (Equiv.sumCongr (Equiv.refl _) finSumFinEquiv).trans
+    (finSumFinEquiv.trans (ndimCast B S))
+
+theorem colEquiv_inl (B S : ℕ) (r : Fin (Dref B)) :
+    colEquiv B S (Sum.inl r) = ⟨r.val, by simp only [Ndim, Dref]; omega⟩ := by
+  apply Fin.ext
+  simp [colEquiv, ndimCast_val, finSumFinEquiv_apply_left]
+
+theorem colEquiv_inr_inl (B S : ℕ) (j : Fin S) :
+    colEquiv B S (Sum.inr (Sum.inl j)) =
+      ⟨Dref B + j.val, by simp only [Ndim, Dref]; omega⟩ := by
+  apply Fin.ext
+  simp [colEquiv, ndimCast_val, finSumFinEquiv_apply_left, finSumFinEquiv_apply_right]
+
+theorem colEquiv_inr_inr (B S : ℕ) (t : Fin 3) :
+    colEquiv B S (Sum.inr (Sum.inr t)) =
+      ⟨Dref B + S + t.val, by simp only [Ndim, Dref]; omega⟩ := by
+  apply Fin.ext
+  simp [colEquiv, ndimCast_val, finSumFinEquiv_apply_right, Nat.add_assoc]
+
+theorem colKind_colEquiv (B S : ℕ) (x : Fin (Dref B) ⊕ (Fin S ⊕ Fin 3)) :
+    colKind B S (colEquiv B S x) = x := by
+  cases x with
+  | inl r =>
+      have hr : (colEquiv B S (Sum.inl r)).val = r.val := by simp [colEquiv_inl]
+      have hrlt : (colEquiv B S (Sum.inl r)).val < Dref B := by rw [hr]; exact r.isLt
+      simp only [colKind, hrlt, ↓reduceDIte]
+      exact congrArg Sum.inl (Fin.ext hr.symm)
+  | inr y =>
+      cases y with
+      | inl j =>
+          have hj : (colEquiv B S (Sum.inr (Sum.inl j))).val = Dref B + j.val := by
+            simp [colEquiv_inr_inl]
+          have h1 : ¬ (colEquiv B S (Sum.inr (Sum.inl j))).val < Dref B := by rw [hj]; omega
+          have h2 : (colEquiv B S (Sum.inr (Sum.inl j))).val < Dref B + S := by rw [hj]; omega
+          simp only [colKind, h1, ↓reduceDIte, h2]
+          refine congrArg (fun z => Sum.inr (Sum.inl z)) (Fin.ext ?_)
+          simp [hj]
+      | inr t =>
+          have ht : (colEquiv B S (Sum.inr (Sum.inr t))).val = Dref B + S + t.val := by
+            simp [colEquiv_inr_inr]
+          have h1 : ¬ (colEquiv B S (Sum.inr (Sum.inr t))).val < Dref B := by rw [ht]; omega
+          have h2 : ¬ (colEquiv B S (Sum.inr (Sum.inr t))).val < Dref B + S := by rw [ht]; omega
+          simp only [colKind, h1, ↓reduceDIte, h2]
+          refine congrArg (fun z => Sum.inr (Sum.inr z)) (Fin.ext ?_)
+          simp [ht]
+          omega
+
+theorem colEquiv_colKind (B S : ℕ) (j : Fin (Ndim B S)) :
+    colEquiv B S (colKind B S j) = j := by
+  simp only [colKind]
+  split_ifs with hj hj' <;> apply Fin.ext
+  · simp [colEquiv_inl]
+  · simp [colEquiv_inr_inl]; omega
+  · simp [colEquiv_inr_inr]
+    have hjN : j.val < Ndim B S := j.isLt
+    simp only [Ndim, Dref] at hjN hj hj' ⊢
+    omega
+
+theorem colEquiv_symm_eq_colKind (B S : ℕ) :
+    ⇑(colEquiv B S).symm = colKind B S := by
+  ext j
+  apply (colEquiv B S).injective
+  rw [Equiv.apply_symm_apply, colEquiv_colKind]
+
+/-- Row index equiv: reference / selected residual / omitted residual. -/
+def rowEquiv {B S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Fin (Dref B) ⊕ (Fin S ⊕ Fin 3) ≃ Fin (Ndim B S) :=
+  (Equiv.sumCongr (Equiv.refl _) (selectedOmitEquiv o ho)).trans
+    (finSumFinEquiv.trans (ndimCast B S))
+
+theorem rowEquiv_inl {B S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (r : Fin (Dref B)) :
+    rowEquiv (B := B) (S := S) o ho (Sum.inl r) =
+      ⟨r.val, by simp only [Ndim, Dref]; omega⟩ := by
+  apply Fin.ext
+  simp [rowEquiv, ndimCast_val, finSumFinEquiv_apply_left]
+
+theorem rowEquiv_inr_inl {B S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (j : Fin S) :
+    rowEquiv (B := B) (S := S) o ho (Sum.inr (Sum.inl j)) =
+      residualRow B S (selectedRows o ho j) := by
+  apply Fin.ext
+  simp [rowEquiv, ndimCast_val, residualRow, selectedOmitEquiv_inl,
+    finSumFinEquiv_apply_right, Nat.add_comm]
+
+theorem rowEquiv_inr_inr {B S : ℕ} (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o)
+    (t : Fin 3) :
+    rowEquiv (B := B) (S := S) o ho (Sum.inr (Sum.inr t)) =
+      residualRow B S (o t) := by
+  apply Fin.ext
+  simp [rowEquiv, ndimCast_val, residualRow, selectedOmitEquiv_inr,
+    finSumFinEquiv_apply_right, Nat.add_comm]
+
+/-! ## P1: `AtildeDiff` and column characterizations -/
+
+def AtildeDiff (B S : ℕ) (o : Fin 3 → Fin (S + 3)) :
+    Matrix (Fin (Ndim B S)) (Fin (Ndim B S)) ℝ :=
+  DiffMat (Ndim B S) * Atilde B S o
+
+theorem AtildeDiff_apply (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (n j : Fin (Ndim B S)) :
+    AtildeDiff B S o n j =
+      (DiffMat (Ndim B S) *ᵥ fun i : Fin (Ndim B S) => Atilde B S o i j) n := by
+  simp only [AtildeDiff, mul_apply', mulVec, dotProduct]
+
+theorem Atilde_col_pow (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (r : Fin (Dref B)) (i : Fin (Ndim B S)) :
+    Atilde B S o i (colEquiv B S (Sum.inl r)) = (i.val : ℝ) ^ r.val := by
+  have hj : colKind B S (colEquiv B S (Sum.inl r)) = Sum.inl r := colKind_colEquiv B S _
+  simp only [Atilde, of_apply, hj]
+
+theorem Atilde_col_target (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (jj : Fin S) (i : Fin (Ndim B S)) :
+    Atilde B S o i (colEquiv B S (Sum.inr (Sum.inl jj))) =
+      (TwoAdic.PiFactor B i.val : ℝ) * Tail.weightedTail (i.val + (jj.val + 1)) := by
+  have hj : colKind B S (colEquiv B S (Sum.inr (Sum.inl jj))) =
+      Sum.inr (Sum.inl jj) := colKind_colEquiv B S _
+  simp only [Atilde, of_apply, hj]
+
+theorem Atilde_col_aux (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (t : Fin 3) (i : Fin (Ndim B S)) :
+    Atilde B S o i (colEquiv B S (Sum.inr (Sum.inr t))) =
+      (i.val.choose (Dref B + (o t).val) : ℝ) := by
+  have hj : colKind B S (colEquiv B S (Sum.inr (Sum.inr t))) =
+      Sum.inr (Sum.inr t) := colKind_colEquiv B S _
+  simp only [Atilde, of_apply, hj]
+
+theorem AtildeDiff_pow_residual (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (r : Fin (Dref B)) (α : Fin (S + 3)) :
+    AtildeDiff B S o (residualRow B S α) (colEquiv B S (Sum.inl r)) = 0 := by
+  rw [AtildeDiff_apply]
+  have hcol :
+      (fun i : Fin (Ndim B S) => Atilde B S o i (colEquiv B S (Sum.inl r))) =
+        fun i => (i.val : ℝ) ^ r.val := by
+    ext i; exact Atilde_col_pow B S o r i
+  rw [hcol]
+  exact DiffMat_mulVec_pow_of_lt (by simp [residualRow, Dref]; omega)
+
+theorem AtildeDiff_pow_ref (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (n r : Fin (Dref B)) :
+    AtildeDiff B S o ⟨n.val, by simp only [Ndim, Dref]; omega⟩
+      (colEquiv B S (Sum.inl r)) =
+      powerDiffBlock (Dref B) n r := by
+  rw [AtildeDiff_apply, powerDiffBlock, of_apply]
+  have hcol :
+      (fun i : Fin (Ndim B S) => Atilde B S o i (colEquiv B S (Sum.inl r))) =
+        fun i => (i.val : ℝ) ^ r.val := by
+    ext i; exact Atilde_col_pow B S o r i
+  rw [hcol]
+  have hnN : n.val < Ndim B S := by simp only [Ndim, Dref]; omega
+  have h1 := DiffMat_mulVec_pow (N := Ndim B S) (r := r.val) ⟨n.val, hnN⟩
+  have h2 := DiffMat_mulVec_pow (N := Dref B) (r := r.val) n
+  exact h1.trans h2.symm
+
+theorem AtildeDiff_aux (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (t : Fin 3) (n : Fin (Ndim B S)) :
+    AtildeDiff B S o n (colEquiv B S (Sum.inr (Sum.inr t))) =
+      if n.val = Dref B + (o t).val then
+        (-1 : ℝ) ^ (Dref B + (o t).val)
+      else 0 := by
+  rw [AtildeDiff_apply]
+  have hcol :
+      (fun i : Fin (Ndim B S) => Atilde B S o i (colEquiv B S (Sum.inr (Sum.inr t)))) =
+        fun i => (i.val.choose (Dref B + (o t).val) : ℝ) := by
+    ext i; exact Atilde_col_aux B S o t i
+  rw [hcol]
+  have hm : Dref B + (o t).val < Ndim B S := by simp only [Ndim, Dref]; omega
+  simpa using DiffMat_mulVec_binom (N := Ndim B S) (m := Dref B + (o t).val) hm n
+
+theorem AtildeDiff_aux_at_omitted (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (ho : Function.Injective o) (t t' : Fin 3) :
+    AtildeDiff B S o (residualRow B S (o t)) (colEquiv B S (Sum.inr (Sum.inr t'))) =
+      (if t = t' then (-1 : ℝ) ^ (Dref B + (o t).val) else 0) := by
+  rw [AtildeDiff_aux, residualRow_val]
+  by_cases ht : t = t'
+  · subst ht
+    simp [Nat.add_comm]
+  · have hne : (o t).val ≠ (o t').val := fun hv => ht (ho (Fin.ext hv))
+    have : (o t).val + Dref B ≠ Dref B + (o t').val := by intro h; exact hne (by omega)
+    simp [ht, this]
+
+theorem AtildeDiff_aux_at_selected (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (ho : Function.Injective o) (j : Fin S) (t : Fin 3) :
+    AtildeDiff B S o (residualRow B S (selectedRows o ho j))
+      (colEquiv B S (Sum.inr (Sum.inr t))) = 0 := by
+  rw [AtildeDiff_aux, residualRow_val]
+  have hne : (selectedRows o ho j).val ≠ (o t).val :=
+    fun hv => selectedRows_ne_o o ho j t (Fin.ext hv)
+  have : (selectedRows o ho j).val + Dref B ≠ Dref B + (o t).val := by
+    intro h; exact hne (by omega)
+  simp [this]
+
+theorem AtildeDiff_target_residual (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (α : Fin (S + 3)) (jj : Fin S) :
+    AtildeDiff B S o (residualRow B S α) (colEquiv B S (Sum.inr (Sum.inl jj))) =
+      Residual.Rmatrix B α.val (jj.val + 1) := by
+  rw [AtildeDiff_apply]
+  have hcol :
+      (fun i : Fin (Ndim B S) => Atilde B S o i (colEquiv B S (Sum.inr (Sum.inl jj)))) =
+        fun i => (TwoAdic.PiFactor B i.val : ℝ) *
+          Tail.weightedTail (i.val + (jj.val + 1)) := by
+    ext i; exact Atilde_col_target B S o jj i
+  rw [hcol]
+  have hα : α.val ≤ S + 2 := Nat.le_of_lt_succ α.isLt
+  have hrow : residualRow B S α = ⟨α.val + 2 * B, by simp only [Ndim]; omega⟩ := by
+    apply Fin.ext; simp [residualRow, Dref]
+  rw [hrow]
+  exact DiffMat_mulVec_Pi_u_eq_Rmatrix B S α.val (jj.val + 1) hα
+
+theorem AtildeDiff_target_selected (B S : ℕ) (o : Fin 3 → Fin (S + 3))
+    (ho : Function.Injective o) (j jj : Fin S) :
+    AtildeDiff B S o (residualRow B S (selectedRows o ho j))
+      (colEquiv B S (Sum.inr (Sum.inl jj))) =
+      Rank.RmatrixFin B S (selectedRows o ho j) jj := by
+  rw [AtildeDiff_target_residual, Rank.RmatrixFin, of_apply]
+
+/-! ## P2: reindex to nested `fromBlocks` -/
+
+lemma neg_one_pow_eq_one_or_neg_one (n : ℕ) :
+    (-1 : ℝ) ^ n = 1 ∨ (-1 : ℝ) ^ n = -1 := by
+  cases Nat.even_or_odd n with
+  | inl h => rw [Even.neg_one_pow h]; exact Or.inl rfl
+  | inr h => rw [Odd.neg_one_pow h]; exact Or.inr rfl
+
+lemma mul_one_or_neg_one {a b : ℝ}
+    (ha : a = 1 ∨ a = -1) (hb : b = 1 ∨ b = -1) :
+    a * b = 1 ∨ a * b = -1 := by
+  rcases ha with ha | ha <;> rcases hb with hb | hb <;> simp [ha, hb]
+
+theorem prod_aux_sign_eq_one_or_neg_one (B : ℕ) {S : ℕ} (o : Fin 3 → Fin (S + 3)) :
+    (∏ t : Fin 3, (-1 : ℝ) ^ (Dref B + (o t).val)) = 1 ∨
+      (∏ t : Fin 3, (-1 : ℝ) ^ (Dref B + (o t).val)) = -1 := by
+  classical
+  simp only [Fin.prod_univ_three]
+  exact mul_one_or_neg_one
+    (mul_one_or_neg_one (neg_one_pow_eq_one_or_neg_one _) (neg_one_pow_eq_one_or_neg_one _))
+    (neg_one_pow_eq_one_or_neg_one _)
+
+def auxDiag (B : ℕ) {S : ℕ} (o : Fin 3 → Fin (S + 3)) : Matrix (Fin 3) (Fin 3) ℝ :=
+  diagonal fun t => (-1 : ℝ) ^ (Dref B + (o t).val)
+
+theorem det_auxDiag (B : ℕ) {S : ℕ} (o : Fin 3 → Fin (S + 3)) :
+    (auxDiag B o).det = ∏ t : Fin 3, (-1 : ℝ) ^ (Dref B + (o t).val) := by
+  simp [auxDiag, det_diagonal]
+
+def junkTop (B S : ℕ) (o : Fin 3 → Fin (S + 3)) (_ho : Function.Injective o) :
+    Matrix (Fin (Dref B)) (Fin S ⊕ Fin 3) ℝ :=
+  Matrix.of fun n k =>
+    AtildeDiff B S o ⟨n.val, by simp only [Ndim, Dref]; omega⟩ (colEquiv B S (Sum.inr k))
+
+def junkBot (B S : ℕ) (o : Fin 3 → Fin (S + 3)) (_ho : Function.Injective o) :
+    Matrix (Fin 3) (Fin S) ℝ :=
+  Matrix.of fun t jj =>
+    AtildeDiff B S o (residualRow B S (o t)) (colEquiv B S (Sum.inr (Sum.inl jj)))
+
+def innerBlock (B S : ℕ) (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Matrix (Fin S ⊕ Fin 3) (Fin S ⊕ Fin 3) ℝ :=
+  fromBlocks
+    ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id)
+    0
+    (junkBot B S o ho)
+    (auxDiag B o)
+
+def outerBlock (B S : ℕ) (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    Matrix (Fin (Dref B) ⊕ (Fin S ⊕ Fin 3)) (Fin (Dref B) ⊕ (Fin S ⊕ Fin 3)) ℝ :=
+  fromBlocks (powerDiffBlock (Dref B)) (junkTop B S o ho) 0 (innerBlock B S o ho)
+
+theorem AtildeDiff_submatrix_eq_outerBlock (B S : ℕ)
+    (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    (AtildeDiff B S o).submatrix
+        (rowEquiv (B := B) (S := S) o ho) (colEquiv B S) =
+      outerBlock B S o ho := by
+  ext i j
+  simp only [submatrix_apply, outerBlock, innerBlock, junkTop, junkBot]
+  rcases i with r | rs <;> rcases j with c | cs
+  · rw [fromBlocks_apply₁₁, rowEquiv_inl, AtildeDiff_pow_ref]
+  · rw [fromBlocks_apply₁₂, rowEquiv_inl, of_apply]
+  · rw [fromBlocks_apply₂₁, Matrix.zero_apply]
+    rcases rs with jsel | tom
+    · rw [rowEquiv_inr_inl, AtildeDiff_pow_residual]
+    · rw [rowEquiv_inr_inr, AtildeDiff_pow_residual]
+  · rw [fromBlocks_apply₂₂]
+    rcases rs with jsel | tom <;> rcases cs with jtar | taux
+    · rw [fromBlocks_apply₁₁, submatrix_apply, id_eq, rowEquiv_inr_inl,
+        AtildeDiff_target_selected]
+    · rw [fromBlocks_apply₁₂, Matrix.zero_apply, rowEquiv_inr_inl,
+        AtildeDiff_aux_at_selected]
+    · rw [fromBlocks_apply₂₁, rowEquiv_inr_inr, of_apply]
+    · rw [fromBlocks_apply₂₂, rowEquiv_inr_inr, auxDiag, diagonal_apply]
+      exact AtildeDiff_aux_at_omitted B S o ho tom taux
+
+theorem det_outerBlock (B S : ℕ) (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    (outerBlock B S o ho).det =
+      (powerDiffBlock (Dref B)).det *
+        ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det *
+          (auxDiag B o).det := by
+  simp only [outerBlock, det_fromBlocks_zero₂₁, innerBlock, det_fromBlocks_zero₁₂]
+  ring
+
+theorem det_AtildeDiff_submatrix (B S : ℕ)
+    (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    ∃ ε : ℝ, (ε = 1 ∨ ε = -1) ∧
+      ((AtildeDiff B S o).submatrix
+          (rowEquiv (B := B) (S := S) o ho) (colEquiv B S)).det =
+        ε * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by
+  rw [AtildeDiff_submatrix_eq_outerBlock, det_outerBlock, det_powerDiffBlock_Dref, det_auxDiag]
+  refine ⟨(-1 : ℝ) ^ (B * (2 * B - 1)) *
+      (∏ t : Fin 3, (-1 : ℝ) ^ (Dref B + (o t).val)), ?sign, by ring⟩
+  exact mul_one_or_neg_one (neg_one_pow_eq_one_or_neg_one _)
+    (prod_aux_sign_eq_one_or_neg_one B o)
+
+/-! ## P3: transfer to `det Atilde` -/
+
+lemma sign_cast_eq_one_or_neg_one {α : Type*} [Fintype α] [DecidableEq α] (σ : Equiv.Perm α) :
+    (((Equiv.Perm.sign σ : ℤˣ) : ℤ) : ℝ) = 1 ∨
+      (((Equiv.Perm.sign σ : ℤˣ) : ℤ) : ℝ) = -1 := by
+  rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;> simp [h]
+
+theorem det_AtildeDiff_eq_signed_F_B_det_R {B S : ℕ}
+    (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    ∃ ε : ℝ, (ε = 1 ∨ ε = -1) ∧
+      (AtildeDiff B S o).det =
+        ε * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by
+  classical
+  obtain ⟨ε₀, hε₀, hsub⟩ := det_AtildeDiff_submatrix B S o ho
+  let eR := rowEquiv (B := B) (S := S) o ho
+  let eC := colEquiv B S
+  have hreindex :
+      (AtildeDiff B S o).submatrix eR eC =
+        (reindex eR.symm eC.symm) (AtildeDiff B S o) := by
+    simp [reindex_apply]
+  have hdet := det_reindex (R := ℝ) eR.symm eC.symm (AtildeDiff B S o)
+  set σsign : ℝ := (((Equiv.Perm.sign (eC.symm.trans eR) : ℤˣ) : ℤ) : ℝ)
+  have hσ : σsign = 1 ∨ σsign = -1 := sign_cast_eq_one_or_neg_one _
+  have hmul : σsign * (AtildeDiff B S o).det =
+      ε₀ * (F_B B : ℝ) *
+        ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by
+    calc σsign * (AtildeDiff B S o).det
+        = ((AtildeDiff B S o).reindex eR.symm eC.symm).det := by
+            simpa [σsign] using hdet.symm
+      _ = ((AtildeDiff B S o).submatrix eR eC).det := by rw [← hreindex]
+      _ = _ := hsub
+  have hσ2 : σsign * σsign = 1 := by rcases hσ with h | h <;> simp [h]
+  refine ⟨σsign * ε₀, mul_one_or_neg_one hσ hε₀, ?_⟩
+  calc (AtildeDiff B S o).det
+      = (σsign * σsign) * (AtildeDiff B S o).det := by rw [hσ2, one_mul]
+    _ = σsign * (σsign * (AtildeDiff B S o).det) := by ring
+    _ = σsign * (ε₀ * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det) := by rw [hmul]
+    _ = (σsign * ε₀) * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by ring
+
+theorem prop_3_1_det_Atilde {B S : ℕ} (_h : S < B) (_hS : 0 < S)
+    (o : Fin 3 → Fin (S + 3)) (ho : Function.Injective o) :
+    ∃ ε : ℝ, (ε = 1 ∨ ε = -1) ∧
+      (Atilde B S o).det =
+        ε * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by
+  obtain ⟨ε₁, hε₁, hM⟩ := det_AtildeDiff_eq_signed_F_B_det_R o ho
+  have hmul : (AtildeDiff B S o).det =
+      (DiffMat (Ndim B S)).det * (Atilde B S o).det := by
+    simp only [AtildeDiff, det_mul]
+  set d : ℝ := (DiffMat (Ndim B S)).det
+  have hd : d = 1 ∨ d = -1 := by
+    simpa [d, det_DiffMat_eq_neg_one_pow] using
+      (neg_one_pow_eq_one_or_neg_one (Ndim B S * (Ndim B S - 1) / 2))
+  have hd2 : d * d = 1 := by rcases hd with hd | hd <;> simp [d, hd]
+  have hmul' : d * (Atilde B S o).det =
+      ε₁ * (F_B B : ℝ) *
+        ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by
+    rw [← hM, hmul]
+  refine ⟨d * ε₁, mul_one_or_neg_one hd hε₁, ?_⟩
+  calc (Atilde B S o).det
+      = (d * d) * (Atilde B S o).det := by rw [hd2, one_mul]
+    _ = d * (d * (Atilde B S o).det) := by ring
+    _ = d * (ε₁ * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det) := by rw [hmul']
+    _ = (d * ε₁) * (F_B B : ℝ) *
+          ((Rank.RmatrixFin B S).submatrix (selectedRows o ho) id).det := by ring
 
 end CatalanSun.NewtonCompletion

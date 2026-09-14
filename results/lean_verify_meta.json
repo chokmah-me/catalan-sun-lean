@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 4021,
+  "build_ms": 39121,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -559,10 +559,66 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.selectedFinset_card",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.AtildeDiff_pow_ref",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.AtildeDiff_aux_at_omitted",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.AtildeDiff_target_selected",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.AtildeDiff_submatrix_eq_outerBlock",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.prop_3_1_det_Atilde",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T20:12:20.959805+00:00",
+  "timestamp_utc": "2026-09-14T21:09:41.777249+00:00",
   "status": "pass"
 }

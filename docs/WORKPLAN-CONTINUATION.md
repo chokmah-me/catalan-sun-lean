@@ -73,11 +73,11 @@ Scratchpad: `.scratchpad/geneval-m8/`.
 
 ## Known gap after Theorem 2.1
 
-**Prop 3.1 scaffolding landed** in `CatalanSun/NewtonCompletion.lean` (sorry-free
-prefix: `Ndim`/`Dref`/`F_B`, `DiffMat` + det ±1, power-block pivots ±r! with
-`det = (-1)^{B(2B-1)} F_B`, binomial → signed unit vectors, `OmittedRows` /
-`Atilde` / `Ahat` defs + row-scale det, optional residual-row bridge). The full
-identity `det Atilde = ± F_B · det R[A,J]` remains open.
+**Prop 3.1 proved** in `CatalanSun/NewtonCompletion.lean`:
+`prop_3_1_det_Atilde` — `det Atilde = ± F_B · det (RmatrixFin.submatrix selectedRows id)`,
+via `M = DiffMat * Atilde`, column facts, reindex to nested `fromBlocks`,
+`det_fromBlocks_zero₂₁` / `det_fromBlocks_zero₁₂`, then `det_mul` back to `Atilde`.
+Optional stretch `qhat_ne_zero` not landed this pass.
 
 Det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2) has **no
 Cauchy–Binet** and **no general-`n` Cauchy determinant**. Those each need

@@ -96,3 +96,10 @@ import CatalanSun.Structure
 #print axioms CatalanSun.NewtonCompletion.det_Atilde_eq_Pi_mul_det_Ahat
 #print axioms CatalanSun.NewtonCompletion.DiffMat_mulVec_Pi_u_eq_Rmatrix
 #print axioms CatalanSun.NewtonCompletion.F_B_ne_zero
+#print axioms CatalanSun.NewtonCompletion.selectedFinset_card
+#print axioms CatalanSun.NewtonCompletion.AtildeDiff_pow_ref
+#print axioms CatalanSun.NewtonCompletion.AtildeDiff_aux_at_omitted
+#print axioms CatalanSun.NewtonCompletion.AtildeDiff_target_selected
+#print axioms CatalanSun.NewtonCompletion.AtildeDiff_submatrix_eq_outerBlock
+#print axioms CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R
+#print axioms CatalanSun.NewtonCompletion.prop_3_1_det_Atilde
