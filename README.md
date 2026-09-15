@@ -38,6 +38,8 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **PC3** | Lemma 4.1 factorization via `paperP` / integer `PsiA : ℤ` (`det_polyEval_dvd_vandermonde`) | `PascalCauchy.lean` | proved |
 | **(4.5) signed** | `Xi_closed_form` (no `q`/`|·|`): ABS-A DiagCauchy factor + two `V(I)` + `PsiA` + weights | `PascalCauchy.lean` | proved |
 | **Thm 5.1 scaffold** | Layer defs `phiQ`/`NKQ`/`nQr`/`CAQ`/`FNQ`/`ellAQ`/`mAQ`/`aQB` + `thm_5_1_statement` (unproved) | `Thm51.lean` | defs only |
+| **Thm 5.1 COMB** | Φ_Q remainder (5.3); consecutive collision (5.15); balanced occupancy minimizes collisions | `Thm51.lean` | proved |
+| **Thm 5.1 PROOF-A/B/C** | `mAQ_le_ellAQ`; (5.16) `aQB_sub_ellAQ_consecutive`; (5.17) `phiQ_add_CAQ_le_phiQ_N` | `Thm51.lean` | proved |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -47,7 +49,7 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Deferred (later sessions)
 
-Lemma 5.3 / prove Theorem 5.1; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+Finish Theorem 5.1 proof ((5.18)–(5.21) residue engine + assembly); Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 

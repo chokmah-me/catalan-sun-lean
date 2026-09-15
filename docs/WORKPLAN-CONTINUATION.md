@@ -7,28 +7,22 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
-**Landed:** Pascal–Cauchy PC0–PC3 complete; signed (4.5) packaging
-`Xi_closed_form` (ABS-A/ABS-B) in `PascalCauchy.lean`; Theorem 5.1
-layer scaffolding in `CatalanSun/Thm51.lean` (`phiQ`…`aQB`,
-`thm_5_1_statement` Prop only — **not proved**). Scratchpads:
-`.scratchpad/geneval-pascal-cauchy-pc01/`,
-`.scratchpad/geneval-pascal-cauchy-pc2/`,
-`.scratchpad/geneval-pascal-cauchy-pc3/`,
-`.scratchpad/geneval-psia-integrality/`,
-`.scratchpad/geneval-abs45-thm51-scaffold/`.
+**Landed:** Pascal–Cauchy PC0–PC3; signed (4.5) `Xi_closed_form`; Thm 5.1
+scaffold; COMB-A/B/C; and PROOF-A/B/C in `Thm51.lean`:
+`mAQ_le_ellAQ`, (5.16) `aQB_sub_ellAQ_consecutive`, (5.17)
+`phiQ_add_CAQ_le_phiQ_N`, `phiQ_superadditive`. Scratchpads include
+`.scratchpad/geneval-thm51-comb/` and `.scratchpad/geneval-thm51-proof/`.
 
 Start here next:
 
 1. This file (`docs/WORKPLAN-CONTINUATION.md`)
-2. **Lemma 5.3 / prove Theorem 5.1** — **still not** Theorem 1.1
-3. Evidence: `.scratchpad/geneval-abs45-thm51-scaffold/`,
+2. **Finish Theorem 5.1 proof** — residue engine (5.18)–(5.21) + assembly
+   under `S*20 ≤ B` and `Injective f`; then Lemma 5.3. **Still not** Theorem 1.1.
+3. Evidence: `.scratchpad/geneval-thm51-proof/`,
+   `.scratchpad/geneval-thm51-comb/`,
+   `.scratchpad/geneval-abs45-thm51-scaffold/`,
    `.scratchpad/geneval-psia-integrality/`,
-   `.scratchpad/geneval-pascal-cauchy-pc3/`,
-   `.scratchpad/geneval-pascal-cauchy-pc2/`,
-   `.scratchpad/geneval-pascal-cauchy-pc01/`,
-   `.scratchpad/geneval-lemma54-det/`, `.scratchpad/geneval-cauchy-binet/`,
-   `.scratchpad/geneval-cauchy-general-n/`, `.scratchpad/geneval-qhat/`,
-   `.scratchpad/geneval-prop31-finish/`
+   `.scratchpad/geneval-pascal-cauchy-pc3/`
 
 ## What landed
 
@@ -88,8 +82,8 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
   `∑ Ξ_I` + Lemma 4.2 + Lemma 4.1 via `paperP`/`PsiA : ℤ`
   (`det_polyEval_dvd_vandermonde`) + signed `Xi_closed_form` (Lean (4.5) without
   `q`). Done.
-- `CatalanSun/Thm51.lean` — §5 layer defs + `thm_5_1_statement` (unproved). Done
-  (scaffold only).
+- `CatalanSun/Thm51.lean` — §5 layer defs + combinatorial core (COMB-A/B/C) +
+  `thm_5_1_statement` (unproved). Done (scaffold + COMB; Thm 5.1 not proved).
 - `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1; M0. Done.
 - `CatalanSun/NewtonDiff.lean` — M1–M2 finite-diff / Newton helpers. Done.
 - `CatalanSun/Structure.lean` — M4 `Dlam`/`Plam` + degree bounds. Done.
@@ -131,7 +125,14 @@ via `paperPPoly` / `paperPMatrixZ` / `det_polyEval_dvd_vandermonde`
 **Signed (4.5) packaging landed:** `det_rowsSubmatrix_diagCauchy` (ABS-A) and
 `Xi_closed_form` (ABS-B; two copies of `V(I)`, no `q`/`|·|`).
 **Thm 5.1 scaffolding landed** in `Thm51.lean` (defs + statement Prop).
-**Next:** Lemma 5.3 / prove Theorem 5.1 — still not Theorem 1.1.
+**Thm 5.1 combinatorial core landed** in `Thm51.lean` (COMB-A/B/C:
+`phiQ_sub_quadratic_nonneg`/`_le`, `sum_choose_nQr_consecutive`,
+`collisionSum_eq_phiQ_of_balanced`/`collisionSum_ge_phiQ`).
+**PROOF-A/B/C landed** in \Thm51.lean\: \mAQ_le_ellAQ\,
+\QB_sub_ellAQ_consecutive\ (5.16), \phiQ_add_CAQ_le_phiQ_N\ (5.17),
+\phiQ_superadditive\. **Next:** residue engine (5.18)–(5.21) + assemble
+\	hm_5_1\ under \S*20 ≤ B\ and \Injective f\; then Lemma 5.3. Still not
+Theorem 1.1.
 
 ## Process notes
 

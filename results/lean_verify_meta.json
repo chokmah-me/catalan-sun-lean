@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a5b9-8f2e-7810-bdf8-34e6413bdfd1",
+  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a5f7-5b69-7b91-b857-b320aa91b3e9",
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 4289,
+  "build_ms": 4476,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -847,10 +847,50 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.Thm51.phiQ_sub_quadratic_nonneg",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm51.phiQ_sub_quadratic_le",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm51.sum_choose_nQr_consecutive",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm51.collisionSum_eq_phiQ_of_balanced",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.Thm51.collisionSum_ge_phiQ",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-15T15:58:04.358155+00:00",
+  "timestamp_utc": "2026-09-15T17:58:54.757646+00:00",
   "status": "pass"
 }

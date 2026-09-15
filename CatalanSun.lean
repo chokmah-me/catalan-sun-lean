@@ -137,3 +137,8 @@ import CatalanSun.Thm51
 #print axioms CatalanSun.PascalCauchy.Xi_closed_form
 #print axioms CatalanSun.Thm51.sum_nQr_eq_card
 #print axioms CatalanSun.Thm51.phiQ_formula
+#print axioms CatalanSun.Thm51.phiQ_sub_quadratic_nonneg
+#print axioms CatalanSun.Thm51.phiQ_sub_quadratic_le
+#print axioms CatalanSun.Thm51.sum_choose_nQr_consecutive
+#print axioms CatalanSun.Thm51.collisionSum_eq_phiQ_of_balanced
+#print axioms CatalanSun.Thm51.collisionSum_ge_phiQ
