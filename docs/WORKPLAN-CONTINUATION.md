@@ -1,4 +1,4 @@
-# Workplan: continuing toward det-level Lemma 5.4 / Theorem 5.1
+# Workplan: continuing toward Theorem 5.1
 
 **Repo:** https://github.com/chokmah-me/catalan-sun-lean (public)
 **Paper:** Z.-W. Sun, *Catalan's constant is irrational*, arXiv:2609.04176v1.
@@ -7,20 +7,23 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
-**Landed:** Pascal–Cauchy PC0–PC3 structural in `CatalanSun/PascalCauchy.lean`
-(PC0–PC1 factorization / `∑ Ξ_I`; PC2 `lemma_4_2_odd_cauchy`;
-PC3-A/B + real `PsiA_real` / `lemma_4_1_real` — **PC3 structural only;
-integrality of integer `Ψ_A` open**). Scratchpads:
+**Landed:** Pascal–Cauchy PC0–PC3 complete; signed (4.5) packaging
+`Xi_closed_form` (ABS-A/ABS-B) in `PascalCauchy.lean`; Theorem 5.1
+layer scaffolding in `CatalanSun/Thm51.lean` (`phiQ`…`aQB`,
+`thm_5_1_statement` Prop only — **not proved**). Scratchpads:
 `.scratchpad/geneval-pascal-cauchy-pc01/`,
 `.scratchpad/geneval-pascal-cauchy-pc2/`,
-`.scratchpad/geneval-pascal-cauchy-pc3/`.
+`.scratchpad/geneval-pascal-cauchy-pc3/`,
+`.scratchpad/geneval-psia-integrality/`,
+`.scratchpad/geneval-abs45-thm51-scaffold/`.
 
 Start here next:
 
 1. This file (`docs/WORKPLAN-CONTINUATION.md`)
-2. **PC3 integrality** (`PsiA : ℤ`) and/or absolute identity (4.5) packaging
-   toward Theorem 5.1 — **still not** Theorem 1.1
-3. Evidence: `.scratchpad/geneval-pascal-cauchy-pc3/`,
+2. **Lemma 5.3 / prove Theorem 5.1** — **still not** Theorem 1.1
+3. Evidence: `.scratchpad/geneval-abs45-thm51-scaffold/`,
+   `.scratchpad/geneval-psia-integrality/`,
+   `.scratchpad/geneval-pascal-cauchy-pc3/`,
    `.scratchpad/geneval-pascal-cauchy-pc2/`,
    `.scratchpad/geneval-pascal-cauchy-pc01/`,
    `.scratchpad/geneval-lemma54-det/`, `.scratchpad/geneval-cauchy-binet/`,
@@ -81,9 +84,12 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
 - `CatalanSun/Residual.lean` — residual entries `R_{α,j}` (eq. 2.1); **entry-level**
   Lemma 5.4 + `RmatrixRatFin`. Done.
 - `CatalanSun/Lemma54.lean` — **det-level Lemma 5.4** (`lemma_5_4_det`). Done.
-- `CatalanSun/PascalCauchy.lean` — **PC0–PC3 structural** Pascal×Diag×Cauchy +
-  `∑ Ξ_I` + Lemma 4.2 + Lemma 4.1 via `paperP`/`PsiA_real`
-  (integrality of `Ψ_A` open). Done (PARTIAL for PC3).
+- `CatalanSun/PascalCauchy.lean` — **PC0–PC3 complete** Pascal×Diag×Cauchy +
+  `∑ Ξ_I` + Lemma 4.2 + Lemma 4.1 via `paperP`/`PsiA : ℤ`
+  (`det_polyEval_dvd_vandermonde`) + signed `Xi_closed_form` (Lean (4.5) without
+  `q`). Done.
+- `CatalanSun/Thm51.lean` — §5 layer defs + `thm_5_1_statement` (unproved). Done
+  (scaffold only).
 - `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1; M0. Done.
 - `CatalanSun/NewtonDiff.lean` — M1–M2 finite-diff / Newton helpers. Done.
 - `CatalanSun/Structure.lean` — M4 `Dlam`/`Plam` + degree bounds. Done.
@@ -117,17 +123,15 @@ map `o` has `(Ahat B S o).det ≠ 0`.
 vanishing: entry 2-integrality ⇒ det 2-integrality ⇒ `R₂ ≥ 0`, and
 `v₂(F_B) > 0` for `B ≥ 2`).
 
-**PC0–PC3 structural landed** in `CatalanSun/PascalCauchy.lean`: residual minor =
+**PC0–PC3 complete** in `CatalanSun/PascalCauchy.lean`: residual minor =
 Pascal × DiagCauchy, then Cauchy–Binet → `∑ Ξ_I` (paper (4.1) without `q^S`);
-Lemma 4.2 odd-Cauchy closed form; Lemma 4.1 structural factorization
-`binomMatrix.det = V(I)·PsiA_real·(∏ row factorials)/(∏ col factorials)`
-with real `PsiA_real := det(paperPMatrix)/V(I)`.
-**Blocked for full PC3 PASS:** integrality `PsiA : ℤ` needs a local
-`det_polyEval_dvd_vandermonde` / alternating⇒Vandermonde-dvd over `ℤ`
-(Mathlib `det_eval_matrixOfPolynomials_eq_det_vandermonde` is the wrong
-tool — deg `P_a` can exceed `S-1`).
-Theorem 5.1 still needs PC3 integrality and the rational/`q`
-packaging of `Xi` / absolute identity (4.5).
+Lemma 4.2 odd-Cauchy closed form; Lemma 4.1 with integer `PsiA : ℤ`
+via `paperPPoly` / `paperPMatrixZ` / `det_polyEval_dvd_vandermonde`
+(column ops + constructive `/ₘ` + induction + Laplace).
+**Signed (4.5) packaging landed:** `det_rowsSubmatrix_diagCauchy` (ABS-A) and
+`Xi_closed_form` (ABS-B; two copies of `V(I)`, no `q`/`|·|`).
+**Thm 5.1 scaffolding landed** in `Thm51.lean` (defs + statement Prop).
+**Next:** Lemma 5.3 / prove Theorem 5.1 — still not Theorem 1.1.
 
 ## Process notes
 

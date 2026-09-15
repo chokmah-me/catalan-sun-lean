@@ -4,7 +4,8 @@
   Pascal–Cauchy factorization of residual minors (Sun arXiv:2609.04176v1 §4):
   PC0 structural rewrite / matrix product, PC1 Cauchy–Binet expansion to ∑ Ξ_I
   (paper (4.1) without the `q^S` factor), PC2 Lemma 4.2 odd-Cauchy instance,
-  PC3 Lemma 4.1 structural factorization (`paperP` / real `Ψ_A`; integrality open).
+  PC3 Lemma 4.1 factorization (`paperP` / integer `Ψ_A` via Vandermonde dvd),
+  ABS signed `Xi_closed_form` (Lean stand-in for paper (4.5) without `q`/`|·|`).
 
   Sign convention follows `Tail.weightedTail_shift_succ` / Thm21 `hwt`:
   paper column `j ≥ 1` has leading coefficient `(-1)^{j-1}` (not the paper's
@@ -23,6 +24,7 @@ import CatalanSun.TwoAdic
 import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
+import Mathlib.Algebra.Polynomial.Div
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Nat.Choose.Cast
 import Mathlib.Data.Nat.Factorial.BigOperators
@@ -515,12 +517,11 @@ theorem det_rowsSubmatrix_cauchyOddMatrix_closed {B S : ℕ} (hS : 0 < S)
             Tail.oddReal ((I.orderEmbOfFin hI ν).val + (jj.val + 1))) := by
   rw [det_rowsSubmatrix_cauchyOddMatrix hS I hI, lemma_4_2_odd_cauchy hS I hI]
 
-/-! ## PC3 — Lemma 4.1 structural (`paperP` / real `Ψ_A`)
+/-! ## PC3 — Lemma 4.1 (`paperP` / integer `Ψ_A`)
 
 Paper (4.3): residual binomial minor factors through `P_a(i) = ∏_{r=a+1}^{S+2}(2B+r-i)`
-and Vandermonde `V(I)`. Integrality of the quotient `Ψ_A = det[P]/V(I)` is left
-open (PARTIAL): blocked on a local alternating/`det_polyEval_dvd_vandermonde`
-lemma over `ℤ`. -/
+and Vandermonde `V(I)`. Integrality of `Ψ_A = det[P]/V(I)` is via integer
+polynomial matrix + local `det_polyEval_dvd_vandermonde` (column ops + `/ₘ`). -/
 
 /-- Paper `P_a(i) = ∏_{r=a+1}^{S+2} (2B + r - i)` as a real (ℤ differences). -/
 def paperP (B S a i : ℕ) : ℝ :=
@@ -723,6 +724,309 @@ theorem lemma_4_1_real
     simp_rw [one_div]
     rw [← Finset.prod_inv_distrib]
   rw [hinv]
+  ring
+
+/-! ### INT-A — Integer `paperP` polynomial / matrix -/
+
+/-- `P_a` as a polynomial over `ℤ`: `∏_{r=a+1}^{S+2} (C(2B+r) - X)`. -/
+def paperPPoly (B S a : ℕ) : ℤ[X] :=
+  ∏ r ∈ Finset.Icc (a + 1) (S + 2), (C (2 * B + r : ℤ) - X)
+
+theorem eval_paperPPoly (B S a i : ℕ) :
+    (↑((paperPPoly B S a).eval (↑i : ℤ)) : ℝ) = paperP B S a i := by
+  unfold paperPPoly paperP
+  rw [eval_prod, Int.cast_prod]
+  refine prod_congr rfl fun r _ => ?_
+  simp [eval_sub, eval_C, eval_X]
+
+def paperPMatrixZ (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    Matrix (Fin S) (Fin S) ℤ :=
+  Matrix.of fun α ν =>
+    (paperPPoly B S (f α).val).eval ((I.orderEmbOfFin hI ν).val : ℤ)
+
+theorem paperPMatrix_eq_map_paperPMatrixZ
+    (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    paperPMatrix B S f I hI =
+      (paperPMatrixZ B S f I hI).map fun z => (z : ℝ) := by
+  ext α ν
+  simp only [paperPMatrix, paperPMatrixZ, Matrix.of_apply, Matrix.map_apply]
+  exact (eval_paperPPoly B S (f α).val (I.orderEmbOfFin hI ν).val).symm
+
+theorem det_paperPMatrix_eq_det_paperPMatrixZ
+    (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (paperPMatrix B S f I hI).det = ((paperPMatrixZ B S f I hI).det : ℝ) := by
+  rw [paperPMatrix_eq_map_paperPMatrixZ, Int.cast_det]
+
+/-! ### INT-B — Local Vandermonde divisibility -/
+
+/-- Integer Vandermonde product matching `vandermondeProd` (`Ioi` shape). -/
+def vandermondeProdZ {N S : ℕ} (I : Finset (Fin N)) (hI : I.card = S) : ℤ :=
+  ∏ u : Fin S, ∏ v ∈ Ioi u,
+    (((I.orderEmbOfFin hI v).val : ℤ) - ((I.orderEmbOfFin hI u).val : ℤ))
+
+theorem vandermondeProd_eq_vandermondeProdZ {N S : ℕ}
+    (I : Finset (Fin N)) (hI : I.card = S) :
+    vandermondeProd I hI = (vandermondeProdZ I hI : ℝ) := by
+  simp only [vandermondeProd, vandermondeProdZ]
+  rw [Int.cast_prod]
+  refine prod_congr rfl fun u _ => ?_
+  rw [Int.cast_prod]
+  refine prod_congr rfl fun v _ => ?_
+  rw [Int.cast_sub, Int.cast_natCast, Int.cast_natCast]
+
+/-- Constructive quotient for `p(a) - p(b) = (a - b) · q(a)`. -/
+noncomputable def polyEvalDiffQuotient {R : Type*} [CommRing R] (p : R[X]) (b : R) :
+    R[X] :=
+  (p - C (p.eval b)) /ₘ (X - C b)
+
+theorem polyEvalDiffQuotient_mul {R : Type*} [CommRing R] (p : R[X]) (b : R) :
+    p - C (p.eval b) = (X - C b) * polyEvalDiffQuotient p b := by
+  have hmon : (X - C b).Monic := monic_X_sub_C b
+  have hdvd : X - C b ∣ p - C (p.eval b) := X_sub_C_dvd_sub_C_eval
+  have hmod : (p - C (p.eval b)) %ₘ (X - C b) = 0 :=
+    (modByMonic_eq_zero_iff_dvd hmon).2 hdvd
+  have hadd := modByMonic_add_div (p - C (p.eval b)) (X - C b)
+  rw [hmod, zero_add] at hadd
+  simpa [polyEvalDiffQuotient] using hadd.symm
+
+theorem eval_sub_eq_sub_mul_eval_polyEvalDiffQuotient {R : Type*} [CommRing R]
+    (p : R[X]) (a b : R) :
+    p.eval a - p.eval b = (a - b) * (polyEvalDiffQuotient p b).eval a := by
+  have h := congr_arg (eval a) (polyEvalDiffQuotient_mul p b)
+  simpa [eval_sub, eval_C, eval_mul, eval_X] using h
+
+/-- Column analogue of `det_eq_of_forall_row_eq_smul_add_const` (CommRing). -/
+theorem det_eq_of_forall_col_eq_smul_add_const
+    {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
+    {A B : Matrix n n R} (c : n → R) (k : n) (hk : c k = 0)
+    (A_eq : ∀ i j, A i j = B i j + c j * B i k) : A.det = B.det := by
+  rw [← det_transpose A, ← det_transpose B]
+  exact det_eq_of_forall_row_eq_smul_add_const c k hk fun i j => A_eq j i
+
+/-- Vandermonde product divides the poly-evaluation determinant over any CommRing. -/
+theorem det_polyEval_dvd_vandermonde {R : Type*} [CommRing R] :
+    ∀ {n : ℕ} (p : Fin n → R[X]) (x : Fin n → R),
+      (∏ u : Fin n, ∏ v ∈ Ioi u, (x v - x u))
+        ∣ (Matrix.of fun α ν => (p α).eval (x ν)).det := by
+  intro n
+  induction n with
+  | zero =>
+    intro p x
+    simp [det_fin_zero]
+  | succ n ih =>
+    intro p x
+    let M : Matrix (Fin (n + 1)) (Fin (n + 1)) R :=
+      Matrix.of fun α ν => (p α).eval (x ν)
+    let A : Matrix (Fin (n + 1)) (Fin (n + 1)) R :=
+      Matrix.of fun α ν =>
+        if ν = 0 then (p α).eval (x 0) else (p α).eval (x ν) - (p α).eval (x 0)
+    have hAM : A.det = M.det := by
+      refine det_eq_of_forall_col_eq_smul_add_const
+        (fun j : Fin (n + 1) => if j = 0 then (0 : R) else (-1)) 0 ?_ ?_
+      · simp
+      · intro i j
+        by_cases hj : j = 0
+        · simp [A, M, hj]
+        · simp only [A, M, Matrix.of_apply, hj, ↓reduceIte, if_neg hj]
+          ring
+    let q : Fin (n + 1) → R[X] := fun α => polyEvalDiffQuotient (p α) (x 0)
+    let B : Matrix (Fin (n + 1)) (Fin (n + 1)) R :=
+      Matrix.of fun α ν =>
+        Fin.cases ((p α).eval (x 0)) (fun j => (q α).eval (x j.succ)) ν
+    let s : Fin (n + 1) → R := Fin.cases 1 (fun j => x j.succ - x 0)
+    have hAB : A = Matrix.of fun α ν => s ν * B α ν := by
+      ext α ν
+      refine Fin.cases ?_ (fun j => ?_) ν
+      · simp [A, B, s]
+      · have hj0 : (j.succ : Fin (n + 1)) ≠ 0 := Fin.succ_ne_zero j
+        simp only [A, B, s, Matrix.of_apply, Fin.cases_succ, hj0, ↓reduceIte]
+        exact eval_sub_eq_sub_mul_eval_polyEvalDiffQuotient (p α) (x j.succ) (x 0)
+    have hA_factor : A.det = (∏ ν, s ν) * B.det := by
+      rw [hAB]
+      exact det_mul_row s B
+    have hs : (∏ ν, s ν) = ∏ j : Fin n, (x j.succ - x 0) := by
+      rw [Fin.prod_univ_succ]
+      simp [s]
+    have hVsplit :
+        (∏ u : Fin (n + 1), ∏ v ∈ Ioi u, (x v - x u)) =
+          (∏ j : Fin n, (x j.succ - x 0)) *
+            (∏ u : Fin n, ∏ v ∈ Ioi u, (x v.succ - x u.succ)) := by
+      rw [Fin.prod_univ_succ]
+      have h0 :
+          (∏ v ∈ Ioi (0 : Fin (n + 1)), (x v - x 0)) =
+            ∏ j : Fin n, (x j.succ - x 0) := by
+        simp [Fin.Ioi_zero_eq_map, Finset.prod_map, Fin.succEmb]
+      rw [h0]
+      congr 1
+      refine prod_congr rfl fun u _ => ?_
+      simp [Fin.Ioi_succ, Finset.prod_map, Fin.succEmb, Function.comp]
+    have hminor (i : Fin (n + 1)) :
+        B.submatrix i.succAbove Fin.succ =
+          Matrix.of fun β γ =>
+            (polyEvalDiffQuotient (p (i.succAbove β)) (x 0)).eval
+              ((x ∘ Fin.succ) γ) := by
+      ext β γ
+      simp [B, q]
+    have hdvd_minor (i : Fin (n + 1)) :
+        (∏ u : Fin n, ∏ v ∈ Ioi u, (x v.succ - x u.succ))
+          ∣ (B.submatrix i.succAbove Fin.succ).det := by
+      have h := ih (fun β => polyEvalDiffQuotient (p (i.succAbove β)) (x 0))
+        (x ∘ Fin.succ)
+      simpa [hminor i, Function.comp] using h
+    have hVy_dvd_B :
+        (∏ u : Fin n, ∏ v ∈ Ioi u, (x v.succ - x u.succ)) ∣ B.det := by
+      rw [det_succ_column_zero]
+      refine Finset.dvd_sum fun i _ => ?_
+      exact dvd_mul_of_dvd_right (hdvd_minor i) _
+    change (∏ u : Fin (n + 1), ∏ v ∈ Ioi u, (x v - x u)) ∣ M.det
+    rw [← hAM, hA_factor, hs, hVsplit]
+    exact mul_dvd_mul_left _ hVy_dvd_B
+
+/-! ### INT-C — Integer `PsiA` and Lemma 4.1 -/
+
+theorem vandermondeProdZ_dvd_det_paperPMatrixZ
+    (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    vandermondeProdZ I hI ∣ (paperPMatrixZ B S f I hI).det := by
+  simpa [vandermondeProdZ, paperPMatrixZ] using
+    det_polyEval_dvd_vandermonde
+      (fun α : Fin S => paperPPoly B S (f α).val)
+      (fun ν : Fin S => ((I.orderEmbOfFin hI ν).val : ℤ))
+
+/-- Paper `Ψ_A(I)` as an integer (quotient of det by Vandermonde). -/
+noncomputable def PsiA (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℤ :=
+  (paperPMatrixZ B S f I hI).det / vandermondeProdZ I hI
+
+theorem PsiA_mul_vandermonde
+    (B S : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (paperPMatrixZ B S f I hI).det =
+      vandermondeProdZ I hI * PsiA B S f I hI := by
+  simpa [PsiA] using
+    (Int.mul_ediv_cancel' (vandermondeProdZ_dvd_det_paperPMatrixZ B S f I hI)).symm
+
+theorem PsiA_real_eq_PsiA
+    {B S : ℕ} (hS : 0 < S) (_h : S < B)
+    (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    PsiA_real B S f I hI = (PsiA B S f I hI : ℝ) := by
+  have hVz : (vandermondeProdZ I hI : ℝ) ≠ 0 := by
+    rw [← vandermondeProd_eq_vandermondeProdZ]
+    exact vandermondeProd_ne_zero hS I hI
+  rw [PsiA_real, det_paperPMatrix_eq_det_paperPMatrixZ, PsiA_mul_vandermonde,
+    Int.cast_mul, vandermondeProd_eq_vandermondeProdZ, mul_div_cancel_left₀ _ hVz]
+
+theorem lemma_4_1_psi
+    {B S : ℕ} (hS : 0 < S) (h : S < B)
+    (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (paperPMatrix B S f I hI).det =
+      vandermondeProd I hI * (PsiA B S f I hI : ℝ) := by
+  rw [lemma_4_1_psi_real hS h f I hI, PsiA_real_eq_PsiA hS h f I hI]
+
+theorem lemma_4_1
+    {B S : ℕ} (hS : 0 < S) (h : S < B)
+    (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (binomMatrix B S f I hI).det =
+      vandermondeProd I hI * (PsiA B S f I hI : ℝ) *
+        (∏ α : Fin S, (((f α).val + 2 * B).factorial : ℝ)) /
+        (∏ ν : Fin S,
+          ((I.orderEmbOfFin hI ν).val.factorial : ℝ) *
+            ((Ndim B S - 1 - (I.orderEmbOfFin hI ν).val).factorial : ℝ)) := by
+  rw [lemma_4_1_real hS h f I hI, PsiA_real_eq_PsiA hS h f I hI]
+
+/-! ## ABS — Signed closed form for `Xi` (Lean stand-in for paper (4.5), no `q`)
+
+Paper (4.5) is absolute-valued and includes `|q T_{i+1}|`. Lean’s `Xi` omits `q^S`
+by design and keeps signed dets. The identity below multiplies Pascal column-minor
+signs × `lemma_4_1` with DiagCauchy row-minor factorization × odd-Cauchy closed form,
+yielding two copies of `V(I)` plus `V(J)`, `2^{S(S-1)}`, `PsiA`, factorial weights,
+`∏ diagFactors`, and Cauchy denominators. -/
+
+/-- ABS-A: DiagCauchy row-minor = diagonal scales × odd-Cauchy row-minor.
+Row scales use `det_mul_column` (Mathlib: `det_mul_column` = row scaling). -/
+theorem det_rowsSubmatrix_diagCauchy {B S : ℕ} (_hS : 0 < S)
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (CauchyBinet.rowsSubmatrix (diagCauchy B S) I hI).det =
+      (∏ ν : Fin S, diagFactors B S (I.orderEmbOfFin hI ν)) *
+        (CauchyBinet.rowsSubmatrix (cauchyOddMatrix B S) I hI).det := by
+  have hscale :
+      CauchyBinet.rowsSubmatrix (diagCauchy B S) I hI =
+        Matrix.of fun ν jj =>
+          diagFactors B S (I.orderEmbOfFin hI ν) *
+            CauchyBinet.rowsSubmatrix (cauchyOddMatrix B S) I hI ν jj := by
+    ext ν jj
+    simp only [CauchyBinet.rowsSubmatrix_apply, diagCauchy_apply, cauchyOddMatrix,
+      diagFactors, Matrix.of_apply, id_eq]
+  rw [hscale, det_mul_column]
+
+/-- Column signs from the Pascal factor of `Xi`. -/
+def Xi_pascal_signs {B S : ℕ} (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℝ :=
+  ∏ ν : Fin S, (-1 : ℝ) ^ (I.orderEmbOfFin hI ν).val
+
+/-- Column signs from the odd-Cauchy factor of `Xi`. -/
+def Xi_cauchy_signs (S : ℕ) : ℝ :=
+  ∏ jj : Fin S, (-1 : ℝ) ^ jj.val
+
+/-- Row factorial numerator from Lemma 4.1. -/
+def Xi_factorial_num (B S : ℕ) (f : Fin S → Fin (S + 3)) : ℝ :=
+  ∏ α : Fin S, (((f α).val + 2 * B).factorial : ℝ)
+
+/-- Column factorial denominator from Lemma 4.1. -/
+def Xi_factorial_den {B S : ℕ} (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℝ :=
+  ∏ ν : Fin S,
+    ((I.orderEmbOfFin hI ν).val.factorial : ℝ) *
+      ((Ndim B S - 1 - (I.orderEmbOfFin hI ν).val).factorial : ℝ)
+
+/-- Product of `Πᵢ T_{i+1}` diagonal entries on the ordered columns of `I`. -/
+def Xi_diag_prod (B S : ℕ) (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℝ :=
+  ∏ ν : Fin S, diagFactors B S (I.orderEmbOfFin hI ν)
+
+/-- Odd-Cauchy denominator product `∏_ν ∏_j (2(i_ν+j)+1)`. -/
+def Xi_cauchy_den {B S : ℕ} (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℝ :=
+  ∏ ν : Fin S, ∏ jj : Fin S,
+    Tail.oddReal ((I.orderEmbOfFin hI ν).val + (jj.val + 1))
+
+/-- Pascal minor factor of `Xi` (signs × Lemma 4.1). -/
+theorem Xi_pascal_factor {B S : ℕ} (hS : 0 < S) (h : S < B)
+    (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (CauchyBinet.colsSubmatrix (pascalMatrix B S f) I hI).det =
+      Xi_pascal_signs I hI * vandermondeProd I hI * (PsiA B S f I hI : ℝ) *
+        Xi_factorial_num B S f / Xi_factorial_den I hI := by
+  rw [det_colsSubmatrix_pascalMatrix hS h f I hI, lemma_4_1 hS h f I hI]
+  simp only [Xi_pascal_signs, Xi_factorial_num, Xi_factorial_den]
+  ring
+
+/-- DiagCauchy minor factor of `Xi` (ABS-A × odd-Cauchy closed form). -/
+theorem Xi_cauchy_factor {B S : ℕ} (hS : 0 < S)
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    (CauchyBinet.rowsSubmatrix (diagCauchy B S) I hI).det =
+      Xi_diag_prod B S I hI * Xi_cauchy_signs S *
+        ((2 : ℝ) ^ (S * (S - 1)) * vandermondeProd I hI * vandermondeProdFin S /
+          Xi_cauchy_den I hI) := by
+  rw [det_rowsSubmatrix_diagCauchy hS I hI,
+    det_rowsSubmatrix_cauchyOddMatrix_closed hS I hI]
+  simp only [Xi_diag_prod, Xi_cauchy_signs, Xi_cauchy_den]
+  ring
+
+/-- Signed Lean stand-in for paper (4.5) without `q` / absolute values.
+Global sign product = `Xi_pascal_signs * Xi_cauchy_signs`. Two copies of `V(I)`. -/
+theorem Xi_closed_form {B S : ℕ} (hS : 0 < S) (h : S < B)
+    (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    Xi B S f I hI =
+      Xi_pascal_signs I hI * Xi_cauchy_signs S *
+        (2 : ℝ) ^ (S * (S - 1)) * vandermondeProd I hI ^ 2 * vandermondeProdFin S *
+        (PsiA B S f I hI : ℝ) * Xi_factorial_num B S f / Xi_factorial_den I hI *
+        Xi_diag_prod B S I hI / Xi_cauchy_den I hI := by
+  unfold Xi
+  rw [Xi_pascal_factor hS h f I hI, Xi_cauchy_factor hS I hI]
   ring
 
 end CatalanSun.PascalCauchy

@@ -35,7 +35,9 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Cauchy–Binet** | `det(A*B) = ∑_{|s|=m} det(cols_s A)·det(rows_s B)` | `CauchyBinet.lean` | proved |
 | **PC0–PC1** | Pascal×Diag×Cauchy factorization of residual minor; CB → `∑ Ξ_I` | `PascalCauchy.lean` | proved |
 | **PC2** | Lemma 4.2 odd-Cauchy instance (`lemma_4_2_odd_cauchy`) + row-minor bridge | `PascalCauchy.lean` | proved |
-| **PC3 (structural)** | Lemma 4.1 factorization via `paperP` / real `PsiA_real`; integrality of `Ψ_A` open | `PascalCauchy.lean` | proved (PARTIAL) |
+| **PC3** | Lemma 4.1 factorization via `paperP` / integer `PsiA : ℤ` (`det_polyEval_dvd_vandermonde`) | `PascalCauchy.lean` | proved |
+| **(4.5) signed** | `Xi_closed_form` (no `q`/`|·|`): ABS-A DiagCauchy factor + two `V(I)` + `PsiA` + weights | `PascalCauchy.lean` | proved |
+| **Thm 5.1 scaffold** | Layer defs `phiQ`/`NKQ`/`nQr`/`CAQ`/`FNQ`/`ellAQ`/`mAQ`/`aQB` + `thm_5_1_statement` (unproved) | `Thm51.lean` | defs only |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -45,8 +47,7 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Deferred (later sessions)
 
-PC3 integrality (`PsiA : ℤ`); absolute identity (4.5);
-Theorem 5.1; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+Lemma 5.3 / prove Theorem 5.1; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 

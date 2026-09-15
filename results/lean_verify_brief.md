@@ -1,6 +1,6 @@
 # Lean proof verification — pass
 
-- project: `C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a533-6a98-7730-b52d-53aa2272c730`
+- project: `C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a5b9-8f2e-7810-bdf8-34e6413bdfd1`
 - lake: `C:\Users\Elke Shayna\.elan\bin\lake.EXE`
 - target: `(default)`
 - build_exit: 0

@@ -28,6 +28,7 @@ import CatalanSun.Qhat
 import CatalanSun.Structure
 import CatalanSun.Lemma54
 import CatalanSun.PascalCauchy
+import CatalanSun.Thm51
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -126,3 +127,13 @@ import CatalanSun.PascalCauchy
 #print axioms CatalanSun.PascalCauchy.det_colsSubmatrix_pascalMatrix
 #print axioms CatalanSun.PascalCauchy.lemma_4_1_psi_real
 #print axioms CatalanSun.PascalCauchy.lemma_4_1_real
+#print axioms CatalanSun.PascalCauchy.det_polyEval_dvd_vandermonde
+#print axioms CatalanSun.PascalCauchy.vandermondeProdZ_dvd_det_paperPMatrixZ
+#print axioms CatalanSun.PascalCauchy.lemma_4_1_psi
+#print axioms CatalanSun.PascalCauchy.lemma_4_1
+#print axioms CatalanSun.PascalCauchy.det_rowsSubmatrix_diagCauchy
+#print axioms CatalanSun.PascalCauchy.Xi_pascal_factor
+#print axioms CatalanSun.PascalCauchy.Xi_cauchy_factor
+#print axioms CatalanSun.PascalCauchy.Xi_closed_form
+#print axioms CatalanSun.Thm51.sum_nQr_eq_card
+#print axioms CatalanSun.Thm51.phiQ_formula
