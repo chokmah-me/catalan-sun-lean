@@ -31,6 +31,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | `Thm21.lean` | proved |
 | **Prop 3.1** | `det Atilde = ± F_B · det R[A,J]` via DiffMat + fromBlocks | `NewtonCompletion.lean` | proved |
 | **`qhat_ne_zero`** | ∃ injective `o` with `det (Ahat B S o) ≠ 0` | `Qhat.lean` | proved |
+| **Cauchy–Binet** | `det(A*B) = ∑_{|s|=m} det(cols_s A)·det(rows_s B)` | `CauchyBinet.lean` | proved |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -40,8 +41,8 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
 ### Deferred (later sessions)
 
-Cauchy–Binet (not in Mathlib v4.32.2);
-det-level Lemma 5.4 / Theorem 5.1 (needs Pascal–Cauchy factorization, §§2–4);
+Pascal–Cauchy factorization of residual minors (paper §4);
+det-level Lemma 5.4 / Theorem 5.1;
 Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build

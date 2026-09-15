@@ -16,6 +16,7 @@
 import CatalanSun.Ledger
 import CatalanSun.TwoAdic
 import CatalanSun.Cauchy
+import CatalanSun.CauchyBinet
 import CatalanSun.FunctionalEq
 import CatalanSun.Tail
 import CatalanSun.Residual
@@ -37,6 +38,9 @@ import CatalanSun.Structure
 #print axioms CatalanSun.Cauchy.det_cauchy_fin_two
 #print axioms CatalanSun.Cauchy.det_cauchyMatrix
 #print axioms CatalanSun.Cauchy.oddDenom_cast_ne_zero
+#print axioms CatalanSun.CauchyBinet.det_mul_eq_sum_minors
+#print axioms CatalanSun.CauchyBinet.det_mul_eq_zero_of_card_lt
+#print axioms CatalanSun.CauchyBinet.det_mul_eq_sum_minors_square
 #print axioms CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment
 #print axioms CatalanSun.FunctionalEq.no_constant_denom_solution
 #print axioms CatalanSun.FunctionalEq.no_polynomial_cleared_solution

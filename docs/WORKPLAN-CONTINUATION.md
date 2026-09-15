@@ -7,16 +7,17 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
-**Landed:** `qhat_ne_zero`; general-`n` Cauchy **`det_cauchyMatrix`** (C0–C3 PASS)
-in `CatalanSun/Cauchy.lean`. Scratchpad: `.scratchpad/geneval-cauchy-general-n/`.
+**Landed:** Cauchy–Binet **`det_mul_eq_sum_minors`** (CB0–CB3 PASS) in
+`CatalanSun/CauchyBinet.lean`. Scratchpad: `.scratchpad/geneval-cauchy-binet/`.
 
 Start here next:
 
 1. This file (`docs/WORKPLAN-CONTINUATION.md`)
-2. **Cauchy–Binet** (not in Mathlib v4.32.2) toward det-level Lemma 5.4 /
-   Pascal–Cauchy factorization (paper §4)
-3. Evidence: `.scratchpad/geneval-cauchy-general-n/`, `.scratchpad/geneval-qhat/`,
-   `.scratchpad/geneval-prop31-finish/`
+2. **Pascal–Cauchy factorization** of residual minors (paper §4) using
+   Cauchy–Binet + `det_cauchyMatrix` + Pascal/Vandermonde factors → toward
+   det-level Lemma 5.4 / Theorem 5.1
+3. Evidence: `.scratchpad/geneval-cauchy-binet/`, `.scratchpad/geneval-cauchy-general-n/`,
+   `.scratchpad/geneval-qhat/`, `.scratchpad/geneval-prop31-finish/`
 
 ## What landed
 
@@ -66,6 +67,7 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
 - `CatalanSun/TwoAdic.lean` — P1, 2-adic toolkit. Done (toolkit only).
 - `CatalanSun/Cauchy.lean` — P2, general-`n` Cauchy determinant
   (`det_cauchyMatrix` / Remark 4.1). Done.
+- `CatalanSun/CauchyBinet.lean` — Cauchy–Binet `det_mul_eq_sum_minors`. Done.
 - `CatalanSun/FunctionalEq.lean` — P3, full `no_rational_solution` + M7 ClearedEq23. Done.
 - `CatalanSun/Tail.lean` — Sun eq. 1.4. Done, sorry-free.
 - `CatalanSun/Residual.lean` — residual entries `R_{α,j}` (eq. 2.1); **entry-level**
@@ -96,9 +98,12 @@ map `o` has `(Ahat B S o).det ≠ 0`.
 **General-`n` Cauchy proved** in `CatalanSun/Cauchy.lean`: `det_cauchyMatrix`
 (Remark 4.1 product form).
 
-Det-level Lemma 5.4 / Theorem 5.1: Mathlib (pinned v4.32.2) still has **no
-Cauchy–Binet**. That is the next multi-session effort toward Pascal–Cauchy
-factorization.
+**Cauchy–Binet proved** in `CatalanSun/CauchyBinet.lean`: `det_mul_eq_sum_minors`
+(plus `m=0`/`m=1`/`square` specializations and `m > n ⇒ det = 0`).
+
+Det-level Lemma 5.4 / Theorem 5.1: next is **Pascal–Cauchy factorization** of
+the residual minor summands (paper §4), combining CB + Cauchy det + Pascal
+alternants — not yet in this repo.
 
 ## Process notes
 

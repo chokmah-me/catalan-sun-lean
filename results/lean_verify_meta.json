@@ -4,7 +4,7 @@
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 4749,
+  "build_ms": 39079,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -74,6 +74,30 @@
     },
     {
       "theorem": "CatalanSun.Cauchy.oddDenom_cast_ne_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.CauchyBinet.det_mul_eq_sum_minors",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.CauchyBinet.det_mul_eq_zero_of_card_lt",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.CauchyBinet.det_mul_eq_sum_minors_square",
       "axioms": [
         "propext",
         "Classical.choice",
@@ -635,6 +659,6 @@
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-14T23:13:37.606202+00:00",
+  "timestamp_utc": "2026-09-15T01:01:18.727893+00:00",
   "status": "pass"
 }

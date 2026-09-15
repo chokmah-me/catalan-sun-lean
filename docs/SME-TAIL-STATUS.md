@@ -46,7 +46,7 @@ Highest leverage after your tail module:
 
 1. ~~Residual entries \(R_{a,j}\) using `weightedTail`, then finish Lemma 5.4 (every \(q R_{a,j}\) is 2-integral when \(G\in\mathbb{Q}\)).~~
    **Entry-level done** in `CatalanSun/Residual.lean` (sorry-free): `Rmatrix B α j` implements eq. (2.1) directly from `weightedTail`, and `RmatrixRatWitness_twoIntegral` proves every entry `q·R_{α,j}` is 2-integral when `G = a/q`, via an induction on the eq. 1.4 recurrence (`ratWitness`) tracking `q·T_m` as an explicit rational — no need to construct the paper's finite partial sum `S_{m-1}`.
-   **Still open:** the *det-level* Lemma 5.4 / Theorem 5.1, which needs `det R[A,J]` via the full Pascal–Cauchy factorization (rank/Newton-completion apparatus of §§2–4, Corollary 2.1, Proposition 3.1) — none of that machinery (matrix rank, Cauchy–Binet expansion) is in this repo yet. That's the natural next increment if this is picked up again.
+   **Still open:** the *det-level* Lemma 5.4 / Theorem 5.1, which needs `det R[A,J]` via the full Pascal–Cauchy factorization. Rank/Newton-completion (Thm 2.1, Cor 2.1, Prop 3.1), general-`n` Cauchy, and Cauchy–Binet are now in-repo; the remaining gap is the paper §4 Pascal–Cauchy factorization of the CB summands.
 2. Full “no rational solution to \(S_0(z)+S_0(z+1)=1/(4z^2)\)” (pole chain), not just the polynomial case.
 3. Independent of Lean: certified recomputation of \(c_{\mathrm{odd}}\) / \(\Lambda_{\mathrm{mid}}\) (Arb/Sage).
 
