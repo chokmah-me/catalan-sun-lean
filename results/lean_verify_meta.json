@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "project": "C:\\Users\\Elke Shayna\\Documents\\00Dev\\catalan-sun-lean",
+  "project": "C:\\Users\\Elke Shayna\\.grok\\worktrees\\00dev-catalan-sun-lean\\subagent-01a0a533-6a98-7730-b52d-53aa2272c730",
   "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
   "target": null,
   "build_exit": 0,
-  "build_ms": 39079,
+  "build_ms": 3822,
   "sorry_hits": [],
   "native_decide_hits": [],
   "axiom_entries": [
@@ -655,10 +655,122 @@
         "Classical.choice",
         "Quot.sound"
       ]
+    },
+    {
+      "theorem": "CatalanSun.TwoAdic.isTwoIntegral_det",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.NewtonCompletion.padicValNat_two_F_B_pos",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.lemma_5_4_det",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.Rmatrix_eq_T_succ_cauchy_sum",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.RmatrixFin_submatrix_eq_mul",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.det_Rmatrix_submatrix_eq_sum_Xi",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.lemma_4_2_odd_cauchy",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix_closed",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.choose_eq_factorial_mul_paperP_of_lt_Ndim",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.det_binomMatrix_eq_factorials_mul_det_paperP",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.det_colsSubmatrix_pascalMatrix",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.lemma_4_1_psi_real",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "theorem": "CatalanSun.PascalCauchy.lemma_4_1_real",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "axiom_violations": [],
   "errors": [],
-  "timestamp_utc": "2026-09-15T01:01:18.727893+00:00",
+  "timestamp_utc": "2026-09-15T13:33:55.240189+00:00",
   "status": "pass"
 }

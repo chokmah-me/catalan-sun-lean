@@ -13,6 +13,8 @@
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Rat.Defs
+import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
@@ -120,6 +122,20 @@ theorem isTwoIntegral_sum {ι : Type*} {s : Finset ι} {f : ι → ℚ}
     exact isTwoIntegral_add (h a (Finset.mem_insert_self _ _))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
+/-- Finite products of 2-integral rationals are 2-integral. -/
+theorem isTwoIntegral_prod {ι : Type*} {s : Finset ι} {f : ι → ℚ}
+    (h : ∀ i ∈ s, IsTwoIntegral (f i)) : IsTwoIntegral (∏ i ∈ s, f i) := by
+  classical
+  revert h
+  refine s.induction_on (motive := fun t => (∀ i ∈ t, IsTwoIntegral (f i)) →
+    IsTwoIntegral (∏ i ∈ t, f i)) ?base ?step
+  · intro _
+    simpa using isTwoIntegral_nat 1
+  · intro a s ha ih h
+    rw [Finset.prod_insert ha]
+    exact isTwoIntegral_mul' (h a (Finset.mem_insert_self _ _))
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+
 /-- Division by an odd positive natural preserves 2-integrality. -/
 theorem isTwoIntegral_div_odd {q : ℚ} {d : ℕ} (hd : Odd d) (hdpos : 0 < d)
     (hq : IsTwoIntegral q) : IsTwoIntegral (q / d) := by
@@ -188,5 +204,19 @@ theorem lemma_5_4_from_layers (vF : ℕ) (R₂ : ℤ)
     (hvF : 0 < vF) (hR : 0 ≤ R₂) :
     posPart ((-(vF : ℤ)) - R₂) = 0 :=
   lemma_5_4_positive_part _ R₂ (A2_neg_of_pos_v2 vF hvF) hR
+
+/-! ## Determinant closure of 2-integrality -/
+
+/-- If every entry of a square rational matrix is 2-integral, so is its determinant. -/
+theorem isTwoIntegral_det {n : Type*} [Fintype n] [DecidableEq n]
+    (M : Matrix n n ℚ) (h : ∀ i j, IsTwoIntegral (M i j)) :
+    IsTwoIntegral M.det := by
+  classical
+  rw [Matrix.det_apply']
+  apply isTwoIntegral_sum
+  intro σ _
+  refine isTwoIntegral_mul' ?sign ?prod
+  · exact isTwoIntegral_int (Equiv.Perm.sign σ : ℤ)
+  · exact isTwoIntegral_prod fun i _ => h (σ i) i
 
 end CatalanSun.TwoAdic

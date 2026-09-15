@@ -54,6 +54,20 @@ theorem F_B_ne_zero (B : ℕ) : ((F_B B : ℕ) : ℝ) ≠ 0 := by
   intro r _
   exact factorial_ne_zero r
 
+/-- For `B ≥ 2`, `2 ∈ range (2B)` and `2 ∣ 2!`, so `2 ∣ F_B` and `v₂(F_B) > 0`.
+(Spec wrote `1 ≤ B`; at `B = 1` one has `F_B = 1` and the valuation is zero.) -/
+theorem padicValNat_two_F_B_pos {B : ℕ} (hB : 2 ≤ B) :
+    0 < padicValNat 2 (F_B B) := by
+  have h2mem : 2 ∈ range (2 * B) := by
+    rw [mem_range]
+    omega
+  have hfac : 2 ∣ Nat.factorial 2 := Nat.dvd_factorial (by decide : 0 < 2) le_rfl
+  have hdiv : 2 ∣ F_B B :=
+    dvd_trans hfac (dvd_prod_of_mem (fun r : ℕ => r.factorial) h2mem)
+  have hne : F_B B ≠ 0 := Nat.cast_ne_zero.mp (F_B_ne_zero B)
+  exact Nat.pos_of_ne_zero
+    (one_le_iff_ne_zero.mp (one_le_padicValNat_of_dvd (p := 2) hne hdiv))
+
 /-! ## Finite-difference transform `DiffMat` -/
 
 /-- Lower-triangular finite-difference matrix: row `n`, column `i` is

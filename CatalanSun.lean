@@ -26,6 +26,8 @@ import CatalanSun.NewtonCompletion
 import CatalanSun.Thm21
 import CatalanSun.Qhat
 import CatalanSun.Structure
+import CatalanSun.Lemma54
+import CatalanSun.PascalCauchy
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -110,3 +112,17 @@ import CatalanSun.Structure
 #print axioms CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R
 #print axioms CatalanSun.NewtonCompletion.prop_3_1_det_Atilde
 #print axioms CatalanSun.NewtonCompletion.qhat_ne_zero
+#print axioms CatalanSun.TwoAdic.isTwoIntegral_det
+#print axioms CatalanSun.NewtonCompletion.padicValNat_two_F_B_pos
+#print axioms CatalanSun.lemma_5_4_det
+#print axioms CatalanSun.PascalCauchy.Rmatrix_eq_T_succ_cauchy_sum
+#print axioms CatalanSun.PascalCauchy.RmatrixFin_submatrix_eq_mul
+#print axioms CatalanSun.PascalCauchy.det_Rmatrix_submatrix_eq_sum_Xi
+#print axioms CatalanSun.PascalCauchy.lemma_4_2_odd_cauchy
+#print axioms CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix
+#print axioms CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix_closed
+#print axioms CatalanSun.PascalCauchy.choose_eq_factorial_mul_paperP_of_lt_Ndim
+#print axioms CatalanSun.PascalCauchy.det_binomMatrix_eq_factorials_mul_det_paperP
+#print axioms CatalanSun.PascalCauchy.det_colsSubmatrix_pascalMatrix
+#print axioms CatalanSun.PascalCauchy.lemma_4_1_psi_real
+#print axioms CatalanSun.PascalCauchy.lemma_4_1_real

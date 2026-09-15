@@ -5,7 +5,7 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
-column rank) and absolute Corollary 2.1 are proved; det-level Lemma 5.4 /
+column rank), absolute Corollary 2.1, and det-level Lemma 5.4 are proved;
 Theorem 5.1 / Theorem 1.1 remain open.
 
 ## Status
@@ -18,7 +18,8 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | P3 | Full `no_rational_solution` for cleared `1/(4X²)` form | `CatalanSun/FunctionalEq.lean` | proved |
 | P3 / M7 | Cleared `(2X+3)²` form → ClearedEq; no-solution over ℚ/ℂ/ℝ | `CatalanSun/FunctionalEq.lean` | proved |
 | eq. 1.4 | Catalan tail `T_m + T_{m+1} = 1/(2m+1)²` | `CatalanSun/Tail.lean` | proved |
-| eq. 2.1 / entry Lemma 5.4 | `R_{α,j}` from `weightedTail`; `q·R` 2-integral when `G∈ℚ` | `CatalanSun/Residual.lean` | proved (entry-level; **not** det-level Lemma 5.4) |
+| eq. 2.1 / entry Lemma 5.4 | `R_{α,j}` from `weightedTail`; `q·R` 2-integral when `G∈ℚ` | `CatalanSun/Residual.lean` | proved (entry-level) |
+| **Det-level Lemma 5.4** | `[A₂ − R₂]₊ = 0` via entry 2-int → det 2-int and `v₂(F_B) > 0` | `CatalanSun/Lemma54.lean` | proved |
 | Rank bridge | `RmatrixFin`; full column rank ⇒ nonvanishing maximal minor | `CatalanSun/Rank.lean` | proved |
 | Cor 2.1 (conditional) | Nonvanishing minor **assuming** rank = S | `CatalanSun/Rank.lean` | proved (conditional) |
 | Thm 2.1 / M0 | Rank ↔ injective `mulVec` / nontrivial kernel | `CatalanSun/Rank.lean` | proved |
@@ -32,18 +33,20 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Prop 3.1** | `det Atilde = ± F_B · det R[A,J]` via DiffMat + fromBlocks | `NewtonCompletion.lean` | proved |
 | **`qhat_ne_zero`** | ∃ injective `o` with `det (Ahat B S o) ≠ 0` | `Qhat.lean` | proved |
 | **Cauchy–Binet** | `det(A*B) = ∑_{|s|=m} det(cols_s A)·det(rows_s B)` | `CauchyBinet.lean` | proved |
+| **PC0–PC1** | Pascal×Diag×Cauchy factorization of residual minor; CB → `∑ Ξ_I` | `PascalCauchy.lean` | proved |
+| **PC2** | Lemma 4.2 odd-Cauchy instance (`lemma_4_2_odd_cauchy`) + row-minor bridge | `PascalCauchy.lean` | proved |
+| **PC3 (structural)** | Lemma 4.1 factorization via `paperP` / real `PsiA_real`; integrality of `Ψ_A` open | `PascalCauchy.lean` | proved (PARTIAL) |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
 
-**Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign.
+**Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign. PC0 uses the matching `T_{i+1}` leading sign `(-1)^{j-1}`.
 
 ### Deferred (later sessions)
 
-Pascal–Cauchy factorization of residual minors (paper §4);
-det-level Lemma 5.4 / Theorem 5.1;
-Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+PC3 integrality (`PsiA : ℤ`); absolute identity (4.5);
+Theorem 5.1; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 

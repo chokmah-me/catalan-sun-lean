@@ -11,13 +11,13 @@
   (2.1) of R rather than left as the abstract
   `posPart_sub_eq_zero_of_neg_of_nonneg` shape already in `TwoAdic.lean`.
 
-  Does NOT assemble the full Lemma 5.4 / Theorem 5.1 apparatus: that requires
-  `det R[A, J]` via the Pascal–Cauchy factorization (§§2–4 of the paper), which
-  is not formalized in this repo.
+  Det-level Lemma 5.4 is assembled in `CatalanSun/Lemma54.lean` (avoids an
+  import cycle with NewtonCompletion). Theorem 5.1 / Pascal–Cauchy remain open.
 -/
 
 import CatalanSun.Tail
 import CatalanSun.TwoAdic
+import Mathlib.Data.Matrix.Basic
 
 set_option linter.style.header false
 set_option linter.unusedSimpArgs false
@@ -29,7 +29,7 @@ noncomputable section
 
 namespace CatalanSun.Residual
 
-open CatalanSun
+open CatalanSun Matrix
 
 /-! ## Rational witness for `q · T_m` when `G = a / q`
 
@@ -153,5 +153,15 @@ theorem RmatrixRatWitness_twoIntegral (q a B α j : ℕ) :
 theorem lemma_5_4_entry (q a B α j : ℕ) :
     0 ≤ padicValRat 2 (RmatrixRatWitness q a B α j) :=
   RmatrixRatWitness_twoIntegral q a B α j
+
+/-! ## Fin-indexed rational residual matrix
+
+Same indexing as `Rank.RmatrixFin`: rows `Fin (S+3)`, columns `Fin S` with
+column `j` corresponding to paper index `j+1`. -/
+
+/-- Rational residual matrix whose entries are `RmatrixRatWitness` (i.e. witnesses
+for `q · R_{α,j}`). -/
+def RmatrixRatFin (q a B S : ℕ) : Matrix (Fin (S + 3)) (Fin S) ℚ :=
+  Matrix.of fun α j => RmatrixRatWitness q a B α.val (j.val + 1)
 
 end CatalanSun.Residual

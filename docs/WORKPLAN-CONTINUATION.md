@@ -7,17 +7,25 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
-**Landed:** Cauchy–Binet **`det_mul_eq_sum_minors`** (CB0–CB3 PASS) in
-`CatalanSun/CauchyBinet.lean`. Scratchpad: `.scratchpad/geneval-cauchy-binet/`.
+**Landed:** Pascal–Cauchy PC0–PC3 structural in `CatalanSun/PascalCauchy.lean`
+(PC0–PC1 factorization / `∑ Ξ_I`; PC2 `lemma_4_2_odd_cauchy`;
+PC3-A/B + real `PsiA_real` / `lemma_4_1_real` — **PC3 structural only;
+integrality of integer `Ψ_A` open**). Scratchpads:
+`.scratchpad/geneval-pascal-cauchy-pc01/`,
+`.scratchpad/geneval-pascal-cauchy-pc2/`,
+`.scratchpad/geneval-pascal-cauchy-pc3/`.
 
 Start here next:
 
 1. This file (`docs/WORKPLAN-CONTINUATION.md`)
-2. **Pascal–Cauchy factorization** of residual minors (paper §4) using
-   Cauchy–Binet + `det_cauchyMatrix` + Pascal/Vandermonde factors → toward
-   det-level Lemma 5.4 / Theorem 5.1
-3. Evidence: `.scratchpad/geneval-cauchy-binet/`, `.scratchpad/geneval-cauchy-general-n/`,
-   `.scratchpad/geneval-qhat/`, `.scratchpad/geneval-prop31-finish/`
+2. **PC3 integrality** (`PsiA : ℤ`) and/or absolute identity (4.5) packaging
+   toward Theorem 5.1 — **still not** Theorem 1.1
+3. Evidence: `.scratchpad/geneval-pascal-cauchy-pc3/`,
+   `.scratchpad/geneval-pascal-cauchy-pc2/`,
+   `.scratchpad/geneval-pascal-cauchy-pc01/`,
+   `.scratchpad/geneval-lemma54-det/`, `.scratchpad/geneval-cauchy-binet/`,
+   `.scratchpad/geneval-cauchy-general-n/`, `.scratchpad/geneval-qhat/`,
+   `.scratchpad/geneval-prop31-finish/`
 
 ## What landed
 
@@ -71,7 +79,11 @@ functional equation. This is the obstruction Theorem 2.1 will use (now also via
 - `CatalanSun/FunctionalEq.lean` — P3, full `no_rational_solution` + M7 ClearedEq23. Done.
 - `CatalanSun/Tail.lean` — Sun eq. 1.4. Done, sorry-free.
 - `CatalanSun/Residual.lean` — residual entries `R_{α,j}` (eq. 2.1); **entry-level**
-  Lemma 5.4. Done. **Det-level Lemma 5.4 is NOT here.**
+  Lemma 5.4 + `RmatrixRatFin`. Done.
+- `CatalanSun/Lemma54.lean` — **det-level Lemma 5.4** (`lemma_5_4_det`). Done.
+- `CatalanSun/PascalCauchy.lean` — **PC0–PC3 structural** Pascal×Diag×Cauchy +
+  `∑ Ξ_I` + Lemma 4.2 + Lemma 4.1 via `paperP`/`PsiA_real`
+  (integrality of `Ψ_A` open). Done (PARTIAL for PC3).
 - `CatalanSun/Rank.lean` — `RmatrixFin`; rank→minor bridge; conditional Cor 2.1; M0. Done.
 - `CatalanSun/NewtonDiff.lean` — M1–M2 finite-diff / Newton helpers. Done.
 - `CatalanSun/Structure.lean` — M4 `Dlam`/`Plam` + degree bounds. Done.
@@ -101,9 +113,21 @@ map `o` has `(Ahat B S o).det ≠ 0`.
 **Cauchy–Binet proved** in `CatalanSun/CauchyBinet.lean`: `det_mul_eq_sum_minors`
 (plus `m=0`/`m=1`/`square` specializations and `m > n ⇒ det = 0`).
 
-Det-level Lemma 5.4 / Theorem 5.1: next is **Pascal–Cauchy factorization** of
-the residual minor summands (paper §4), combining CB + Cauchy det + Pascal
-alternants — not yet in this repo.
+**Det-level Lemma 5.4 landed** (no Pascal–Cauchy required for the positive-part
+vanishing: entry 2-integrality ⇒ det 2-integrality ⇒ `R₂ ≥ 0`, and
+`v₂(F_B) > 0` for `B ≥ 2`).
+
+**PC0–PC3 structural landed** in `CatalanSun/PascalCauchy.lean`: residual minor =
+Pascal × DiagCauchy, then Cauchy–Binet → `∑ Ξ_I` (paper (4.1) without `q^S`);
+Lemma 4.2 odd-Cauchy closed form; Lemma 4.1 structural factorization
+`binomMatrix.det = V(I)·PsiA_real·(∏ row factorials)/(∏ col factorials)`
+with real `PsiA_real := det(paperPMatrix)/V(I)`.
+**Blocked for full PC3 PASS:** integrality `PsiA : ℤ` needs a local
+`det_polyEval_dvd_vandermonde` / alternating⇒Vandermonde-dvd over `ℤ`
+(Mathlib `det_eval_matrixOfPolynomials_eq_det_vandermonde` is the wrong
+tool — deg `P_a` can exceed `S-1`).
+Theorem 5.1 still needs PC3 integrality and the rational/`q`
+packaging of `Xi` / absolute identity (4.5).
 
 ## Process notes
 
