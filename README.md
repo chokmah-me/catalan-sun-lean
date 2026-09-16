@@ -5,8 +5,8 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
-column rank), absolute Corollary 2.1, and det-level Lemma 5.4 are proved;
-Theorem 5.1 / Theorem 1.1 remain open.
+column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
+5.1** are proved; Theorem 1.1 remains open.
 
 ## Status
 
@@ -37,28 +37,23 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **PC2** | Lemma 4.2 odd-Cauchy instance (`lemma_4_2_odd_cauchy`) + row-minor bridge | `PascalCauchy.lean` | proved |
 | **PC3** | Lemma 4.1 factorization via `paperP` / integer `PsiA : ℤ` (`det_polyEval_dvd_vandermonde`) | `PascalCauchy.lean` | proved |
 | **(4.5) signed** | `Xi_closed_form` (no `q`/`|·|`): ABS-A DiagCauchy factor + two `V(I)` + `PsiA` + weights | `PascalCauchy.lean` | proved |
-| **Thm 5.1 scaffold** | Layer defs `phiQ`/`NKQ`/`nQr`/`CAQ`/`FNQ`/`ellAQ`/`mAQ`/`aQB` + `thm_5_1_statement` (unproved) | `Thm51.lean` | defs only |
+| **Thm 5.1 scaffold** | Layer defs `phiQ`/`NKQ`/`nQr`/`CAQ`/`FNQ`/`ellAQ`/`mAQ`/`aQB` + `thm_5_1_statement` | `Thm51.lean` | defs |
 | **Thm 5.1 COMB** | Φ_Q remainder (5.3); consecutive collision (5.15); balanced occupancy minimizes collisions | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-A/B/C** | `mAQ_le_ellAQ`; (5.16) `aQB_sub_ellAQ_consecutive`; (5.17) `phiQ_add_CAQ_le_phiQ_N` | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
-| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for `Q ≥ 2·Ndim B S + 2·B`, `Q ≤ B`, `Q ≤ 2·B`, and (via exact floor-division, not the crude bound) `2·B < Q < 2·Ndim B S + 2·B` given the extra `hA1lt` hypothesis (`sum_NKQ_tail_ge_of_gap`) | `Thm51.lean` | partial — narrow sliver of ~2-4 odd `Q` values just above `2·B` (where `hA1lt` fails) still open |
+| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`, now **unconditional**: dispatches over `Q ≤ 2·B`, `Q ≥ 2·Ndim B S + 2·B`, and (splitting the middle gap in two) `sum_NKQ_tail_ge_of_gap` / `sum_NKQ_tail_ge_of_gap2` | `Thm51.lean` | **proved** |
+| **Thm 5.1** | `thm_5_1 : thm_5_1_statement`, assembled from PROOF-A–E via `linarith` | `Thm51.lean` | **proved** |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
-Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Reduction of `thm_5_1` to the single
-target `sum_NKQ_tail_ge`, with its remaining middle-`Q`-regime gap: `docs/THM51-REDUCTION-NOTES.md`.
+Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5_1`
+(now complete) is in `docs/THM51-REDUCTION-NOTES.md`.
 
 **Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign. PC0 uses the matching `T_{i+1}` leading sign `(-1)^{j-1}`.
 
 ### Deferred (later sessions)
 
-Finish Theorem 5.1 proof — close the narrow residual sliver in `sum_NKQ_tail_ge`
-(~2-4 odd `Q` values just above `2·B` where `sum_NKQ_tail_ge_of_gap`'s `hA1lt`
-hypothesis fails because `A1 = A3+B` wraps `Q` a second time; see
-`docs/THM51-REDUCTION-NOTES.md`'s "Session 2026-09-16 (continued)" for two
-candidate closing strategies), wire the four partial `sum_NKQ_tail_ge_of_*`
-lemmas into a single `Q`-range case split proving unconditional
-`sum_NKQ_tail_ge`, and assemble `thm_5_1`; Lemma 5.3; Props 6.3/7.4;
+Theorem 5.1 is now fully proved. Remaining work: Lemma 5.3; Props 6.3/7.4;
 Mertens/PNT; Theorem 1.1.
 
 ## Build

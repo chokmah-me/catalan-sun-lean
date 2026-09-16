@@ -142,3 +142,5 @@ import CatalanSun.Thm51
 #print axioms CatalanSun.Thm51.sum_choose_nQr_consecutive
 #print axioms CatalanSun.Thm51.collisionSum_eq_phiQ_of_balanced
 #print axioms CatalanSun.Thm51.collisionSum_ge_phiQ
+#print axioms CatalanSun.Thm51.sum_NKQ_tail_ge
+#print axioms CatalanSun.Thm51.thm_5_1

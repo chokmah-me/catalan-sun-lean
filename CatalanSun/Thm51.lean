@@ -1673,11 +1673,9 @@ Ndim B S + 1 + r0Q Q`, `A4 = S + 1 + r0Q Q`, `A1 = A3+B`, `A2 = A4+B` (the two
 `⌊A3/Q⌋=1`) plus the extra hypothesis `hA1lt : A1 < 2*Q` (no *second*
 wraparound forming `A1` from `A3`) makes `phiQ (A1) - phiQ (A3) = B` and
 `phiQ (A2) = phiQ (A4)` exactly, reducing (KI) to a `phiQ N + 2 phiQ S ≤ 2B`
-quadratic-positivity fact (same technique as `_le_2B`). Numerically (see
-`docs/THM51-REDUCTION-NOTES.md`), `hA1lt` fails only on a narrow window just
-above `Q = 2*B` (e.g. `B=20`: `Q ∈ {41,43}` before `hA1lt` starts holding at
-`Q=45`) — that sliver is not yet covered by any lemma in this file and is the
-remaining gap after this one. -/
+quadratic-positivity fact (same technique as `_le_2B`). `hA1lt`'s negation
+(`A1 ≥ 2*Q`) is covered by `sum_NKQ_tail_ge_of_double_wrap` below (the two
+together cover all of `2*B < Q < 2*Ndim B S + 2*B`). -/
 theorem sum_NKQ_tail_ge_of_gap {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
     (hB : 20 ≤ B) (hSB : S * 20 ≤ B)
     (hS : S ≤ Ndim B S)
@@ -1788,6 +1786,239 @@ theorem sum_NKQ_tail_ge_of_gap {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
       exact_mod_cast hfinal
     linarith [hgoal]
 
+set_option maxHeartbeats 4000000 in
+-- Three internal case-split branches, each with its own `phiQ_poly_le`-based
+-- `nlinarith` polynomial step, push the default heartbeat budget over the edge.
+/-- (KI), closing the residual sliver left by `sum_NKQ_tail_ge_of_gap`: the
+negation of its hypothesis, `Ndim B S + 2*B + 1 + r0Q Q ≥ 2*Q`. Writing
+`A1 = Ndim B S + (B+1) + r0Q Q`, `A2 = S + (B+1) + r0Q Q`, `A3 = Ndim B S + 1
++ r0Q Q`, `A4 = S + 1 + r0Q Q` as before: throughout this residual band one
+has `Q ≤ A3 < 2Q` (so `⌊A3/Q⌋ = 1`, ruling out `_gap`'s `d = 0` case) and
+`A4 < Q` (`⌊A4/Q⌋ = 0`, unconditional given the ratio hypothesis), but now
+`A2 ≥ Q` (`⌊A2/Q⌋ = 1`, unlike `_gap`'s case) and `A1` can be either `< 2Q`
+(`⌊A1/Q⌋ = 1`) or `≥ 2Q` (`⌊A1/Q⌋ = 2`, a *second* wraparound). Rather than
+extend the `no_wrap`-additive-identity route (which breaks down exactly when
+a second wraparound occurs), this applies `phiQ_formula` directly at each of
+the four points with its explicit, `omega`-derived quotient — valid
+regardless of how many times `Q` has been wrapped — collapsing `2*sumT` to
+one of two closed forms (`2*Q - 2*S - 2*r0Q Q - 2` or `2*B + 2*N - 2*Q -
+2*S`), each of which reduces (KI) to a quadratic-in-`Q` fact closed via
+`phiQ_poly_le` plus the ratio hypothesis (same technique as `_le_2B`/`_gap`).
+Together with `sum_NKQ_tail_ge_of_Q_le_2B` and `sum_NKQ_tail_ge_of_gap`, this
+closes all of `2*B < Q < 2*Ndim B S + 2*B`. -/
+theorem sum_NKQ_tail_ge_of_gap2 {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B)
+    (hS : S ≤ Ndim B S)
+    (hQlo : 2 * B < Q) (hQhi : Q < 2 * Ndim B S + 2 * B)
+    (hA1ge : 2 * Q ≤ Ndim B S + 2 * B + 1 + r0Q Q) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  rw [sum_NKQ_tail_eq hQ hodd hS]
+  set N := Ndim B S with hNdef
+  set r := r0Q Q with hrdef
+  have hNv : N = 2 * B + S + 3 := hNdef
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  have hSB' : S ≤ B := by have : S * 20 ≤ B := hSB; omega
+  -- `A4 < Q` and `Q ≤ A3 < 2Q` hold throughout the whole `2B<Q<2N+2B` gap.
+  have hA4ltQ : S + 1 + r < Q := by omega
+  have hA3ge : Q ≤ N + 1 + r := by omega
+  have hA3ltQ2 : N + 1 + r < 2 * Q := by omega
+  -- `phiQ_formula` at `A4` (`q=0`) and `A3` (`q=1`): exact regardless of `A1`,`A2`.
+  have hφA4 : phiQ Q (S + 1 + r) = Q * (0 * (0 - 1) / 2) + (S + 1 + r) * 0 :=
+    phiQ_formula (Q := Q) (n := S + 1 + r) (q := 0) (r := S + 1 + r) hQ hA4ltQ (by ring)
+  have hφA3 : phiQ Q (N + 1 + r) =
+      Q * (1 * (1 - 1) / 2) + (N + 1 + r - Q) * 1 :=
+    phiQ_formula (Q := Q) (n := N + 1 + r) (q := 1) (r := N + 1 + r - Q) hQ
+      (by omega) (by omega)
+  have hφA4' : phiQ Q (S + 1 + r) = 0 := by simpa using hφA4
+  have hφA3' : phiQ Q (N + 1 + r) = N + 1 + r - Q := by
+    have hz : (1 : ℕ) * (1 - 1) / 2 = 0 := by norm_num
+    rw [hφA3, hz]; ring_nf
+  have hcast4 : (phiQ Q (S + 1 + r) : ℤ) = 0 := by exact_mod_cast hφA4'
+  have hcast3 : (phiQ Q (N + 1 + r) : ℤ) = (N : ℤ) + 1 + r - Q := by
+    rw [hφA3']; push_cast [Nat.cast_sub hA3ge]; ring
+  by_cases hA2ltQ : S + (B + 1) + r < Q
+  · -- `⌊A2/Q⌋ = 0`; the residual condition (`hA1ge`) then forces `A1 ≥ Q`
+    -- (in fact `⌊A1/Q⌋ = 1`, since `A1 - A2 = N - S` is a fixed constant and
+    -- `Q > 2B ≥ N - S` cannot push `A1` two full multiples past `A2`'s zero).
+    -- This is the *same* closed form as `_gap`'s `d = 1` case; the difference
+    -- from `_gap` is only that `_gap`'s stated hypothesis is stronger than
+    -- needed to derive `A2 < Q`, so it doesn't cover this branch even though
+    -- the same combination applies.
+    have hφA2 : phiQ Q (S + (B + 1) + r) = 0 :=
+      phiQ_of_lt (le_of_lt hA2ltQ)
+    have hA1geQ : Q ≤ N + (B + 1) + r := by omega
+    have hφA1 : phiQ Q (N + (B + 1) + r) =
+        Q * (1 * (1 - 1) / 2) + (N + (B + 1) + r - Q) * 1 :=
+      phiQ_formula (Q := Q) (n := N + (B + 1) + r) (q := 1) (r := N + (B + 1) + r - Q) hQ
+        (by omega) (by omega)
+    have hφA1' : phiQ Q (N + (B + 1) + r) = N + (B + 1) + r - Q := by
+      have hz : (1 : ℕ) * (1 - 1) / 2 = 0 := by norm_num
+      rw [hφA1, hz]; ring_nf
+    have hcast1 : (phiQ Q (N + (B + 1) + r) : ℤ) = (N : ℤ) + (B + 1) + r - Q := by
+      rw [hφA1']; push_cast [Nat.cast_sub hA1geQ]; ring
+    have hcast2 : (phiQ Q (S + (B + 1) + r) : ℤ) = 0 := by exact_mod_cast hφA2
+    -- `sumT = B` exactly, matching `_gap`'s `d = 1` closed form.
+    have hsumT : ((phiQ Q (N + (B + 1) + r) : ℤ) - (phiQ Q (S + (B + 1) + r) : ℤ)
+          - (phiQ Q (N + 1 + r) : ℤ) + (phiQ Q (S + 1 + r) : ℤ)) =
+        (B : ℤ) := by
+      rw [hcast1, hcast2, hcast3, hcast4]; ring
+    have hgoal2 : (phiQ Q N : ℤ) + 2 * (phiQ Q S : ℤ) ≤ 2 * (B : ℤ) := by
+      have hN_le := phiQ_poly_le (Q := Q) (n := N) hQ
+      have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+      have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+      have hBQ : (20 : ℚ) ≤ B := by exact_mod_cast hB
+      have hSBQ : (S : ℚ) * 20 ≤ B := by exact_mod_cast hSB
+      have hQloQ : (2 : ℚ) * B < Q := by exact_mod_cast hQlo
+      have hQhiQ : (Q : ℚ) < 2 * N + 2 * B := by
+        have hh : (Q : ℕ) < 2 * N + 2 * B := hQhi
+        exact_mod_cast hh
+      have hNvQ : (N : ℚ) = 2 * (B : ℚ) + S + 3 := by
+        rw [hNv]; push_cast; ring
+      rw [hNvQ] at hN_le hQhiQ
+      have hpoly : (4 * (2*(B:ℚ)+S+3) * (2*(B:ℚ)+S+3) - 4 * (2*(B:ℚ)+S+3) * Q + Q * Q)
+            + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤ 8 * Q * (2 * (B:ℚ)) := by
+        nlinarith [hQloQ, hQhiQ, hBQ, hSBQ, sq_nonneg ((Q:ℚ) - 2*B),
+          mul_nonneg (Nat.cast_nonneg S : (0:ℚ) ≤ S) (by linarith : (0:ℚ) ≤ B - 20*S)]
+      have hchain : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S ≤ 8 * Q * (2 * (B:ℚ)) :=
+        le_trans (by linarith [hN_le, hS_le]) hpoly
+      have h8Q : (0:ℚ) < 8 * Q := by positivity
+      have heqL : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S =
+          8 * (Q:ℚ) * ((phiQ Q N : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+      rw [heqL] at hchain
+      have hfinal := le_of_mul_le_mul_left hchain h8Q
+      exact_mod_cast hfinal
+    linarith [hsumT, hgoal2]
+  · -- `⌊A2/Q⌋ = 1` (`A2 ≥ Q`). `A1` can be either `< 2Q` (`⌊A1/Q⌋ = 1`) or
+    -- `≥ 2Q` (`⌊A1/Q⌋ = 2`, a second wraparound); split further.
+    simp only [not_lt] at hA2ltQ
+    have hA2ltQ2 : S + (B + 1) + r < 2 * Q := by omega
+    have hφA2 : phiQ Q (S + (B + 1) + r) =
+        Q * (1 * (1 - 1) / 2) + (S + (B + 1) + r - Q) * 1 :=
+      phiQ_formula (Q := Q) (n := S + (B + 1) + r) (q := 1) (r := S + (B + 1) + r - Q) hQ
+        (by omega) (by omega)
+    have hφA2' : phiQ Q (S + (B + 1) + r) = S + (B + 1) + r - Q := by
+      have hz : (1 : ℕ) * (1 - 1) / 2 = 0 := by norm_num
+      rw [hφA2, hz]; ring_nf
+    have hcast2 : (phiQ Q (S + (B + 1) + r) : ℤ) = (S : ℤ) + (B + 1) + r - Q := by
+      rw [hφA2']; push_cast [Nat.cast_sub hA2ltQ]; ring
+    by_cases hA1lt2Q : N + (B + 1) + r < 2 * Q
+    · -- `⌊A1/Q⌋ = 1`.
+      have hA1geQ : Q ≤ N + (B + 1) + r := by omega
+      have hφA1 : phiQ Q (N + (B + 1) + r) =
+          Q * (1 * (1 - 1) / 2) + (N + (B + 1) + r - Q) * 1 :=
+        phiQ_formula (Q := Q) (n := N + (B + 1) + r) (q := 1) (r := N + (B + 1) + r - Q) hQ
+          (by omega) (by omega)
+      have hφA1' : phiQ Q (N + (B + 1) + r) = N + (B + 1) + r - Q := by
+        have hz : (1 : ℕ) * (1 - 1) / 2 = 0 := by norm_num
+        rw [hφA1, hz]; ring_nf
+      have hcast1 : (phiQ Q (N + (B + 1) + r) : ℤ) = (N : ℤ) + (B + 1) + r - Q := by
+        rw [hφA1']; push_cast [Nat.cast_sub hA1geQ]; ring
+      -- `sumT = Q - S - r - 1` exactly (the `N`-dependence cancels).
+      have hsumT : ((phiQ Q (N + (B + 1) + r) : ℤ) - (phiQ Q (S + (B + 1) + r) : ℤ)
+            - (phiQ Q (N + 1 + r) : ℤ) + (phiQ Q (S + 1 + r) : ℤ)) =
+          (Q : ℤ) - S - r - 1 := by
+        rw [hcast1, hcast2, hcast3, hcast4]; ring
+      have hgoal2 : (phiQ Q N : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+          2 * ((Q : ℤ) - S - r - 1) := by
+        have hN_le := phiQ_poly_le (Q := Q) (n := N) hQ
+        have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+        have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+        have hBQ : (20 : ℚ) ≤ B := by exact_mod_cast hB
+        have hSBQ : (S : ℚ) * 20 ≤ B := by exact_mod_cast hSB
+        have hQloQ : (2 : ℚ) * B < Q := by exact_mod_cast hQlo
+        have hA1lt2QQ : (N : ℚ) + (B + 1) + r < 2 * Q := by exact_mod_cast hA1lt2Q
+        have hA2geQQ : (Q : ℚ) ≤ S + (B + 1) + r := by exact_mod_cast hA2ltQ
+        have hqrQ : 2 * (r : ℚ) + 1 = Q := by exact_mod_cast hqr
+        have hNvQ : (N : ℚ) = 2 * (B : ℚ) + S + 3 := by
+          rw [hNv]; push_cast; ring
+        rw [hNvQ] at hN_le hA1lt2QQ
+        have hpoly : (4 * (2*(B:ℚ)+S+3) * (2*(B:ℚ)+S+3) - 4 * (2*(B:ℚ)+S+3) * Q + Q * Q)
+              + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤
+            8 * Q * (2 * ((Q:ℚ) - S - r - 1)) := by
+          nlinarith [hQloQ, hBQ, hSBQ, hqrQ, hA1lt2QQ, hA2geQQ, sq_nonneg ((Q:ℚ) - 2*B),
+            mul_nonneg (Nat.cast_nonneg S : (0:ℚ) ≤ S) (by linarith : (0:ℚ) ≤ B - 20*S)]
+        have hchain : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S ≤
+            8 * Q * (2 * ((Q:ℚ) - S - r - 1)) :=
+          le_trans (by linarith [hN_le, hS_le]) hpoly
+        have h8Q : (0:ℚ) < 8 * Q := by positivity
+        have heqL : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S =
+            8 * (Q:ℚ) * ((phiQ Q N : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+        rw [heqL] at hchain
+        have hfinal := le_of_mul_le_mul_left hchain h8Q
+        exact_mod_cast hfinal
+      linarith [hsumT, hgoal2]
+    · -- `⌊A1/Q⌋ = 2`: a second wraparound.
+      simp only [not_lt] at hA1lt2Q
+      have hA1lt3Q : N + (B + 1) + r < 3 * Q := by omega
+      have hφA1 : phiQ Q (N + (B + 1) + r) =
+          Q * (2 * (2 - 1) / 2) + (N + (B + 1) + r - 2 * Q) * 2 :=
+        phiQ_formula (Q := Q) (n := N + (B + 1) + r) (q := 2) (r := N + (B + 1) + r - 2 * Q) hQ
+          (by omega) (by omega)
+      have hφA1' : phiQ Q (N + (B + 1) + r) = Q + 2 * (N + (B + 1) + r - 2 * Q) := by
+        have hz : Q * (2 * (2 - 1) / 2) = Q := by norm_num
+        rw [hφA1, hz]; ring
+      have hcast1 : (phiQ Q (N + (B + 1) + r) : ℤ) =
+          (Q : ℤ) + 2 * ((N : ℤ) + (B + 1) + r - 2 * Q) := by
+        rw [hφA1']; push_cast [Nat.cast_sub hA1lt2Q]; ring
+      -- `2*sumT = 2*B + 2*N - 2*Q - 2*S` exactly (the `r`-dependence cancels).
+      have hsumT : ((phiQ Q (N + (B + 1) + r) : ℤ) - (phiQ Q (S + (B + 1) + r) : ℤ)
+            - (phiQ Q (N + 1 + r) : ℤ) + (phiQ Q (S + 1 + r) : ℤ)) =
+          (B : ℤ) + N - Q - S := by
+        rw [hcast1, hcast2, hcast3, hcast4]; ring
+      have hgoal2 : (phiQ Q N : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+          2 * ((B : ℤ) + N - Q - S) := by
+        have hN_le := phiQ_poly_le (Q := Q) (n := N) hQ
+        have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+        have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+        have hBQ : (20 : ℚ) ≤ B := by exact_mod_cast hB
+        have hSBQ : (S : ℚ) * 20 ≤ B := by exact_mod_cast hSB
+        have hQloQ : (2 : ℚ) * B < Q := by exact_mod_cast hQlo
+        have hA1geQQ : 2 * (Q : ℚ) ≤ (N : ℚ) + (B + 1) + r := by exact_mod_cast hA1lt2Q
+        have hqrQ : 2 * (r : ℚ) + 1 = Q := by exact_mod_cast hqr
+        have hNvQ : (N : ℚ) = 2 * (B : ℚ) + S + 3 := by
+          rw [hNv]; push_cast; ring
+        rw [hNvQ] at hN_le hA1geQQ
+        have hpoly : (4 * (2*(B:ℚ)+S+3) * (2*(B:ℚ)+S+3) - 4 * (2*(B:ℚ)+S+3) * Q + Q * Q)
+              + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤
+            8 * Q * (2 * ((B:ℚ) + (2*(B:ℚ)+S+3) - Q - S)) := by
+          nlinarith [hQloQ, hA1geQQ, hqrQ, hBQ, hSBQ, sq_nonneg ((Q:ℚ) - 2*B),
+            mul_nonneg (Nat.cast_nonneg S : (0:ℚ) ≤ S) (by linarith : (0:ℚ) ≤ B - 20*S)]
+        have hchain : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S ≤
+            8 * Q * (2 * ((B:ℚ) + (2*(B:ℚ)+S+3) - Q - S)) :=
+          le_trans (by linarith [hN_le, hS_le]) hpoly
+        have h8Q : (0:ℚ) < 8 * Q := by positivity
+        have heqL : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S =
+            8 * (Q:ℚ) * ((phiQ Q N : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+        rw [heqL] at hchain
+        have hfinal : (phiQ Q N : ℚ) + 2 * (phiQ Q S : ℚ) ≤
+            2 * ((B:ℚ) + (2*(B:ℚ)+S+3) - Q - S) :=
+          le_of_mul_le_mul_left hchain h8Q
+        have hNvQ' : (N : ℚ) = 2 * (B : ℚ) + S + 3 := by rw [hNv]; push_cast; ring
+        rw [← hNvQ'] at hfinal
+        exact_mod_cast hfinal
+      linarith [hsumT, hgoal2]
+
+/-- (KI), unconditional: dispatches on `Q` relative to `2*B` and
+`2*Ndim B S + 2*B`, and (inside the middle gap) on `_gap`'s `hA1lt` versus its
+negation, to cover the full range via `sum_NKQ_tail_ge_of_Q_le_2B`,
+`sum_NKQ_tail_ge_of_Q_large`, `sum_NKQ_tail_ge_of_gap`, and
+`sum_NKQ_tail_ge_of_gap2`. -/
+theorem sum_NKQ_tail_ge {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B) (hS : S ≤ Ndim B S) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  by_cases h2B : Q ≤ 2 * B
+  · exact sum_NKQ_tail_ge_of_Q_le_2B hQ hodd hB hSB hS h2B
+  · simp only [not_le] at h2B
+    by_cases hlarge : 2 * Ndim B S + 2 * B ≤ Q
+    · exact sum_NKQ_tail_ge_of_Q_large hS hlarge
+    · simp only [not_le] at hlarge
+      by_cases hA1 : Ndim B S + 2 * B + 1 + r0Q Q < 2 * Q
+      · exact sum_NKQ_tail_ge_of_gap hQ hodd hB hSB hS h2B hlarge hA1
+      · simp only [not_lt] at hA1
+        exact sum_NKQ_tail_ge_of_gap2 hQ hodd hB hSB hS h2B hlarge hA1
+
 /-- Paper Theorem 5.1 as a proposition. -/
 def thm_5_1_statement : Prop :=
   ∀ (B : ℕ), 20 ≤ B →
@@ -1795,5 +2026,23 @@ def thm_5_1_statement : Prop :=
       ∀ (S : ℕ), 0 < S → S * 20 ≤ B →
         ∀ (f : Fin S → Fin (S + 3)), Function.Injective f →
           aQB B S Q ≥ mAQ B S Q f
+
+/-- Theorem 5.1, assembled from PROOF-A/B/C/D/E: `aQB_sub_ellAQ_consecutive`
+(5.16) plus `second_line_nonneg` (drop the nonneg correction sum) plus
+`phiQ_add_CAQ_le_phiQ_N` (5.17) plus `sum_NKQ_tail_ge` (KI, now unconditional)
+plus `mAQ_le_ellAQ_consecutive` chain to the target inequality; see
+`docs/THM51-REDUCTION-NOTES.md` for the derivation. -/
+theorem thm_5_1 : thm_5_1_statement := by
+  intro B hB Q hOPP S hS0 hSB f hf
+  have hQ : 0 < Q := hOPP.pos
+  have hodd : Odd Q := hOPP.odd
+  have hSN : S ≤ Ndim B S := S_le_Ndim B S
+  have h16 := aQB_sub_ellAQ_consecutive (B := B) (S := S) (Q := Q) hQ hSN f
+  have h17 := phiQ_add_CAQ_le_phiQ_N (B := B) (S := S) (Q := Q) f hf
+  have h2 := second_line_nonneg (B := B) (S := S) (Q := Q) hSN
+  have hKI := sum_NKQ_tail_ge (B := B) (S := S) (Q := Q) hQ hodd hB hSB hSN
+  have hle := mAQ_le_ellAQ_consecutive (B := B) (S := S) (Q := Q) f hSN
+  simp only [ge_iff_le]
+  linarith
 
 end CatalanSun.Thm51

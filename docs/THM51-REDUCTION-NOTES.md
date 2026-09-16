@@ -472,6 +472,49 @@ sliver is closed. Not yet attempted this session — `sum_NKQ_tail_ge_of_gap`
 was landed as a standalone lemma with its own explicit hypotheses, not yet
 wired into a case-split dispatcher.
 
+## Session 2026-09-16 (continued further): residual sliver closed, `thm_5_1` proved
+
+Landed, `lake build`-verified, zero-`sorry`: `sum_NKQ_tail_ge_of_gap2`, the
+unconditional `sum_NKQ_tail_ge` (dispatching over `Q ≤ 2B`, `Q ≥ 2·Ndim B S +
+2·B`, and `_gap`/`_gap2` for the two halves of the middle range), and
+`thm_5_1` itself (the `linarith` assembly sketched earlier in this file).
+**Theorem 5.1 is now fully proved**, `#print axioms` restricted to
+`[propext, Classical.choice, Quot.sound]`.
+
+**Correction to the earlier "~2-4 values" estimate.** The previous session's
+claim that `hA1lt`'s failure band was only ~2-4 odd `Q` values just above `2B`
+was checked only at `B=20`; a wider scan showed the true residual (negation
+of `sum_NKQ_tail_ge_of_gap`'s literal hypothesis `Ndim B S + 2*B + 1 + r0Q Q <
+2*Q`) grows *linearly* with `B` (e.g. ~35 values at `B=2000`), and moreover is
+not uniformly pinned to a single `(⌊A1/Q⌋,⌊A2/Q⌋)` quotient pair — a first
+attempt assuming a single closed form `(2,1)` for the whole residual failed
+numerically once `S` was allowed to range over its full `1..B/20` domain (not
+just `S = B/20`), which had masked a further sub-case. The residual actually
+splits into three quotient regimes, all reachable depending on `B,S,Q`:
+`(⌊A1/Q⌋,⌊A2/Q⌋) ∈ {(1,0), (1,1), (2,1)}` (the fourth combinatorial
+possibility, `(2,0)`, never occurs — `A1 − A2 = Ndim B S − S` is a fixed
+constant and `Q > 2B` bounds how far apart their quotients can be).
+
+**How it was closed.** `sum_NKQ_tail_ge_of_gap2` handles the full residual
+(negation of `_gap`'s hypothesis) via `phiQ_formula` applied directly at each
+of the four shifted points with `omega`-derived, explicit integer quotients —
+not the `no_wrap` additive identity (`phiQ_add_eq_phiQ_add_of_no_wrap`), which
+only covers single-wrap steps and cannot express a second wraparound. Internal
+structure: outer `by_cases` on `A2 < Q` (`(1,0)` vs `A2 ≥ Q`), then inner
+`by_cases` on `A1 < 2*Q` within the `A2 ≥ Q` branch (`(1,1)` vs `(2,1)`). Each
+branch collapses `2*sumT` to its own closed form (`2*B`, `2*Q−2*S−2*r0Q Q−2`,
+or `2*B+2*N−2*Q−2*S` respectively) and closes via the same
+`phiQ_poly_le`-based quadratic-positivity technique as `_le_2B`/`_gap`, using
+the branch's own tight linear hypothesis (not `hQhi`) as the `nlinarith` hint
+— the `(2,1)` branch's polynomial fact is false against the full `hQhi` upper
+bound but true against the tighter `A1 ≥ 2*Q` bound, which was the fix needed
+after an initial `nlinarith` failure with the looser hint.
+
+**`sum_NKQ_tail_ge`** dispatches `Q ≤ 2*B` / `Q ≥ 2*Ndim B S + 2*B` / (within
+the remaining gap) `_gap`'s `hA1lt` / its negation, calling the four regime
+lemmas. **`thm_5_1`** is exactly the `linarith` assembly this file sketched
+under "The reduction" above, now with all five inputs proved unconditionally.
+
 ## Environment note for next session
 
 This session could not install Lean/elan: `elan toolchain install` failed
