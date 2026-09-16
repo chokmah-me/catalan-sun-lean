@@ -32,13 +32,29 @@ the naive asymptotic bounds (`phiQ_sub_quadratic_*`) are too coarse to close it.
 
 Start here next:
 
+**2026-09-16 update:** narrowed the gap further. `sum_NKQ_tail_ge_of_Q_le_2B`
+(`Thm51.lean`) extends the "small Q" regime from `Q ≤ B` to `Q ≤ 2*B` — same
+crude `phiQ_poly_le/ge` machinery, but with the exact `r0Q`-independent
+identity `A1²-A2²-A3²+A4² = 4B²+6B` making the remaining pure-polynomial
+inequality closable by a concavity argument (`g` concave in `Q`, check both
+endpoints `Q=0` and `Q=2B`, combine via convexity). **The crude bound is
+provably maxed out here** — hand analysis (see chat/agent notes, not yet a
+doc) shows the same style of bound fails once `Q` exceeds roughly `2.2*B`.
+**Remaining open gap: `2*B < Q < 2*Ndim B S + 2*B`** (was `B < Q < 6B`).
+Closing it needs the *exact* `phiQ_formula` (not the `±Q/8`-slop relaxation)
+via finite case-splits on the quotient `n / Q` for each of the six arguments
+— see the plan sketch referenced below.
+
+Start here next:
+
 1. `docs/THM51-REDUCTION-NOTES.md` — the precise reduction and open target.
 2. This file (`docs/WORKPLAN-CONTINUATION.md`)
-3. **Finish Theorem 5.1 proof** — prove `sum_NKQ_tail_ge` (residue engine,
-   paper's (5.18)–(5.21)) via the double-counting strategy in the reduction
-   notes, then land the `thm_5_1` assembly sketched there (needs a working
-   `lake build` — the reduction/assembly was never type-checked); then
-   Lemma 5.3. **Still not** Theorem 1.1.
+3. **Finish Theorem 5.1 proof** — close `2*B < Q < 2*Ndim B S + 2*B` in
+   `sum_NKQ_tail_ge` via exact `phiQ_formula`-based case splits (paper's
+   (5.18)–(5.21) residue engine), mirroring `sum_NKQ_tail_ge_of_Q_le_2B`'s
+   proof shape but without the `±Q/8` relaxation; then land the `thm_5_1`
+   assembly sketched in the reduction notes; then Lemma 5.3. **Still not**
+   Theorem 1.1.
 4. Evidence: `.scratchpad/geneval-thm51-proof/`,
    `.scratchpad/geneval-thm51-comb/`,
    `.scratchpad/geneval-abs45-thm51-scaffold/`,

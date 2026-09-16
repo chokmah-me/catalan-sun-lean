@@ -41,7 +41,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Thm 5.1 COMB** | Φ_Q remainder (5.3); consecutive collision (5.15); balanced occupancy minimizes collisions | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-A/B/C** | `mAQ_le_ellAQ`; (5.16) `aQB_sub_ellAQ_consecutive`; (5.17) `phiQ_add_CAQ_le_phiQ_N` | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
-| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for two disjoint `Q`-regimes, `Q ≥ 2·Ndim B S + 2·B` (`sum_NKQ_tail_ge_of_Q_large`) and `Q ≤ B` (`sum_NKQ_tail_ge_of_Q_small`) | `Thm51.lean` | partial — gap `B < Q < 2·Ndim B S + 2·B` open |
+| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for `Q ≥ 2·Ndim B S + 2·B` (`sum_NKQ_tail_ge_of_Q_large`), `Q ≤ B` (`sum_NKQ_tail_ge_of_Q_small`), and `Q ≤ 2·B` (`sum_NKQ_tail_ge_of_Q_le_2B`, the max reach of the crude bound) | `Thm51.lean` | partial — gap `2·B < Q < 2·Ndim B S + 2·B` open |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -52,9 +52,10 @@ target `sum_NKQ_tail_ge`, with its remaining middle-`Q`-regime gap: `docs/THM51-
 
 ### Deferred (later sessions)
 
-Finish Theorem 5.1 proof — close the remaining `B < Q < 2·Ndim B S + 2·B` gap in
-`sum_NKQ_tail_ge` (the paper's (5.18)–(5.21) residue engine) and assemble `thm_5_1`;
-Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+Finish Theorem 5.1 proof — close the remaining `2·B < Q < 2·Ndim B S + 2·B` gap in
+`sum_NKQ_tail_ge` (the paper's (5.18)–(5.21) residue engine, now needing exact
+`phiQ_formula` case-splits since the crude `±Q/8` bound is maxed out at `Q ≤ 2·B`)
+and assemble `thm_5_1`; Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 

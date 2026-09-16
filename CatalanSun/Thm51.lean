@@ -1420,6 +1420,161 @@ theorem sum_NKQ_tail_ge_of_Q_small {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
     exact le_of_mul_le_mul_left hchain h8Q
   exact_mod_cast key
 
+set_option maxHeartbeats 4000000 in
+-- Same symbolic-size concern as `sum_NKQ_tail_ge_of_Q_small` above.
+/-- (KI), regime B extended: `Q ≤ 2 * B` (a wider "small `Q`" range than
+`sum_NKQ_tail_ge_of_Q_small`). Same proof skeleton (`sum_NKQ_tail_eq` plus the
+crude `Corr(n) ≤ Q/8` bound), but the pure-polynomial step now needs the sharper
+fact that the four `A1..A2..A3..A4` quadratic terms combine to a value
+independent of `r0Q Q`, reducing the target to a quadratic-in-`Q` inequality on
+`[0, 2*B]` which is checked via its (concave) endpoint values at `Q = 0` and
+`Q = 2 * B`. -/
+theorem sum_NKQ_tail_ge_of_Q_le_2B {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B)
+    (hS : S ≤ Ndim B S)
+    (hbracket : Q ≤ 2 * B) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  rw [sum_NKQ_tail_eq hQ hodd hS]
+  have hNv : (Ndim B S : ℚ) = 2 * (B : ℚ) + S + 3 := by
+    simp only [Ndim]; push_cast; ring
+  have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+  have hN_le := phiQ_poly_le (Q := Q) (n := Ndim B S) hQ
+  have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+  have hA1_ge := phiQ_poly_ge (Q := Q) (n := Ndim B S + (B + 1) + r0Q Q) hQ
+  have hA2_le := phiQ_poly_le (Q := Q) (n := S + (B + 1) + r0Q Q) hQ
+  have hA3_le := phiQ_poly_le (Q := Q) (n := Ndim B S + 1 + r0Q Q) hQ
+  have hA4_ge := phiQ_poly_ge (Q := Q) (n := S + 1 + r0Q Q) hQ
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  have hqrQ : (2 : ℚ) * (r0Q Q : ℚ) + 1 = Q := by exact_mod_cast hqr
+  have key : (phiQ Q (Ndim B S) : ℚ) + 2 * (phiQ Q S : ℚ) ≤
+      2 * ((phiQ Q (Ndim B S + (B + 1) + r0Q Q) : ℚ)
+        - (phiQ Q (S + (B + 1) + r0Q Q) : ℚ)
+        - (phiQ Q (Ndim B S + 1 + r0Q Q) : ℚ)
+        + (phiQ Q (S + 1 + r0Q Q) : ℚ)) := by
+    have hA1v : ((Ndim B S + (B + 1) + r0Q Q : ℕ) : ℚ) =
+        (Ndim B S : ℚ) + B + 1 + r0Q Q := by push_cast; ring
+    have hA2v : ((S + (B + 1) + r0Q Q : ℕ) : ℚ) = (S : ℚ) + B + 1 + r0Q Q := by
+      push_cast; ring
+    have hA3v : ((Ndim B S + 1 + r0Q Q : ℕ) : ℚ) = (Ndim B S : ℚ) + 1 + r0Q Q := by
+      push_cast; ring
+    have hA4v : ((S + 1 + r0Q Q : ℕ) : ℚ) = (S : ℚ) + 1 + r0Q Q := by push_cast; ring
+    rw [hA1v] at hA1_ge
+    rw [hA2v] at hA2_le
+    rw [hA3v] at hA3_le
+    rw [hA4v] at hA4_ge
+    rw [hNv] at hN_le hA1_ge hA3_le
+    -- Step 1: combine the two "upper" bounds (N, S) into a single Q*phiQ bound.
+    have hLHS : 8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S ≤
+        (4 * (2 * (B:ℚ) + S + 3) * (2 * (B:ℚ) + S + 3) - 4 * (2 * (B:ℚ) + S + 3) * Q + Q * Q)
+          + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) := by
+      linarith [hN_le, hS_le]
+    -- Step 2: combine the four "tail" bounds (A1..A4) into a single Q*phiQ bound.
+    have hRHS :
+        2 * (4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * Q)
+          - 2 * (4 * ((S:ℚ) + B + 1 + r0Q Q) * ((S:ℚ) + B + 1 + r0Q Q)
+              - 4 * ((S:ℚ) + B + 1 + r0Q Q) * Q + Q * Q)
+          - 2 * (4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * Q + Q * Q)
+          + 2 * (4 * ((S:ℚ) + 1 + r0Q Q) * ((S:ℚ) + 1 + r0Q Q) - 4 * ((S:ℚ) + 1 + r0Q Q) * Q)
+        ≤ 16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+          - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+          - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+          + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) := by
+      linarith [hA1_ge, hA2_le, hA3_le, hA4_ge]
+    -- Step 3: the pure polynomial inequality (no phiQ), where the ratio hypothesis bites.
+    -- Unlike `sum_NKQ_tail_ge_of_Q_small`, the four tail-quadratic terms combine
+    -- (via difference-of-squares) to a value with *no* `r0Q Q` dependence at all,
+    -- so the whole inequality reduces to a quadratic-in-`Q` fact `g Q ≥ 0` on
+    -- `[0, 2*B]`; since `g` is concave (its `Q^2` coefficient is `-7`), it suffices
+    -- to check the endpoints `Q = 0` and `Q = 2*B`, which is the `hg0`/`hg2B` split
+    -- below, combined via `2*B*g(Q) = (2*B-Q)*g(0) + Q*g(2*B) + 14*B*Q*(2*B-Q)`.
+    have hPure :
+        (4 * (2 * (B:ℚ) + S + 3) * (2 * (B:ℚ) + S + 3) - 4 * (2 * (B:ℚ) + S + 3) * Q + Q * Q)
+          + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤
+        2 * (4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * Q)
+          - 2 * (4 * ((S:ℚ) + B + 1 + r0Q Q) * ((S:ℚ) + B + 1 + r0Q Q)
+              - 4 * ((S:ℚ) + B + 1 + r0Q Q) * Q + Q * Q)
+          - 2 * (4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * Q + Q * Q)
+          + 2 * (4 * ((S:ℚ) + 1 + r0Q Q) * ((S:ℚ) + 1 + r0Q Q) - 4 * ((S:ℚ) + 1 + r0Q Q) * Q) := by
+      have hBQ : (20 : ℚ) ≤ B := by exact_mod_cast hB
+      have hSBQ : (S : ℚ) * 20 ≤ B := by exact_mod_cast hSB
+      have hbracketQ : (Q : ℚ) ≤ 2 * B := by exact_mod_cast hbracket
+      have hQnn : (0 : ℚ) ≤ Q := Nat.cast_nonneg _
+      have hBnn : (0 : ℚ) ≤ B := Nat.cast_nonneg _
+      have hSnn : (0 : ℚ) ≤ S := Nat.cast_nonneg _
+      have hd : (0 : ℚ) ≤ B - 20 * S := by linarith
+      have h2BQ : (0 : ℚ) ≤ 2 * B - Q := by linarith
+      have hBd : (0 : ℚ) ≤ (B : ℚ) * (B - 20 * S) := mul_nonneg hBnn hd
+      have hSd : (0 : ℚ) ≤ (S : ℚ) * (B - 20 * S) := mul_nonneg hSnn hd
+      have hSBsq : 400 * (S : ℚ) * S ≤ (B : ℚ) * B := by nlinarith [hBd, hSd]
+      have hB20 : 20 * (B : ℚ) ≤ (B : ℚ) * B := by nlinarith [hBQ, hBnn]
+      have hBSnn : (0 : ℚ) ≤ (B : ℚ) * S := mul_nonneg hBnn hSnn
+      -- `g 0`: the polynomial at `Q = 0`.
+      have hg0 : (0 : ℚ) ≤ 16 * (B : ℚ) * B - 16 * B * S - 12 * S * S - 24 * S - 36 := by
+        nlinarith [hBd, hSBsq, hSBQ, hB20, hBQ]
+      -- `g (2*B)`: the polynomial at `Q = 2*B`.
+      have hg2B : (0 : ℚ) ≤
+          4 * (B : ℚ) * B + 8 * B * S + 24 * B - 12 * S * S - 24 * S - 36 := by
+        nlinarith [hBSnn, hSBsq, hSBQ, hB20, hBQ]
+      have hterm1 : (0 : ℚ) ≤
+          (2 * (B : ℚ) - Q) * (16 * B * B - 16 * B * S - 12 * S * S - 24 * S - 36) :=
+        mul_nonneg h2BQ hg0
+      have hterm2 : (0 : ℚ) ≤
+          (Q : ℚ) * (4 * B * B + 8 * B * S + 24 * B - 12 * S * S - 24 * S - 36) :=
+        mul_nonneg hQnn hg2B
+      have hterm3 : (0 : ℚ) ≤ 14 * (B : ℚ) * Q * (2 * B - Q) := by
+        have h14BQ : (0 : ℚ) ≤ 14 * (B : ℚ) * Q := by positivity
+        nlinarith [mul_nonneg h14BQ h2BQ]
+      have hBpos : (0 : ℚ) < 2 * B := by linarith
+      have hgQ2B : (2 * (B : ℚ)) * 0 ≤ (2 * (B : ℚ)) *
+          (16 * B * B - 16 * B * S - 12 * S * S - 24 * S - 36
+            + 8 * B * Q + 12 * S * Q + 12 * Q - 7 * Q * Q) := by
+        nlinarith [hterm1, hterm2, hterm3]
+      have hgQ : (0 : ℚ) ≤
+          16 * (B : ℚ) * B - 16 * B * S - 12 * S * S - 24 * S - 36
+            + 8 * B * Q + 12 * S * Q + 12 * Q - 7 * Q * Q :=
+        le_of_mul_le_mul_left hgQ2B hBpos
+      have hident :
+          (2 * (4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q)
+                - 4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * Q)
+            - 2 * (4 * ((S:ℚ) + B + 1 + r0Q Q) * ((S:ℚ) + B + 1 + r0Q Q)
+                - 4 * ((S:ℚ) + B + 1 + r0Q Q) * Q + Q * Q)
+            - 2 * (4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + 1 + r0Q Q)
+                - 4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * Q + Q * Q)
+            + 2 * (4 * ((S:ℚ) + 1 + r0Q Q) * ((S:ℚ) + 1 + r0Q Q) - 4 * ((S:ℚ) + 1 + r0Q Q) * Q))
+          -
+          ((4 * (2 * (B:ℚ) + S + 3) * (2 * (B:ℚ) + S + 3) - 4 * (2 * (B:ℚ) + S + 3) * Q + Q * Q)
+            + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q))
+        = 16 * (B : ℚ) * B - 16 * B * S - 12 * S * S - 24 * S - 36
+            + 8 * B * Q + 12 * S * Q + 12 * Q - 7 * Q * Q := by ring
+      linarith [hgQ, hident]
+    have hchain :
+        8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S ≤
+          16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+            + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) :=
+      le_trans hLHS (le_trans hPure hRHS)
+    have h8Q : (0 : ℚ) < 8 * Q := by positivity
+    have heqL : 8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S =
+        8 * (Q : ℚ) * ((phiQ Q (Ndim B S) : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+    have heqR :
+        16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+            + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) =
+        8 * (Q : ℚ) * (2 * ((phiQ Q (Ndim B S + (B + 1) + r0Q Q) : ℚ)
+          - (phiQ Q (S + (B + 1) + r0Q Q) : ℚ)
+          - (phiQ Q (Ndim B S + 1 + r0Q Q) : ℚ)
+          + (phiQ Q (S + 1 + r0Q Q) : ℚ))) := by ring
+    rw [heqL, heqR] at hchain
+    exact le_of_mul_le_mul_left hchain h8Q
+  exact_mod_cast key
+
 /-- Paper Theorem 5.1 as a proposition. -/
 def thm_5_1_statement : Prop :=
   ∀ (B : ℕ), 20 ≤ B →
