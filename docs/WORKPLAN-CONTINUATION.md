@@ -13,12 +13,33 @@ scaffold; COMB-A/B/C; and PROOF-A/B/C in `Thm51.lean`:
 `phiQ_add_CAQ_le_phiQ_N`, `phiQ_superadditive`. Scratchpads include
 `.scratchpad/geneval-thm51-comb/` and `.scratchpad/geneval-thm51-proof/`.
 
+**New (analysis-only, unverified — see `docs/THM51-REDUCTION-NOTES.md`):** a
+2026-09-16 session with no Lean toolchain available (sandboxed, could not
+reach `release.lean-lang.org`) worked out — but could not type-check — that
+finishing `thm_5_1` needs exactly **one** further fact plus a `linarith`
+assembly over `mAQ_le_ellAQ_consecutive` + (5.16) + `second_line_nonneg` +
+(5.17). It also confirms (independently of paper access) that
+`thm_5_1_statement`'s current hypotheses are too weak: it needs
+`Injective f` (used by (5.17)) and the ratio bound `S * 20 ≤ B` (not just
+`S < B` — a leading-order estimate in the notes shows the unconditional
+statement isn't plausible from the existing lemmas alone). The one missing
+piece is a single named target, `sum_NKQ_tail_ge` (the "(KI)" inequality in
+the notes) — an exact, `S*20≤B`-dependent bound on
+`∑_{i=S}^{Ndim B S - 1} NKQ B Q i` against `phiQ Q (Ndim B S) + 2*phiQ Q S`.
+**Read `docs/THM51-REDUCTION-NOTES.md` first** — it has the exact target
+statement, a suggested double-counting/convolution proof strategy, and why
+the naive asymptotic bounds (`phiQ_sub_quadratic_*`) are too coarse to close it.
+
 Start here next:
 
-1. This file (`docs/WORKPLAN-CONTINUATION.md`)
-2. **Finish Theorem 5.1 proof** — residue engine (5.18)–(5.21) + assembly
-   under `S*20 ≤ B` and `Injective f`; then Lemma 5.3. **Still not** Theorem 1.1.
-3. Evidence: `.scratchpad/geneval-thm51-proof/`,
+1. `docs/THM51-REDUCTION-NOTES.md` — the precise reduction and open target.
+2. This file (`docs/WORKPLAN-CONTINUATION.md`)
+3. **Finish Theorem 5.1 proof** — prove `sum_NKQ_tail_ge` (residue engine,
+   paper's (5.18)–(5.21)) via the double-counting strategy in the reduction
+   notes, then land the `thm_5_1` assembly sketched there (needs a working
+   `lake build` — the reduction/assembly was never type-checked); then
+   Lemma 5.3. **Still not** Theorem 1.1.
+4. Evidence: `.scratchpad/geneval-thm51-proof/`,
    `.scratchpad/geneval-thm51-comb/`,
    `.scratchpad/geneval-abs45-thm51-scaffold/`,
    `.scratchpad/geneval-psia-integrality/`,
@@ -128,11 +149,13 @@ via `paperPPoly` / `paperPMatrixZ` / `det_polyEval_dvd_vandermonde`
 **Thm 5.1 combinatorial core landed** in `Thm51.lean` (COMB-A/B/C:
 `phiQ_sub_quadratic_nonneg`/`_le`, `sum_choose_nQr_consecutive`,
 `collisionSum_eq_phiQ_of_balanced`/`collisionSum_ge_phiQ`).
-**PROOF-A/B/C landed** in \Thm51.lean\: \mAQ_le_ellAQ\,
-\QB_sub_ellAQ_consecutive\ (5.16), \phiQ_add_CAQ_le_phiQ_N\ (5.17),
-\phiQ_superadditive\. **Next:** residue engine (5.18)–(5.21) + assemble
-\	hm_5_1\ under \S*20 ≤ B\ and \Injective f\; then Lemma 5.3. Still not
-Theorem 1.1.
+**PROOF-A/B/C landed** in `Thm51.lean`: `mAQ_le_ellAQ`,
+`aQB_sub_ellAQ_consecutive` (5.16), `phiQ_add_CAQ_le_phiQ_N` (5.17),
+`phiQ_superadditive`. **Next:** residue engine (5.18)–(5.21) + assemble
+`thm_5_1` under `S*20 ≤ B` and `Injective f`; then Lemma 5.3. Still not
+Theorem 1.1. See `docs/THM51-REDUCTION-NOTES.md` for a (2026-09-16,
+type-check-unverified) reduction of this to one named target lemma,
+`sum_NKQ_tail_ge`, plus a ready `linarith` assembly.
 
 ## Process notes
 
