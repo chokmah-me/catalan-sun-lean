@@ -308,6 +308,89 @@ bound reaches down further (e.g. show `NKQ` is *small* rather than *zero*
 for a wider `Q` range, using the periodicity fact `NKQ B Q (i+Q) = NKQ B Q i`
 — not yet attempted).
 
+A later session extended coverage to `sum_NKQ_tail_ge_of_Q_le_2B` (`Q ≤ 2·B`,
+landed, `lake build`-verified) using the same crude `Corr(n) ≤ Q/8` technique
+but with a concave-quadratic-in-`Q` endpoint argument (`g(0) ≥ 0` and
+`g(2B) ≥ 0`, `g` concave since its `Q²` coefficient is `−7`, so nonneg on
+`[0,2B]` follows from the two endpoints via `2B·g(Q) = (2B−Q)·g(0) + Q·g(2B) +
+14BQ(2B−Q)`). So the true open gap as of that session was narrower:
+`2·B < Q < 2·Ndim(B,S) + 2·B`.
+
+## Session 2026-09-16: numeric structure of the remaining `2B < Q < 2N+2B` gap
+
+**Toolchain note:** this session had a genuinely working `lake build` (elan +
+Lean 4.32.2 + Mathlib cache installed fresh on a machine that had none; unlike
+the session that wrote the note above, `release.lean-lang.org` was reachable).
+`lake build` on the tracked source passes clean: 0 `sorry`, axioms restricted
+to `[propext, Classical.choice, Quot.sound]`. No new Lean was landed this
+session — the time went into **numerically characterizing** the open gap
+before committing to a proof strategy, since the previous session's `g(Q)`
+concavity trick (the same one used for `_le_2B`) provably fails past
+`Q ≈ 2.5B`: a direct check (`B=20,S=1`) shows `g` (the polynomial from the
+`_le_2B` proof) goes negative at `Q=50`, well inside the open gap
+(`2B=40` to `2N+2B=128` for these params) — so extending `_le_2B`'s
+technique to a larger threshold is **not possible**; the crude per-term
+`Corr(n) ≤ Q/8` bound is fundamentally too lossy once `Q` gets much past `2B`.
+
+**What direct numeric evaluation of the true (KI) inequality shows** (Python,
+exact integer arithmetic, `phiQ`/`NKQ` computed directly from their
+definitions — not the `Corr` bound): for `B=20, S=1` (`N=44`, gap
+`Q ∈ (40, 128)`, `Q` odd), the slack `2·sumT − φ_Q(N) − 2·φ_Q(S)` as a
+function of `Q` is:
+
+- **Flat-ish plateau** for `Q ∈ [2B, 2N] = [40, 88]`: slack stays close to
+  `2B = 40` (observed range `39`–`41` at these params; `2B` was confirmed as
+  the right order of magnitude, not exact, across other `(B,S)` samples too —
+  e.g. `B=60,S=3` gives plateau values `117`–`120` against `2B=120`).
+- **Linear decrease** for `Q ∈ [2N, 2N+2B] = [88, 128]`: slack decreases by
+  exactly `2` per step of `2` in `Q` (i.e. slope `−1` in `Q`), from `40` down
+  to a minimum of exactly `2` at `Q = 2N+2B−1 = 127` (the largest odd `Q`
+  below the `_large` regime's threshold, where the true slack must jump to
+  `0`/undefined-comparison since both sides become `0` by `phiQ_of_lt`).
+- This pattern (flat plateau ≈ `2B`, then linear decay to a **tight** minimum
+  of `2` right at the `_large` boundary) was confirmed at `B ∈ {20,40,60,80,100}`
+  with `S = B/20`: in every case the minimum slack over the whole gap is
+  exactly `2`, always at `Q = 2N+2B−1`. So (KI) is **tight by design** near
+  the top of the range — there is no room for a lossy bound there, matching
+  why the `_large` lemma's threshold looks exact rather than conservative.
+
+**A candidate exact mechanism for the linear-decay region**, derived but not
+yet Lean-verified: writing `Corr(n) = r(Q−r)/(2Q)` with `r = n mod Q`
+(`phiQ_sub_quadratic_eq`'s remainder term), the four `sumT`-side arguments
+pair up as `A1 = A3 + B` and `A2 = A4 + B` (`A1,A3` from the `N`-branch,
+`A2,A4` from the `S`-branch, all sharing the same `+ r0Q Q` shift). When
+there is **no mod-`Q` wraparound** in forming `A1` from `A3` (i.e.
+`A3 % Q + B < Q`), there is an exact identity (checked numerically,
+20000 random trials, zero violations):
+
+```text
+Corr(n + B) − Corr(n) = B * (Q − 2*(n % Q) − B) / (2*Q)      [when n%Q + B < Q]
+```
+
+Applying this to both pairs, the `(Q−B)`-type terms cancel between the two
+pairs, collapsing the Corr-part of (KI)'s slack to something proportional to
+`B * (r4 − r3) / Q` where `r3 = A3 % Q`, `r4 = A4 % Q`, minus the two
+"tail" terms `Corr(N) + 2·Corr(S)`. Since `A3 − A4 = N − S = 2B+3` is a fixed
+constant (independent of `Q`), `r3` and `r4` are tightly linked mod `Q`. This
+looks like the right mechanism for the linear-decay region, but formalizing
+it requires splitting on **which** of the (at least) four wraparound
+conditions hold (`A3`↦`A1`, `A4`↦`A2`, and the relation between `r3`,`r4`
+via the fixed offset `2B+3`) — genuinely more case-split work, not yet
+attempted in Lean. The plateau region (`Q ∈ [2B, 2N]`) is comfortably
+positive numerically but was **not** found to be covered by any simple
+extension of the existing `Corr(n) ≤ Q/8` technique either (that bound is
+already too lossy by `Q ≈ 2.5B`, well before the plateau's right edge at
+`2N ≈ 4.4B` for `B=20`), so it likely needs the same exact-Corr-difference
+mechanism, or a separate argument.
+
+**Recommended next step for a future session:** attempt the no-wraparound
+`Corr` difference identity above as a Lean lemma first (it is a clean,
+numerically-verified, unconditional fact about `Corr`/`%`, useful
+independent of the wraparound case-split), then build the wraparound
+case-split around it referencing the fixed offset `A3 − A4 = 2B+3` and
+`A1 − A2 = 2B+3` (same offset) to bound how many of the four points can
+simultaneously wrap.
+
 ## Environment note for next session
 
 This session could not install Lean/elan: `elan toolchain install` failed
