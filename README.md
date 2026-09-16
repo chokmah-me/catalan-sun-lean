@@ -40,16 +40,21 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Thm 5.1 scaffold** | Layer defs `phiQ`/`NKQ`/`nQr`/`CAQ`/`FNQ`/`ellAQ`/`mAQ`/`aQB` + `thm_5_1_statement` (unproved) | `Thm51.lean` | defs only |
 | **Thm 5.1 COMB** | Φ_Q remainder (5.3); consecutive collision (5.15); balanced occupancy minimizes collisions | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-A/B/C** | `mAQ_le_ellAQ`; (5.16) `aQB_sub_ellAQ_consecutive`; (5.17) `phiQ_add_CAQ_le_phiQ_N` | `Thm51.lean` | proved |
+| **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
+| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for two disjoint `Q`-regimes, `Q ≥ 2·Ndim B S + 2·B` (`sum_NKQ_tail_ge_of_Q_large`) and `Q ≤ B` (`sum_NKQ_tail_ge_of_Q_small`) | `Thm51.lean` | partial — gap `B < Q < 2·Ndim B S + 2·B` open |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
-Continuation plan: `docs/WORKPLAN-CONTINUATION.md`.
+Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Reduction of `thm_5_1` to the single
+target `sum_NKQ_tail_ge`, with its remaining middle-`Q`-regime gap: `docs/THM51-REDUCTION-NOTES.md`.
 
 **Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign. PC0 uses the matching `T_{i+1}` leading sign `(-1)^{j-1}`.
 
 ### Deferred (later sessions)
 
-Finish Theorem 5.1 proof ((5.18)–(5.21) residue engine + assembly); Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+Finish Theorem 5.1 proof — close the remaining `B < Q < 2·Ndim B S + 2·B` gap in
+`sum_NKQ_tail_ge` (the paper's (5.18)–(5.21) residue engine) and assemble `thm_5_1`;
+Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 
