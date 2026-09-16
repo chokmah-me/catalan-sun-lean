@@ -1,156 +1,28 @@
 lean-proof-forge verify  ok=True  exit=0
-project: C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a5f7-5b69-7b91-b857-b320aa91b3e9
+project: C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean
 lake: C:\Users\Elke Shayna\.elan\bin\lake.EXE
-target: (default)
+target: CatalanSun.Thm51
 build_exit: 0
-build_ms: 4476
+build_ms: 5668
 sorry_hits: 0
 native_decide_hits: 0
-axiom_entries: 110
+axiom_entries: 0
 axiom_violations: 0
 
 --- lake log (tail) ---
-⚠ [2895/2904] Replayed CatalanSun.NewtonDiff
+⚠ [2888/2898] Replayed CatalanSun.NewtonDiff
 warning: CatalanSun/NewtonDiff.lean:201:4: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [2902/2904] Replayed CatalanSun.Thm51
-warning: CatalanSun/Thm51.lean:266:6: try 'simp' instead of 'simpa'
+⚠ [2898/2898] Replayed CatalanSun.Thm51
+warning: CatalanSun/Thm51.lean:267:6: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: CatalanSun/Thm51.lean:609:8: try 'simp' instead of 'simpa'
+warning: CatalanSun/Thm51.lean:610:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [2903/2904] Replayed CatalanSun
-info: CatalanSun.lean:35:0: 'CatalanSun.Ledger.rawQuadratic_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:36:0: 'CatalanSun.Ledger.deltaLarge_at_one_twentieth' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:37:0: 'CatalanSun.TwoAdic.lemma_5_4_positive_part' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:38:0: 'CatalanSun.TwoAdic.isTwoIntegral_of_odd_den' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:39:0: 'CatalanSun.TwoAdic.odd_PiFactor' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:40:0: 'CatalanSun.Cauchy.det_cauchy_fin_one' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:41:0: 'CatalanSun.Cauchy.det_cauchy_fin_two' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:42:0: 'CatalanSun.Cauchy.det_cauchyMatrix' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:43:0: 'CatalanSun.Cauchy.oddDenom_cast_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:44:0: 'CatalanSun.CauchyBinet.det_mul_eq_sum_minors' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:45:0: 'CatalanSun.CauchyBinet.det_mul_eq_zero_of_card_lt' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:46:0: 'CatalanSun.CauchyBinet.det_mul_eq_sum_minors_square' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:47:0: 'CatalanSun.FunctionalEq.thm_2_1_polynomial_fragment' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:48:0: 'CatalanSun.FunctionalEq.no_constant_denom_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:49:0: 'CatalanSun.FunctionalEq.no_polynomial_cleared_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:50:0: 'CatalanSun.FunctionalEq.no_rational_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:51:0: 'CatalanSun.FunctionalEq.no_clearedEq23_solution' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:52:0: 'CatalanSun.FunctionalEq.no_clearedEq23_solution_real' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:53:0: 'CatalanSun.Cauchy.lemma_4_2_S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:54:0: 'CatalanSun.Tail.summable_tailTerm' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:55:0: 'CatalanSun.Tail.tail_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:56:0: 'CatalanSun.Tail.tail_add_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:57:0: 'CatalanSun.Tail.tail_lt_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:58:0: 'CatalanSun.Tail.tail_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:59:0: 'CatalanSun.Tail.weightedTail_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:60:0: 'CatalanSun.Tail.tail_shift_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:61:0: 'CatalanSun.Tail.weightedTail_shift_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:62:0: 'CatalanSun.Residual.ratWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:63:0: 'CatalanSun.Residual.ratWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:64:0: 'CatalanSun.Residual.RmatrixRatWitness_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:65:0: 'CatalanSun.Residual.RmatrixRatWitness_twoIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:66:0: 'CatalanSun.Residual.lemma_5_4_entry' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:67:0: 'CatalanSun.Rank.exists_nonvanishing_minor_of_full_column_rank' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:68:0: 'CatalanSun.Rank.cor_2_1_of_thm_2_1' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:69:0: 'CatalanSun.Rank.rank_eq_card_iff_mulVec_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:70:0: 'CatalanSun.Rank.exists_nontrivial_column_dependence_of_rank_lt' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:71:0: 'CatalanSun.NewtonDiff.alternating_binomial_sum_eval_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:72:0: 'CatalanSun.NewtonDiff.paperFwdDiff_eq_zero_of_poly' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:73:0: 'CatalanSun.Thm21.column_dep_high_fwdDiff_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:74:0: 'CatalanSun.Thm21.exists_column_dep_with_vanishing_fwdDiff' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:75:0: 'CatalanSun.Structure.natDegree_Dlam_le' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:76:0: 'CatalanSun.Structure.PiFactor_eq_eval_Lpoly_mul_Epoly_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:77:0: 'CatalanSun.Structure.natDegree_Plam_le' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:78:0: 'CatalanSun.Structure.eval_Plam' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:79:0: 'CatalanSun.Structure.eval_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:80:0: 'CatalanSun.Thm21.fSeq_eq_neg_tail_succ_mul_Dlam_add_Plam' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:81:0: 'CatalanSun.NewtonDiff.newtonInterpolant' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:82:0: 'CatalanSun.NewtonDiff.eval_newtonInterpolant' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:83:0: 'CatalanSun.NewtonDiff.natDegree_newtonInterpolant_of_high_vanishing' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:84:0: 'CatalanSun.Structure.natDegree_G0' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:85:0: 'CatalanSun.Structure.G0_dvd_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:86:0: 'CatalanSun.Structure.G0_dvd_shiftPoly_Dlam' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:87:0: 'CatalanSun.Structure.Dlam_eval_neg_three_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:88:0: 'CatalanSun.Thm21.exists_poly_natDegree_le_two_B_sub_one_of_column_dep' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:89:0: 'CatalanSun.Thm21.exists_Apoly_of_column_dep' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:90:0: 'CatalanSun.Thm21.Kpoly_eq_zero_of_column_dep' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:91:0: 'CatalanSun.Structure.oddLin_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:92:0: 'CatalanSun.Structure.Lpoly_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:93:0: 'CatalanSun.Structure.Epoly_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:94:0: 'CatalanSun.Structure.eval_Pstar_at_oddLin_root' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:95:0: 'CatalanSun.Structure.Pstar_ne_zero_of_lam_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:96:0: 'CatalanSun.Structure.Dlam_ne_zero_of_lam_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:97:0: 'CatalanSun.Thm21.clearedEq23_of_Kpoly_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:98:0: 'CatalanSun.Thm21.thm_2_1_full_column_rank' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:99:0: 'CatalanSun.Thm21.cor_2_1' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:100:0: 'CatalanSun.NewtonCompletion.det_DiffMat' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:101:0: 'CatalanSun.NewtonCompletion.isUnit_det_DiffMat' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:102:0: 'CatalanSun.NewtonCompletion.det_powerDiffBlock_Dref' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:103:0: 'CatalanSun.NewtonCompletion.alternating_sum_choose' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:104:0: 'CatalanSun.NewtonCompletion.DiffMat_mulVec_binomCol' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:105:0: 'CatalanSun.NewtonCompletion.det_Atilde_eq_Pi_mul_det_Ahat' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:106:0: 'CatalanSun.NewtonCompletion.DiffMat_mulVec_Pi_u_eq_Rmatrix' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:107:0: 'CatalanSun.NewtonCompletion.F_B_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:108:0: 'CatalanSun.NewtonCompletion.selectedFinset_card' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:109:0: 'CatalanSun.NewtonCompletion.AtildeDiff_pow_ref' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:110:0: 'CatalanSun.NewtonCompletion.AtildeDiff_aux_at_omitted' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:111:0: 'CatalanSun.NewtonCompletion.AtildeDiff_target_selected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:112:0: 'CatalanSun.NewtonCompletion.AtildeDiff_submatrix_eq_outerBlock' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:113:0: 'CatalanSun.NewtonCompletion.det_AtildeDiff_eq_signed_F_B_det_R' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:114:0: 'CatalanSun.NewtonCompletion.prop_3_1_det_Atilde' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:115:0: 'CatalanSun.NewtonCompletion.qhat_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:116:0: 'CatalanSun.TwoAdic.isTwoIntegral_det' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:117:0: 'CatalanSun.NewtonCompletion.padicValNat_two_F_B_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:118:0: 'CatalanSun.lemma_5_4_det' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:119:0: 'CatalanSun.PascalCauchy.Rmatrix_eq_T_succ_cauchy_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:120:0: 'CatalanSun.PascalCauchy.RmatrixFin_submatrix_eq_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:121:0: 'CatalanSun.PascalCauchy.det_Rmatrix_submatrix_eq_sum_Xi' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:122:0: 'CatalanSun.PascalCauchy.lemma_4_2_odd_cauchy' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:123:0: 'CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:124:0: 'CatalanSun.PascalCauchy.det_rowsSubmatrix_cauchyOddMatrix_closed' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:125:0: 'CatalanSun.PascalCauchy.choose_eq_factorial_mul_paperP_of_lt_Ndim' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:126:0: 'CatalanSun.PascalCauchy.det_binomMatrix_eq_factorials_mul_det_paperP' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:127:0: 'CatalanSun.PascalCauchy.det_colsSubmatrix_pascalMatrix' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:128:0: 'CatalanSun.PascalCauchy.lemma_4_1_psi_real' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:129:0: 'CatalanSun.PascalCauchy.lemma_4_1_real' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:130:0: 'CatalanSun.PascalCauchy.det_polyEval_dvd_vandermonde' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:131:0: 'CatalanSun.PascalCauchy.vandermondeProdZ_dvd_det_paperPMatrixZ' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
-info: CatalanSun.lean:132:0: 'CatalanSun.PascalCauchy.lemma_4_1_psi' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:133:0: 'CatalanSun.PascalCauchy.lemma_4_1' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:134:0: 'CatalanSun.PascalCauchy.det_rowsSubmatrix_diagCauchy' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:135:0: 'CatalanSun.PascalCauchy.Xi_pascal_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:136:0: 'CatalanSun.PascalCauchy.Xi_cauchy_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:137:0: 'CatalanSun.PascalCauchy.Xi_closed_form' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:138:0: 'CatalanSun.Thm51.sum_nQr_eq_card' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:139:0: 'CatalanSun.Thm51.phiQ_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:140:0: 'CatalanSun.Thm51.phiQ_sub_quadratic_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:141:0: 'CatalanSun.Thm51.phiQ_sub_quadratic_le' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:142:0: 'CatalanSun.Thm51.sum_choose_nQr_consecutive' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:143:0: 'CatalanSun.Thm51.collisionSum_eq_phiQ_of_balanced' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: CatalanSun.lean:144:0: 'CatalanSun.Thm51.collisionSum_ge_phiQ' depends on axioms: [propext, Classical.choice, Quot.sound]
-Build completed successfully (2904 jobs).
-warning: mathlib: repository 'C:\Users\Elke Shayna\.grok\worktrees\00dev-catalan-sun-lean\subagent-01a0a5f7-5b69-7b91-b857-b320aa91b3e9\.lake/packages\mathlib' has local changes
+warning: CatalanSun/Thm51.lean:770:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (2898 jobs).
+warning: mathlib: repository 'C:\Users\Elke Shayna\Documents\00Dev\catalan-sun-lean\.lake/packages\mathlib' has local changes

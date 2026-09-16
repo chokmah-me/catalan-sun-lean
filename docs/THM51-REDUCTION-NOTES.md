@@ -1,3 +1,13 @@
+**Update (this session, 2026-09-15, working Lean/lake toolchain available):** the
+statement-hypothesis fix below is landed (`thm_5_1_statement` now takes
+`S * 20 ≤ B` and `Injective f`, `lake build`-verified). `sum_NKQ_tail_ge` (KI)
+is **not yet proved**, but the "concrete blocker" this note originally
+flagged — the `NKQ`/`sumT` convolution identity — **is now solved exactly**
+and landed (`lake build`-verified, zero `sorry`): see "Exact `sumT` formula
+(landed)" below, which replaces the open-ended trapezoid sketch with a closed
+form. What remains for (KI) is now a much narrower, precisely-stated gap: see
+"What's left for (KI)" at the end of this file.
+
 # Theorem 5.1: reduction to one remaining inequality
 
 **Status:** analysis only, not a proof. Written in a session with **no Lean
@@ -173,6 +183,130 @@ the paper's (5.18)-(5.21) presumably carry out. This is the concrete blocker.
   access) and (b) the leading-order estimate above, which shows the
   unconditional (`S < B` only) statement is not plausible from the already-
   proved building blocks alone.
+
+## Exact `sumT` formula (landed)
+
+All landed, `lake build`-verified, zero `sorry`, in `CatalanSun/Thm51.lean`
+under `## PROOF-D`:
+
+- `r0Q Q := (Q - 1) / 2`, with `two_mul_r0Q : Odd Q → 2 * r0Q Q + 1 = Q`.
+- `dvd_two_add_one_iff : Q ∣ 2*j+1 ↔ j % Q = r0Q Q` (for `Q` odd): since `Q`
+  is odd, `2` is invertible mod `Q`, and this pins the unique residue.
+- `PsiQ Q n := #{j < n : j % Q = r0Q Q}`, with the closed form
+  `PsiQ_eq : PsiQ Q n = (n + r0Q Q) / Q` (a single floor division — no sum).
+- `NKQ_eq_PsiQ_sub : NKQ K Q i = PsiQ Q (i+K+1) - PsiQ Q (i+1)`: `NKQ` is a
+  window-difference of `PsiQ`, because `Q | 2i+2h+1 ↔ Q | 2(i+h)+1` and `h`
+  ranges over `[1,K]` iff `j := i+h` ranges over `[i+1, i+K]`.
+- `sum_NKQ_tail_eq`: summing `NKQ_eq_PsiQ_sub` over `tailFin` and reindexing
+  each `PsiQ`-sum via `phiQ_sub_eq_sum_Ico` (already in the file) gives, for
+  `hQ : 0 < Q`, `hodd : Odd Q`, `hS : S ≤ Ndim B S`:
+
+  ```text
+  sumT = phiQ Q (N + (B+1) + r0Q Q) - phiQ Q (S + (B+1) + r0Q Q)
+       - phiQ Q (N + 1 + r0Q Q)     + phiQ Q (S + 1 + r0Q Q)
+  ```
+
+  where `N = Ndim B S = 2B+S+3`, all cast to `ℤ`. This is an **exact identity**
+  (not a bound), built entirely from `phiQ` at four shifted arguments — no
+  convolution/trapezoid case-split was needed in the end. It supersedes the
+  "Suggested proof strategy for (KI)" section above (the double-counting
+  sketch), which is no longer the right approach: `PsiQ`'s single-floor
+  closed form made the case-split unnecessary.
+
+## What's left for (KI)
+
+`sum_NKQ_tail_ge` (i.e. `phiQ Q (Ndim B S) + 2*phiQ Q S ≤ 2*sumT`) now reduces,
+via `sum_NKQ_tail_eq`, to a **pure inequality among six `phiQ` evaluations**
+(the four inside `sumT`, plus `phiQ Q (Ndim B S)` and `phiQ Q S` themselves) —
+no more combinatorics, only real analysis of `phiQ`'s remainder.
+
+Using the file's existing `phiQ_sub_quadratic_eq` (exact: `phiQ Q n =
+n²/(2Q) - n/2 + Corr(n)` where `Corr(n) = r(Q-r)/(2Q)`, `r = n % Q`), expand
+all six terms. The pure-quadratic parts cancel almost completely (worked out
+by hand this session): with `N = 2B+S+3`, the quadratic part of
+`2*sumT - phiQ(N) - 2*phiQ(S)` equals `(4B² - 4B - 4BS - S² - 6S - 9)/(2Q) +
+B + 1.5S + 1.5` — positive and `Ω(B)` for `B ≥ 20`, `S*20 ≤ B` (the bracket is
+`≥ 3.8B² - 4.3B - 9 > 0` in that regime). **The obstruction is the six
+`Corr(·)` remainder terms.**
+
+The existing bound `Corr(n) ≤ Q/8` (`phiQ_sub_quadratic_le`) is **too coarse
+alone**: it was calibrated for a single `phiQ` evaluation, but naively
+applied to all six terms it can dominate the `O(B)` quadratic-part slack
+once `Q` is large (worst case `Q → ∞`, sanity-checked by hand this session:
+with e.g. `B=20, S=1, Q` huge, all four `sumT`-side arguments land near
+`Q/2` — because of the `+ r0Q Q ≈ Q/2` shift — so their individual `Corr`
+values are each `≈ Q/8`, not small). What actually happens in that regime
+(verified by hand) is that the four `sumT`-side `Corr` terms **nearly cancel
+against each other** (they enter with net coefficient `2-2-2+2 = 0` and are
+all evaluated near the same point `≈ N+r0Q Q`, so their pairwise differences
+are `O(B²/Q) → 0`), while `Corr(N)` and `Corr(S)` (the two "tail" terms, `O(B)`
+sized independent of `Q`) are what must be controlled against the
+quadratic-part slack. A **naive per-term `Q/8` bound loses this
+cancellation** and is not sufficient by itself.
+
+**What a proof needs:** either (a) a Lipschitz/second-difference bound on
+`Corr` — e.g. `|Corr(a+d) - Corr(a) - Corr(b+d) + Corr(b)|` small when `a,b`
+are close (to control the four-term cancellation exactly, not just bound each
+term separately), or (b) a case split on `Q` relative to `B` (e.g. `Q ≤ cB`
+vs `Q > cB` for a suitable constant `c`), using `Corr(n) ≤ Q/8` in the first
+regime and `Corr(n) ≤ n/2` (trivial: `r ≤ n`, `Corr(n) = r(Q-r)/(2Q) ≤ r/2`)
+in the second. Route (b) is more mechanical and is the recommended next step:
+`phiQ_sub_quadratic_le` already gives the `Q/8` half; the `n/2` half is a
+two-line `nlinarith`/`positivity` fact not yet in the file. The six
+arguments are all within `O(B)` of either `N + r0Q Q`, `S + r0Q Q`, `N`, or
+`S`, so the threshold analysis only needs to track `B`, `S`, `Q`, `r0Q Q`
+(no new combinatorics — this really is now a `nlinarith`-with-the-right-case-
+split problem, not an open combinatorial identity).
+
+## Two concrete regimes landed (this session, continued)
+
+Pushed further on the `Corr` bound and landed two more `lake build`-verified,
+zero-`sorry` **partial** results in `CatalanSun/Thm51.lean` under
+`## PROOF-E` (neither is `sum_NKQ_tail_ge` itself — both are named
+sub-lemmas with an explicit extra hypothesis on `Q`):
+
+- **`sum_NKQ_tail_ge_of_Q_large`**: for `Q ≥ 2 * Ndim B S + 2 * B`, both
+  sides of (KI) are exactly `0` (`NKQ` vanishes pointwise since
+  `2i+2h+1 < Q` always, and `phiQ_of_lt` kills the two `phiQ` terms).
+  Trivial once you see it; the real content is establishing the right
+  threshold value.
+- **`sum_NKQ_tail_ge_of_Q_small`**: for `Q ≤ B` (a *conservative* sub-case
+  of the paper's actual small-`Q` range, chosen because it lets the crude
+  `Corr(n) ≤ Q/8` bound go through cleanly). Landed by clearing the `Q`
+  denominator from `phiQ_sub_quadratic_le`/`_nonneg` first (new helper
+  lemmas `phiQ_poly_le`/`phiQ_poly_ge`: `8Q·φ(n) ≤ 4n²-4nQ+Q²` and the
+  reverse), which avoids `nlinarith` ever touching a division by a variable
+  — that was the single biggest source of tactic timeouts this session.
+  The final polynomial step needed `set_option maxHeartbeats 4000000` (the
+  un-normalized six-term expression is large) plus manual `ring_nf`+`linarith`
+  staging instead of one big `nlinarith` call, since `nlinarith`'s product
+  search kept timing out on an expression this size even though the needed
+  combination is a simple fixed linear one once expanded.
+
+**What this confirms about the hard part.** While deriving the `Q ≤ B`
+threshold by hand, the naive worst-case combination (bound every `Corr`
+term separately by `Q/8`, drop the positive ones to `0`) does **not**
+actually work as originally guessed in the first version of this note —
+working it out symbolically (`ring_nf` on the residual) showed real
+`B·r0Q`/`S·r0Q` cross terms that a crude per-term bound cannot absorb; a
+sharper decomposition (splitting the slack into `7·(B² − Q²) ≥ 0` plus a
+`(16B+24S+24)·r0Q ≥ 0` term plus a `B,S`-only remainder bounded via
+`B² ≥ 20BS` and `B² ≥ 400S²`, both themselves products of the ratio
+hypothesis with itself) was needed even for this conservative threshold.
+
+**Remaining gap.** `B < Q < 2·Ndim(B,S) + 2·B` (roughly `B` to `~6B`) is
+**not covered by either regime** and is still open. Closing it likely means
+either (a) redoing the `sum_NKQ_tail_ge_of_Q_small` derivation with the
+tighter threshold `Q² ≤ 4B² − S² − 4BS − 6S − 9` (attempted this session,
+`ring_nf`-verified to reduce to a residual `D(r) = -28r² + (16B+24S-4)r +
+(16B²-16BS-12S²+8B-12S-31)` in `r = r0Q Q`, which **is** numerically
+nonneg on the valid range but needs a genuine concavity/two-endpoint
+argument, not a one-shot `nlinarith` — the naive version of this attempt
+timed out and was abandoned in favor of the conservative `Q ≤ B` version
+above), or (b) merging the two regimes' thresholds so `sum_NKQ_tail_ge_of_Q_large`'s
+bound reaches down further (e.g. show `NKQ` is *small* rather than *zero*
+for a wider `Q` range, using the periodicity fact `NKQ B Q (i+Q) = NKQ B Q i`
+— not yet attempted).
 
 ## Environment note for next session
 

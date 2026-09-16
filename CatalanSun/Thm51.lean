@@ -12,6 +12,7 @@ import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.IsPrimePow
 import Mathlib.Data.Nat.Cast.Field
 import Mathlib.Data.Nat.Choose.Basic
+import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Rat.Defs
 import Mathlib.Tactic.FieldSimp
@@ -954,12 +955,477 @@ theorem phiQ_superadditive (Q a b : ℕ) :
     sum_le_sum fun k _ => Nat.div_le_div_right (Nat.le_add_left _ _)
   linarith [hsplit, hsum]
 
-/-- Paper Theorem 5.1 as a proposition (not proved here). -/
+/-! ## PROOF-D: exact `NKQ`/`sumT` reduction to `phiQ` (toward (KI)) -/
+
+private theorem block_div {Q : ℕ} (hQ : 0 < Q) (q c : ℕ) (hc : c < Q) :
+    (q * Q + c) / Q = q := by
+  rw [Nat.mul_comm, Nat.mul_add_div hQ, Nat.div_eq_of_lt hc, add_zero]
+
+/-- Exactly one representative `k*Q+r` (`k < q`) per full block. -/
+private theorem card_range_mul_filter_mod {Q r : ℕ} (hQ : 0 < Q) (hr : r < Q) (q : ℕ) :
+    ((range (q * Q)).filter (fun j => j % Q = r)).card = q := by
+  classical
+  have hinj : Function.Injective (fun k : Fin q => k.val * Q + r) := by
+    intro a b h
+    simp only at h
+    have hval : a.val * Q = b.val * Q := by omega
+    exact Fin.ext (Nat.eq_of_mul_eq_mul_right hQ hval)
+  let g : Fin q ↪ ℕ := ⟨fun k => k.val * Q + r, hinj⟩
+  have himg : (range (q * Q)).filter (fun j => j % Q = r) = (univ : Finset (Fin q)).map g := by
+    ext j
+    simp only [mem_filter, mem_range, mem_map, mem_univ, true_and, g,
+      Function.Embedding.coeFn_mk]
+    constructor
+    · rintro ⟨hjlt, hjmod⟩
+      refine ⟨⟨j / Q, ?_⟩, ?_⟩
+      · by_contra hge
+        have hle : q ≤ j / Q := Nat.le_of_not_lt hge
+        have hqQ : q * Q ≤ (j / Q) * Q := Nat.mul_le_mul_right Q hle
+        have hdm : (j / Q) * Q ≤ j := Nat.div_mul_le_self j Q
+        omega
+      · change (j / Q) * Q + r = j
+        rw [← hjmod, Nat.div_add_mod' j Q]
+    · rintro ⟨k, rfl⟩
+      refine ⟨?_, ?_⟩
+      · have hklt : k.val < q := k.isLt
+        calc k.val * Q + r < k.val * Q + Q := by omega
+          _ = (k.val + 1) * Q := by ring
+          _ ≤ q * Q := Nat.mul_le_mul_right Q hklt
+      · show (k.val * Q + r) % Q = r
+        rw [Nat.mul_comm, Nat.mul_add_mod_self_left, Nat.mod_eq_of_lt hr]
+  rw [himg, card_map, card_univ, Fintype.card_fin]
+
+private theorem card_range_filter_mod_lt {Q r ρ : ℕ} (hr : r < Q) (hρ : ρ < Q) :
+    ((range ρ).filter (fun j => j % Q = r)).card = (if r < ρ then 1 else 0) := by
+  classical
+  have heq : (range ρ).filter (fun j => j % Q = r) = if r < ρ then {r} else ∅ := by
+    split_ifs with h
+    · ext j
+      simp only [mem_filter, mem_range, mem_singleton]
+      constructor
+      · rintro ⟨hjρ, hjmod⟩
+        have hjQ : j < Q := lt_trans hjρ hρ
+        rwa [Nat.mod_eq_of_lt hjQ] at hjmod
+      · rintro rfl
+        exact ⟨h, Nat.mod_eq_of_lt hr⟩
+    · ext j
+      simp only [mem_filter, mem_range, not_lt] at *
+      constructor
+      · rintro ⟨hjρ, hjmod⟩
+        have hjQ : j < Q := lt_trans hjρ hρ
+        rw [Nat.mod_eq_of_lt hjQ] at hjmod
+        omega
+      · simp
+  rw [heq]
+  split_ifs <;> simp
+
+/-- Exact closed form: number of `j < n` with `j % Q = r` equals `(n + Q - 1 - r) / Q`. -/
+private theorem card_range_filter_mod_eq {Q r : ℕ} (hQ : 0 < Q) (hr : r < Q) (n : ℕ) :
+    ((range n).filter (fun j => j % Q = r)).card = (n + Q - 1 - r) / Q := by
+  classical
+  set q := n / Q with hqdef
+  set ρ := n % Q with hρdef
+  have hn : n = q * Q + ρ := (Nat.div_add_mod' n Q).symm
+  have hρQ : ρ < Q := Nat.mod_lt n hQ
+  have hle1 : (0 : ℕ) ≤ q * Q := Nat.zero_le _
+  have hle2 : q * Q ≤ n := by rw [hn]; omega
+  have hsplit : range n = range (q * Q) ∪ Ico (q * Q) n := by
+    rw [range_eq_Ico, range_eq_Ico, Finset.Ico_union_Ico_eq_Ico hle1 hle2]
+  have hdisj : Disjoint (range (q * Q)) (Ico (q * Q) n) := by
+    rw [range_eq_Ico]
+    exact Finset.Ico_disjoint_Ico_consecutive 0 (q * Q) n
+  have hcardsplit :
+      ((range n).filter (fun j => j % Q = r)).card =
+        ((range (q * Q)).filter (fun j => j % Q = r)).card +
+          ((Ico (q * Q) n).filter (fun j => j % Q = r)).card := by
+    rw [hsplit, filter_union, card_union_of_disjoint (disjoint_filter_filter hdisj)]
+  have hinj2 : Function.Injective (fun k : ℕ => q * Q + k) := by
+    intro a b h
+    simpa using h
+  let g2 : ℕ ↪ ℕ := ⟨fun k => q * Q + k, hinj2⟩
+  have hshift :
+      (Ico (q * Q) n).filter (fun j => j % Q = r) =
+        ((range ρ).filter (fun j => j % Q = r)).map g2 := by
+    ext j
+    simp only [mem_filter, mem_Ico, mem_map, mem_range, g2, Function.Embedding.coeFn_mk]
+    constructor
+    · rintro ⟨⟨h1, h2⟩, hmod⟩
+      refine ⟨j - q * Q, ⟨by omega, ?_⟩, by omega⟩
+      have hcomm : q * Q + (j - q * Q) = Q * q + (j - q * Q) := by ring
+      have hj : j = q * Q + (j - q * Q) := by omega
+      rw [hj, hcomm, Nat.mul_add_mod_self_left] at hmod
+      exact hmod
+    · rintro ⟨k, ⟨hk, hkmod⟩, rfl⟩
+      refine ⟨⟨by omega, by omega⟩, ?_⟩
+      have hcomm : q * Q + k = Q * q + k := by ring
+      rw [hcomm, Nat.mul_add_mod_self_left]
+      exact hkmod
+  have hcard2 : ((Ico (q * Q) n).filter (fun j => j % Q = r)).card =
+      ((range ρ).filter (fun j => j % Q = r)).card := by
+    rw [hshift, card_map]
+  rw [hcardsplit, card_range_mul_filter_mod hQ hr, hcard2, card_range_filter_mod_lt hr hρQ]
+  rcases lt_or_ge r ρ with h | h
+  · simp only [h, if_true]
+    have hrw : n + Q - 1 - r = (q + 1) * Q + (ρ - 1 - r) := by rw [hn]; ring_nf; omega
+    rw [hrw, block_div hQ (q + 1) (ρ - 1 - r) (by omega)]
+  · simp only [not_lt.mpr h, if_false]
+    have hrw : n + Q - 1 - r = q * Q + (ρ + Q - 1 - r) := by rw [hn]; omega
+    rw [hrw, block_div hQ q (ρ + Q - 1 - r) (by omega)]
+    omega
+
+/-- The "center" residue: for `Q` odd, `2j+1 ≡ 0 (mod Q) ↔ j ≡ r0Q Q (mod Q)`. -/
+def r0Q (Q : ℕ) : ℕ := (Q - 1) / 2
+
+theorem two_mul_r0Q {Q : ℕ} (hodd : Odd Q) : 2 * r0Q Q + 1 = Q := by
+  obtain ⟨k, hk⟩ := hodd
+  simp [r0Q, hk]
+
+theorem r0Q_lt {Q : ℕ} (hQ : 0 < Q) : r0Q Q < Q := by
+  unfold r0Q; omega
+
+theorem dvd_two_add_one_iff {Q j : ℕ} (hQ : 0 < Q) (hodd : Odd Q) :
+    Q ∣ 2 * j + 1 ↔ j % Q = r0Q Q := by
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  have hcop : Nat.gcd Q 2 = 1 := (Nat.coprime_two_left.mpr hodd).symm
+  constructor
+  · intro hdvd
+    have h1 : (2 * j + 1) ≡ 0 [MOD Q] := (Nat.modEq_zero_iff_dvd).mpr hdvd
+    have h2 : (2 * j + 1) ≡ (2 * r0Q Q + 1) [MOD Q] := by
+      rw [hqr]; exact h1.trans (Nat.modEq_zero_iff_dvd.mpr ⟨1, by omega⟩).symm
+    have h3 : 2 * j ≡ 2 * r0Q Q [MOD Q] := h2.add_right_cancel' 1
+    have h4 : j ≡ r0Q Q [MOD Q] := h3.cancel_left_of_coprime hcop
+    unfold Nat.ModEq at h4
+    rw [h4, Nat.mod_eq_of_lt (r0Q_lt hQ)]
+  · intro hmod
+    have h4 : j ≡ r0Q Q [MOD Q] := by
+      unfold Nat.ModEq
+      rw [hmod, Nat.mod_eq_of_lt (r0Q_lt hQ)]
+    have h3 : 2 * j ≡ 2 * r0Q Q [MOD Q] := h4.mul_left 2
+    have h2 : (2 * j + 1) ≡ (2 * r0Q Q + 1) [MOD Q] := h3.add_right 1
+    rw [hqr] at h2
+    exact Nat.modEq_zero_iff_dvd.mp (h2.trans (Nat.modEq_zero_iff_dvd.mpr dvd_rfl))
+
+/-- `Ψ_Q(n) := #{j < n : j % Q = r0Q Q}` (count of `j < n` on the "center" residue). -/
+def PsiQ (Q n : ℕ) : ℕ := ((range n).filter (fun j => j % Q = r0Q Q)).card
+
+theorem PsiQ_eq {Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (n : ℕ) :
+    PsiQ Q n = (n + r0Q Q) / Q := by
+  unfold PsiQ
+  rw [card_range_filter_mod_eq hQ (r0Q_lt hQ) n]
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  congr 1
+  omega
+
+theorem PsiQ_mono {Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) {m n : ℕ} (h : m ≤ n) :
+    PsiQ Q m ≤ PsiQ Q n := by
+  rw [PsiQ_eq hQ hodd, PsiQ_eq hQ hodd]
+  exact Nat.div_le_div_right (by omega)
+
+theorem PsiQ_sub_eq_card_Ico {Q a b : ℕ} (hab : a ≤ b) :
+    PsiQ Q b - PsiQ Q a = ((Ico a b).filter (fun j => j % Q = r0Q Q)).card := by
+  classical
+  unfold PsiQ
+  have hsplit : range b = range a ∪ Ico a b := by
+    rw [range_eq_Ico, range_eq_Ico, Finset.Ico_union_Ico_eq_Ico (Nat.zero_le a) hab]
+  have hdisj : Disjoint (range a) (Ico a b) := by
+    rw [range_eq_Ico]; exact Finset.Ico_disjoint_Ico_consecutive 0 a b
+  have : ((range b).filter (fun j => j % Q = r0Q Q)).card =
+      ((range a).filter (fun j => j % Q = r0Q Q)).card +
+        ((Ico a b).filter (fun j => j % Q = r0Q Q)).card := by
+    rw [hsplit, filter_union, card_union_of_disjoint (disjoint_filter_filter hdisj)]
+  omega
+
+/-- Exact formula for `NKQ` in terms of `PsiQ` shifted evaluations. This is the paper's
+"residue engine" identity: `NKQ K Q i` counts `h ∈ [1,K]` on the center residue, which is
+exactly a window-difference of `PsiQ`. -/
+theorem NKQ_eq_PsiQ_sub {Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (K i : ℕ) :
+    NKQ K Q i = PsiQ Q (i + K + 1) - PsiQ Q (i + 1) := by
+  classical
+  have hbij : Function.Injective (fun h : ℕ => i + h) := fun a b h => by
+    simpa using h
+  have himg : ((Icc 1 K).filter (fun h => Q ∣ 2 * i + 2 * h + 1)).image (fun h => i + h) =
+      (Ico (i + 1) (i + K + 1)).filter (fun j => j % Q = r0Q Q) := by
+    ext j
+    simp only [mem_image, mem_filter, mem_Icc, mem_Ico]
+    constructor
+    · rintro ⟨h, ⟨⟨h1, h2⟩, hdvd⟩, rfl⟩
+      refine ⟨⟨by omega, by omega⟩, ?_⟩
+      have heq : 2 * i + 2 * h + 1 = 2 * (i + h) + 1 := by ring
+      rw [heq] at hdvd
+      exact (dvd_two_add_one_iff hQ hodd).mp hdvd
+    · rintro ⟨⟨hj1, hj2⟩, hjmod⟩
+      refine ⟨j - i, ⟨⟨by omega, by omega⟩, ?_⟩, by omega⟩
+      have heq2 : 2 * i + 2 * (j - i) + 1 = 2 * j + 1 := by omega
+      rw [heq2, dvd_two_add_one_iff hQ hodd]
+      exact hjmod
+  have hcard : NKQ K Q i =
+      ((Ico (i + 1) (i + K + 1)).filter (fun j => j % Q = r0Q Q)).card := by
+    unfold NKQ
+    rw [← himg, card_image_of_injective _ hbij]
+  rw [hcard, PsiQ_sub_eq_card_Ico (by omega)]
+
+theorem PsiQ_shift_sum {Q c a b : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hab : a ≤ b) :
+    ∑ i ∈ Ico a b, PsiQ Q (i + c) = phiQ Q (b + c + r0Q Q) - phiQ Q (a + c + r0Q Q) := by
+  classical
+  have hpt : ∀ i, PsiQ Q (i + c) = (i + (c + r0Q Q)) / Q := by
+    intro i
+    rw [PsiQ_eq hQ hodd]
+    congr 1; omega
+  simp_rw [hpt]
+  rw [Finset.sum_Ico_add' (fun k => k / Q) a b (c + r0Q Q)]
+  have heq := phiQ_sub_eq_sum_Ico (Q := Q) (a := a + (c + r0Q Q)) (b := b + (c + r0Q Q))
+    (by omega)
+  rw [← heq]
+  congr 2 <;> omega
+
+/-- Exact formula for `sumT` (the paper's `∑ NKQ` over the tail block) in terms of `phiQ`
+alone: this replaces the "convolution/trapezoid" identity anticipated in
+`docs/THM51-REDUCTION-NOTES.md` with a closed form built entirely from `phiQ`. -/
+theorem sum_NKQ_tail_eq {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hS : S ≤ Ndim B S) :
+    (∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ)) =
+      (phiQ Q (Ndim B S + (B + 1) + r0Q Q) : ℤ)
+        - (phiQ Q (S + (B + 1) + r0Q Q) : ℤ)
+        - (phiQ Q (Ndim B S + 1 + r0Q Q) : ℤ)
+        + (phiQ Q (S + 1 + r0Q Q) : ℤ) := by
+  classical
+  have himg : (tailFin B S hS).image Fin.val = Ico S (Ndim B S) := by
+    ext j
+    simp only [mem_image, mem_Ico]
+    constructor
+    · rintro ⟨i, hi, rfl⟩
+      have := (mem_tailFin_iff (B := B) (S := S) hS i).mp hi
+      exact ⟨this, i.isLt⟩
+    · rintro ⟨hj1, hj2⟩
+      exact ⟨⟨j, hj2⟩, (mem_tailFin_iff (B := B) (S := S) hS ⟨j, hj2⟩).mpr hj1, rfl⟩
+  have hreindex : ∀ (g : ℕ → ℤ), ∑ i ∈ tailFin B S hS, g i.val = ∑ j ∈ Ico S (Ndim B S), g j := by
+    intro g
+    rw [← himg, sum_image]
+    intro a _ b _ h
+    exact Fin.ext h
+  have hNKQeq : ∀ i : ℕ, (NKQ B Q i : ℤ) =
+      (PsiQ Q (i + B + 1) : ℤ) - (PsiQ Q (i + 1) : ℤ) := by
+    intro i
+    have hnkq := NKQ_eq_PsiQ_sub hQ hodd B i
+    have hmono : PsiQ Q (i + 1) ≤ PsiQ Q (i + B + 1) :=
+      PsiQ_mono hQ hodd (by omega)
+    rw [hnkq]
+    push_cast [Nat.cast_sub hmono]
+    ring
+  rw [hreindex (fun i => (NKQ B Q i : ℤ))]
+  simp_rw [hNKQeq]
+  rw [sum_sub_distrib]
+  have h1 : ∑ i ∈ Ico S (Ndim B S), (PsiQ Q (i + B + 1) : ℤ) =
+      ((phiQ Q (Ndim B S + (B + 1) + r0Q Q) - phiQ Q (S + (B + 1) + r0Q Q) : ℕ) : ℤ) := by
+    have hshift := PsiQ_shift_sum (Q := Q) (c := B + 1) (a := S) (b := Ndim B S) hQ hodd
+      (S_le_Ndim B S)
+    rw [← hshift]
+    push_cast
+    rfl
+  have h2 : ∑ i ∈ Ico S (Ndim B S), (PsiQ Q (i + 1) : ℤ) =
+      ((phiQ Q (Ndim B S + 1 + r0Q Q) - phiQ Q (S + 1 + r0Q Q) : ℕ) : ℤ) := by
+    have hshift := PsiQ_shift_sum (Q := Q) (c := 1) (a := S) (b := Ndim B S) hQ hodd
+      (S_le_Ndim B S)
+    rw [← hshift]
+    push_cast
+    apply Finset.sum_congr rfl
+    intro i _
+    norm_num
+  rw [h1, h2]
+  have hmono1 : phiQ Q (S + (B + 1) + r0Q Q) ≤ phiQ Q (Ndim B S + (B + 1) + r0Q Q) :=
+    phiQ_mono (by simp only [Ndim]; omega)
+  have hmono2 : phiQ Q (S + 1 + r0Q Q) ≤ phiQ Q (Ndim B S + 1 + r0Q Q) :=
+    phiQ_mono (by simp only [Ndim]; omega)
+  push_cast [Nat.cast_sub hmono1, Nat.cast_sub hmono2]
+  ring
+
+/-! ## PROOF-E: partial progress toward (KI) — two concrete `Q` regimes
+
+`sum_NKQ_tail_ge` (KI) is not proved for all `Q`. The two lemmas below cover
+disjoint concrete regimes (`Q` large enough that everything is trivially `0`,
+and `Q ≤ B`), each fully proved; the gap `B < Q < 2 * Ndim B S + 2 * B` is
+open. See `docs/THM51-REDUCTION-NOTES.md` for the analysis. -/
+
+/-- Case A: `Q` large enough that no `2i+2h+1` in the relevant range can be a
+multiple of `Q`, so `NKQ` vanishes identically. -/
+theorem NKQ_eq_zero_of_Q_large {K Q i : ℕ} (h : 2 * i + 2 * K + 1 < Q) :
+    NKQ K Q i = 0 := by
+  unfold NKQ
+  rw [Finset.card_eq_zero, Finset.filter_eq_empty_iff]
+  intro hh hhmem hdvd
+  have h2 : hh ≤ K := (mem_Icc.mp hhmem).2
+  have hbound : 2 * i + 2 * hh + 1 < Q := by omega
+  have hpos : 0 < 2 * i + 2 * hh + 1 := by omega
+  have := Nat.le_of_dvd hpos hdvd
+  omega
+
+/-- (KI), regime A: `Q` large enough that both sides are trivially `0`. -/
+theorem sum_NKQ_tail_ge_of_Q_large {B S Q : ℕ} (hS : S ≤ Ndim B S)
+    (hQ : 2 * Ndim B S + 2 * B ≤ Q) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  have hzero : ∀ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) = 0 := by
+    intro i _
+    have hilt : i.val < Ndim B S := i.isLt
+    have : NKQ B Q i.val = 0 := NKQ_eq_zero_of_Q_large (by omega)
+    exact_mod_cast this
+  have hsum0 : ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) = 0 :=
+    Finset.sum_eq_zero hzero
+  have hN0 : phiQ Q (Ndim B S) = 0 := phiQ_of_lt (by omega)
+  have hS0 : phiQ Q S = 0 := phiQ_of_lt (by omega)
+  rw [hsum0, hN0, hS0]
+  norm_num
+
+/-- `phiQ_sub_quadratic_le`, cleared of the `Q`-denominator: `8Q·φ ≤ 4n²-4nQ+Q²`. -/
+theorem phiQ_poly_le {Q n : ℕ} (hQ : 0 < Q) :
+    8 * (Q : ℚ) * phiQ Q n ≤ 4 * (n : ℚ) * n - 4 * n * Q + Q * Q := by
+  have hn : n = (n / Q) * Q + n % Q := by rw [Nat.mul_comm, Nat.div_add_mod]
+  have hr : n % Q < Q := Nat.mod_lt n hQ
+  have heq := phiQ_sub_quadratic_eq (Q := Q) (n := n) (q := n / Q) (r := n % Q) hQ hr hn
+  set r := n % Q
+  have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+  have hAM : (4 : ℤ) * (r : ℤ) * ((Q : ℤ) - (r : ℤ)) ≤ (Q : ℤ) ^ 2 := by
+    nlinarith [sq_nonneg (2 * (r : ℤ) - (Q : ℤ))]
+  have hAMQ : (4 : ℚ) * (r : ℚ) * ((Q : ℚ) - (r : ℚ)) ≤ (Q : ℚ) ^ 2 := by exact_mod_cast hAM
+  have hQne : (Q : ℚ) ≠ 0 := ne_of_gt hQQ
+  field_simp at heq
+  nlinarith [heq, hAMQ]
+
+/-- `phiQ_sub_quadratic_nonneg`, cleared of the `Q`-denominator: `4n²-4nQ ≤ 8Q·φ`. -/
+theorem phiQ_poly_ge {Q n : ℕ} (hQ : 0 < Q) :
+    4 * (n : ℚ) * n - 4 * n * Q ≤ 8 * (Q : ℚ) * phiQ Q n := by
+  have hn : n = (n / Q) * Q + n % Q := by rw [Nat.mul_comm, Nat.div_add_mod]
+  have hr : n % Q < Q := Nat.mod_lt n hQ
+  have heq := phiQ_sub_quadratic_eq (Q := Q) (n := n) (q := n / Q) (r := n % Q) hQ hr hn
+  set r := n % Q
+  have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+  have hrnn : (0 : ℚ) ≤ (r : ℚ) := Nat.cast_nonneg r
+  have hrQ : (r : ℚ) ≤ (Q : ℚ) := by exact_mod_cast le_of_lt hr
+  have hQne : (Q : ℚ) ≠ 0 := ne_of_gt hQQ
+  field_simp at heq
+  nlinarith [heq, mul_nonneg hrnn (sub_nonneg.mpr hrQ)]
+
+set_option maxHeartbeats 4000000 in
+-- The 6-term phiQ-polynomial combination below has large enough symbolic
+-- expressions (before `ring_nf` normalizes them) to exceed the default budget.
+/-- (KI), regime B: `Q ≤ B` (a conservative sub-case of the paper's "small `Q`"
+range). Uses the exact `sum_NKQ_tail_eq` formula plus the crude `Corr(n) ≤ Q/8`
+bound (`phiQ_sub_quadratic_le`), which is only sufficient once `Q` is capped
+this tightly relative to `B`; see the reduction notes for why the naive bound
+is NOT sufficient for `Q` up to the paper's full range. -/
+theorem sum_NKQ_tail_ge_of_Q_small {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B)
+    (hS : S ≤ Ndim B S)
+    (hbracket : Q ≤ B) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  rw [sum_NKQ_tail_eq hQ hodd hS]
+  have hNv : (Ndim B S : ℚ) = 2 * (B : ℚ) + S + 3 := by
+    simp only [Ndim]; push_cast; ring
+  have hQQ : (0 : ℚ) < Q := Nat.cast_pos.mpr hQ
+  have hN_le := phiQ_poly_le (Q := Q) (n := Ndim B S) hQ
+  have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+  have hA1_ge := phiQ_poly_ge (Q := Q) (n := Ndim B S + (B + 1) + r0Q Q) hQ
+  have hA2_le := phiQ_poly_le (Q := Q) (n := S + (B + 1) + r0Q Q) hQ
+  have hA3_le := phiQ_poly_le (Q := Q) (n := Ndim B S + 1 + r0Q Q) hQ
+  have hA4_ge := phiQ_poly_ge (Q := Q) (n := S + 1 + r0Q Q) hQ
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  have hqrQ : (2 : ℚ) * (r0Q Q : ℚ) + 1 = Q := by exact_mod_cast hqr
+  have key : (phiQ Q (Ndim B S) : ℚ) + 2 * (phiQ Q S : ℚ) ≤
+      2 * ((phiQ Q (Ndim B S + (B + 1) + r0Q Q) : ℚ)
+        - (phiQ Q (S + (B + 1) + r0Q Q) : ℚ)
+        - (phiQ Q (Ndim B S + 1 + r0Q Q) : ℚ)
+        + (phiQ Q (S + 1 + r0Q Q) : ℚ)) := by
+    have hA1v : ((Ndim B S + (B + 1) + r0Q Q : ℕ) : ℚ) =
+        (Ndim B S : ℚ) + B + 1 + r0Q Q := by push_cast; ring
+    have hA2v : ((S + (B + 1) + r0Q Q : ℕ) : ℚ) = (S : ℚ) + B + 1 + r0Q Q := by
+      push_cast; ring
+    have hA3v : ((Ndim B S + 1 + r0Q Q : ℕ) : ℚ) = (Ndim B S : ℚ) + 1 + r0Q Q := by
+      push_cast; ring
+    have hA4v : ((S + 1 + r0Q Q : ℕ) : ℚ) = (S : ℚ) + 1 + r0Q Q := by push_cast; ring
+    rw [hA1v] at hA1_ge
+    rw [hA2v] at hA2_le
+    rw [hA3v] at hA3_le
+    rw [hA4v] at hA4_ge
+    rw [hNv] at hN_le hA1_ge hA3_le
+    -- Step 1: combine the two "upper" bounds (N, S) into a single Q*phiQ bound.
+    have hLHS : 8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S ≤
+        (4 * (2 * (B:ℚ) + S + 3) * (2 * (B:ℚ) + S + 3) - 4 * (2 * (B:ℚ) + S + 3) * Q + Q * Q)
+          + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) := by
+      linarith [hN_le, hS_le]
+    -- Step 2: combine the four "tail" bounds (A1..A4) into a single Q*phiQ bound.
+    have hRHS :
+        2 * (4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * Q)
+          - 2 * (4 * ((S:ℚ) + B + 1 + r0Q Q) * ((S:ℚ) + B + 1 + r0Q Q)
+              - 4 * ((S:ℚ) + B + 1 + r0Q Q) * Q + Q * Q)
+          - 2 * (4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * Q + Q * Q)
+          + 2 * (4 * ((S:ℚ) + 1 + r0Q Q) * ((S:ℚ) + 1 + r0Q Q) - 4 * ((S:ℚ) + 1 + r0Q Q) * Q)
+        ≤ 16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+          - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+          - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+          + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) := by
+      linarith [hA1_ge, hA2_le, hA3_le, hA4_ge]
+    -- Step 3: the pure polynomial inequality (no phiQ), where the ratio hypothesis bites.
+    have hPure :
+        (4 * (2 * (B:ℚ) + S + 3) * (2 * (B:ℚ) + S + 3) - 4 * (2 * (B:ℚ) + S + 3) * Q + Q * Q)
+          + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤
+        2 * (4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + B + 1 + r0Q Q) * Q)
+          - 2 * (4 * ((S:ℚ) + B + 1 + r0Q Q) * ((S:ℚ) + B + 1 + r0Q Q)
+              - 4 * ((S:ℚ) + B + 1 + r0Q Q) * Q + Q * Q)
+          - 2 * (4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * ((2*(B:ℚ)+S+3) + 1 + r0Q Q)
+              - 4 * ((2*(B:ℚ)+S+3) + 1 + r0Q Q) * Q + Q * Q)
+          + 2 * (4 * ((S:ℚ) + 1 + r0Q Q) * ((S:ℚ) + 1 + r0Q Q) - 4 * ((S:ℚ) + 1 + r0Q Q) * Q) := by
+      have hBQ : (20 : ℚ) ≤ B := by exact_mod_cast hB
+      have hSBQ : (S : ℚ) * 20 ≤ B := by exact_mod_cast hSB
+      have hbracketQ : (Q : ℚ) ≤ B := by exact_mod_cast hbracket
+      have hrnn : (0 : ℚ) ≤ r0Q Q := Nat.cast_nonneg _
+      have hQnn : (0 : ℚ) ≤ Q := Nat.cast_nonneg _
+      have hQB2 : (Q : ℚ) * Q ≤ (B : ℚ) * B := by nlinarith [hbracketQ, hQnn]
+      have hstep : (0:ℚ) ≤ 7 * ((B:ℚ)*B - (Q:ℚ)*Q) := by nlinarith [hQB2]
+      have hrterm : (0:ℚ) ≤ (16*(B:ℚ)+24*S+24) * r0Q Q := by positivity
+      have hBnn : (0:ℚ) ≤ B := by positivity
+      have hSnn : (0:ℚ) ≤ S := by positivity
+      have hd : (0:ℚ) ≤ B - 20 * S := by linarith [hSBQ]
+      have h1 : (0:ℚ) ≤ B * B - 20 * (B * S) := by nlinarith [mul_nonneg hBnn hd]
+      have h2 : (0:ℚ) ≤ B * B - 400 * (S * S) := by
+        nlinarith [mul_nonneg hd (by linarith [hSBQ] : (0:ℚ) ≤ B + 20 * S)]
+      have hrem : 16 * (B:ℚ) * S - 9 * B * B + 12 * S + 12 * S * S - 8 * B + 24 ≤ 0 := by
+        nlinarith [h1, h2, hBQ, hSBQ]
+      rw [← hqrQ] at hstep ⊢
+      ring_nf
+      ring_nf at hstep hrterm hrem
+      linarith [hstep, hrterm, hrem]
+    have hchain :
+        8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S ≤
+          16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+            + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) :=
+      le_trans hLHS (le_trans hPure hRHS)
+    have h8Q : (0 : ℚ) < 8 * Q := by positivity
+    have heqL : 8 * (Q : ℚ) * phiQ Q (Ndim B S) + 16 * (Q : ℚ) * phiQ Q S =
+        8 * (Q : ℚ) * ((phiQ Q (Ndim B S) : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+    have heqR :
+        16 * (Q : ℚ) * phiQ Q (Ndim B S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (S + (B + 1) + r0Q Q)
+            - 16 * (Q : ℚ) * phiQ Q (Ndim B S + 1 + r0Q Q)
+            + 16 * (Q : ℚ) * phiQ Q (S + 1 + r0Q Q) =
+        8 * (Q : ℚ) * (2 * ((phiQ Q (Ndim B S + (B + 1) + r0Q Q) : ℚ)
+          - (phiQ Q (S + (B + 1) + r0Q Q) : ℚ)
+          - (phiQ Q (Ndim B S + 1 + r0Q Q) : ℚ)
+          + (phiQ Q (S + 1 + r0Q Q) : ℚ))) := by ring
+    rw [heqL, heqR] at hchain
+    exact le_of_mul_le_mul_left hchain h8Q
+  exact_mod_cast key
+
+/-- Paper Theorem 5.1 as a proposition. -/
 def thm_5_1_statement : Prop :=
   ∀ (B : ℕ), 20 ≤ B →
     ∀ (Q : ℕ), OddPrimePower Q →
-      ∀ (S : ℕ), 0 < S → S < B →
-        ∀ (f : Fin S → Fin (S + 3)),
+      ∀ (S : ℕ), 0 < S → S * 20 ≤ B →
+        ∀ (f : Fin S → Fin (S + 3)), Function.Injective f →
           aQB B S Q ≥ mAQ B S Q f
 
 end CatalanSun.Thm51
