@@ -29,6 +29,7 @@ import CatalanSun.Structure
 import CatalanSun.Lemma54
 import CatalanSun.PascalCauchy
 import CatalanSun.Thm51
+import CatalanSun.Lemma55
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 

@@ -43,6 +43,7 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`, now **unconditional**: dispatches over `Q ≤ 2·B`, `Q ≥ 2·Ndim B S + 2·B`, and (splitting the middle gap in two) `sum_NKQ_tail_ge_of_gap` / `sum_NKQ_tail_ge_of_gap2` | `Thm51.lean` | **proved** |
 | **Thm 5.1** | `thm_5_1 : thm_5_1_statement`, assembled from PROOF-A–E via `linarith` | `Thm51.lean` | **proved** |
+| **Lemma 5.5 scaffold** | `Ndim0`/`ell0AQ`/`m0AQ`/`a0QB` (consecutive-row analogues); `lemma_5_5_row_stability` (5.2) + `lemma_5_5_ledger_little_o` (5.3) targets | `Lemma55.lean` | defs |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -53,7 +54,10 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5
 
 ### Deferred (later sessions)
 
-Theorem 5.1 is now fully proved. Remaining work: Lemma 5.3; Props 6.3/7.4;
+Theorem 5.1 is now fully proved. Remaining work: Lemma 5.5 (the `o(B^2)`
+row-replacement ledger bound; Corollary 5.2 uses a "Lemma 5.3" that is cited
+but never displayed in the arXiv v1 PDF — almost certainly the trivial
+`[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes); Props 6.3/7.4;
 Mertens/PNT; Theorem 1.1.
 
 ## Build
