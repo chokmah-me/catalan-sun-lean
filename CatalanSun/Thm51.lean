@@ -58,14 +58,28 @@ def FNQ (N Q i : ℕ) : ℕ :=
 def indicatorQle (Q i : ℕ) : ℕ :=
   if Q ≤ 2 * i + 1 then 1 else 0
 
-/-- Paper (5.7): complete local layer `ℓ^A_Q(I)` (written `λ^A_Q` in the paper). -/
-def ellAQ (B S Q : ℕ) (f : Fin S → Fin (S + 3))
-    (I : Finset (Fin (Ndim B S))) (_hI : I.card = S) : ℤ :=
+/-- Paper (5.7)/(5.1), generalized: complete local layer `ℓ^A_Q(I)` at an
+explicit ambient dimension `N` (used verbatim, i.e. `FNQ N Q i.val`, rather
+than hardcoding `N = Ndim B S`). This lets §5.1's "corrected" model
+(`N = Ndim0 B S = U₀ + 1`) reuse the same formula as the exact model
+(`N = Ndim B S = U + 1`) — see `CatalanSun.Lemma55.ell0AQ`. -/
+def ellAQN (B S Q : ℕ) (f : Fin S → Fin (S + 3)) (N : ℕ)
+    (I : Finset (Fin N)) (_hI : I.card = S) : ℤ :=
   (CAQ B S Q f : ℤ) +
     2 * ∑ r ∈ range Q, (((nQr Q r I).choose 2) : ℤ) +
     ∑ i ∈ I,
       ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
-        (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ))
+        (2 * indicatorQle Q i.val : ℤ) - (FNQ N Q i.val : ℤ))
+
+/-- Paper (5.7): complete local layer `ℓ^A_Q(I)` (written `λ^A_Q` in the
+paper), at the exact model's dimension `N = Ndim B S`. -/
+def ellAQ (B S Q : ℕ) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) : ℤ :=
+  ellAQN B S Q f (Ndim B S) I hI
+
+theorem ellAQ_eq_ellAQN {B S Q : ℕ} (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    ellAQ B S Q f I hI = ellAQN B S Q f (Ndim B S) I hI := rfl
 
 /-- Paper (5.8): `m^A_{Q,B} = min_{|I|=S} ℓ^A_Q(I)`. -/
 noncomputable def mAQ (B S Q : ℕ) (f : Fin S → Fin (S + 3)) : ℤ :=

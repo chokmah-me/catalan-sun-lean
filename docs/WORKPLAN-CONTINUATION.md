@@ -7,6 +7,58 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-16 (later): (5.2)'s easy direction proved; found and fixed a real
+scaffold bug.** `CatalanSun/Lemma55.lean` now has `mAQ_le_m0AQ_add`
+(sorry-free): `mAQ B S Q f ≤ m0AQ B S Q f hS0 + S * (3/Q + 1)` — i.e. one
+direction of (5.2) with an explicit constant, unconditional.
+
+**Bug found and fixed:** the original scaffold's `ell0AQ` called `ellAQ`
+verbatim, but `ellAQ`'s `FNQ` term hardcoded `N = Ndim B S` internally — so
+`ell0AQ` never actually used the `U₀ = 2B+S-1` cutoff; it was a no-op
+relabeling of the same value at full dimension. Fixed by generalizing
+`Thm51.lean`'s `ellAQ` into a new `ellAQN` (explicit `N` parameter, used
+only in the `FNQ` term), with `ellAQ B S Q f I hI := ellAQN B S Q f
+(Ndim B S) I hI` preserving every existing call site/proof in `Thm51.lean`
+unchanged (full project still builds clean, 0 sorry, axioms ⊆ classical
+three). `Lemma55.lean`'s `ell0AQ` now correctly calls `ellAQN B S Q f
+(Ndim0 B S) ...`.
+
+Chain of new lemmas proved (all sorry-free) toward `mAQ_le_m0AQ_add`:
+- `div_add_le_div_add` / `div_le_div_add` / `abs_div_shift_le`: the atomic
+  fact `|⌊(x+d)/Q⌋ - ⌊x/Q⌋| ≤ d/Q + 1`.
+- `abs_FNQ_shift_le`: specializes the div-shift bound to `FNQ (Ndim B S)`
+  vs `FNQ (Ndim0 B S)` (they differ by the constant `3`), at any
+  `i < S ≤ Ndim0 B S`.
+- `nQr_consecutiveInitial_castLE`, `ellAQN_castLE_sub_eq`,
+  `consecutiveInitial_castLE_eq`: show `ellAQ`'s only `N`-dependent term is
+  `FNQ` (the `CAQ`/collision-sum/`NKQ`/`indicatorQle` terms depend only on
+  `i.val`, not `N`), so `ellAQ B S Q f (consecutive @ Ndim) - ell0AQ B S Q f
+  hS0` collapses to `∑_{i<S} (FNQ(Ndim0) - FNQ(Ndim))`.
+- `abs_ellAQ_consecutive_sub_ell0AQ_le`: sums the per-index `FNQ` bound to
+  get `|ellAQ(consecutive) - ell0AQ| ≤ S * (3/Q + 1)`.
+- `mAQ_le_m0AQ_add`: combines the above with the existing
+  `mAQ_le_ellAQ_consecutive` (from `Thm51.lean`) via `linarith`.
+
+**What's left for (5.2) — the hard direction:** `m0AQ ≤ mAQ + C(1+B/Q)`.
+`mAQ` is `min` over *all* card-`S` subsets `I` of `Fin (Ndim B S)`, not just
+the consecutive one, so this direction needs the paper's genuine
+"row-swap replacement" argument (not just the `FNQ`-shift trick above,
+which only handles the `U → U₀` swap at a *fixed* row set): for whichever
+`I` achieves `mAQ`'s minimum, show it differs from the consecutive set by
+symmetric difference ≤ 6, that each one-element swap changes `ellAQ` by at
+most `O(1+B/Q)` (via `nQr`/`collisionSum` occupancy bounds, similar in
+spirit to `Thm51.lean`'s COMB machinery but genuinely new — nothing in
+`Thm51.lean` bounds the effect of swapping one row index for another), and
+that at most 3 such swaps suffice. This is materially new combinatorial
+work, not yet started. Once landed, `lemma_5_5_row_stability` follows by
+combining both directions and taking `C = max(3, sup over the two
+constants)` — or just restating with `C` large enough to dominate both
+`3/Q+1` (as `1+B/Q` since `Q ≤ 5B` on the relevant range) and the
+replacement-argument constant.
+
+Then **(5.3)** (`lemma_5_5_ledger_little_o`) still needs the separate
+prime-power-counting sum, as described below — untouched this session.
+
 **2026-09-16: Theorem 5.1 is now fully proved and unconditional** (see
 README and `docs/THM51-REDUCTION-NOTES.md` for the closed derivation
 history — `sum_NKQ_tail_ge` was finished via a 3-way quotient case split,
