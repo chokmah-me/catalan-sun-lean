@@ -7,6 +7,85 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-16 (even later): scoped the hard direction of (5.2); numerically
+confirmed the load-bearing claim; NOT started in Lean.** Read the actual
+paper text for §5.1 (arXiv:2609.04176v1, HTML at
+https://arxiv.org/html/2609.04176v1#S5.E8) via the user. Key findings:
+
+- `m^{(0)}_{Q,B}` is confirmed to be `ell0AQ` at the FIXED consecutive set
+  (not a min over subsets) — matches this repo's existing `m0AQ` def, no
+  bug there.
+- The paper's own proof of the hard direction is genuinely informal/
+  hand-wavy: "The two row sets have symmetric difference at most six... If
+  a minimizing set uses any of [the 3 extra top indices], replace each by
+  an unused index in the common range... At most three replacements are
+  needed." It does NOT explain why the resulting swapped set `I'` (a
+  card-`S` subset of the common range `{0,...,U₀}`, not necessarily the
+  consecutive block) has `ellAQN(Ndim0, I') ≥ ell0AQ(consecutive) - O(1+B/Q)`.
+  This second half is the real missing lemma, not addressed by the paper's
+  text at all.
+- Investigated whether the per-index additive term `g(i) := 2*NKQ(B,Q,i) -
+  NKQ(S,Q,i) - 2*indicatorQle(Q,i) - FNQ(N,Q,i)` is monotone in `i` (which
+  would let the consecutive block win the additive part by a greedy/
+  exchange argument). **It is NOT monotone** — numerically checked (Python,
+  thousands of trials): ~22% of adjacent pairs violate `g(i) ≤ g(i+1)`,
+  with violation magnitudes comparable to the O(1+B/Q) budget itself. `g`
+  is essentially periodic with period ≈ `Q` (driven by `NKQ(B,Q,i)`'s
+  sawtooth), so the S indices with globally smallest `g` are scattered
+  across the whole range, not `{0,...,S-1}`. **This kills the cheap
+  "greedy prefix is optimal" shortcut** — any correct argument must jointly
+  bound the additive-term slack and the collision-sum term together (the
+  paper's "double-Vandermonde occupancy... O(1+B/Q)" claim), not treat them
+  separately.
+- **Numerically verified the actual load-bearing claim** (Python, see
+  below): for arbitrary card-`S` subsets `I'` of `{0,...,Ndim0-1}`
+  (including adversarial choices: all-one-residue-class, top block, middle
+  block, random), `ell0AQ(consecutive) - ellAQN(Ndim0, I')` stays bounded
+  by roughly `2*(1+B/Q)` — critically, the ratio **does not grow with S**
+  (checked S up to 160, B up to 3200, Q up to 2187 ≈ B): ratio/S stays
+  under ~1.8 throughout, not blowing up. This is strong evidence
+  `ell0AQ(consecutive) ≤ ellAQN(Ndim0, I') + C*(1+B/Q)` holds for an
+  absolute `C`, for EVERY card-`S` subset `I'` of the common range (not
+  just near-minimizers) — i.e. a genuinely stronger and cleaner lemma than
+  the paper's own argument requires, and one that sidesteps needing to
+  characterize the minimizer's structure at all.
+- **Recommended proof route for next session** (combines two prior
+  planning passes + this numeric check):
+  1. Prove the strengthened, minimizer-free claim: `∀ I' : Finset (Fin
+     (Ndim0 B S))` with `I'.card = S`,
+     `ell0AQ B S Q f hS0 ≤ ellAQN B S Q f (Ndim0 B S) I' hI' + C*(1+B/Q)`
+     for an absolute `C` — this is self-contained, doesn't need the
+     exact-model `U`/swap argument at all, and is the actual hard content.
+     Likely needs: (a) a joint bound combining the collision-sum term
+     (reuse `collisionSum_eq_phiQ_of_balanced`/`collisionSum_ge_phiQ` from
+     Thm51.lean — consecutive's residue occupancy is exactly balanced,
+     hence minimizes the collision term outright) with (b) a bound on how
+     much the additive `g`-term sum can differ between `I'` and
+     consecutive, using `phiQ`-type summation bounds (NOT monotonicity of
+     `g` itself, which is false) — likely via comparing `∑_{i∈I'} g(i)`
+     against `∑_{i<S} g(i)` through the same `Φ_Q` machinery already used
+     for `phiQ_sub_quadratic_le`/`phiQ_superadditive` in Thm51.lean, since
+     `NKQ(B,Q,i)` itself is expressible via `PsiQ`/`phiQ`-style counting
+     (see `NKQ_eq_PsiQ_sub`).
+  2. Given step 1, chain it with the existing swap-mechanics
+     (`abs_FNQ_shift_le`-style bound for the exact-model's 3 extra top
+     indices, i.e. build `I'` from the true minimizer `I` by ≤3 swaps into
+     the common range, each costing `O(1+B/Q)` — reuse/adapt
+     `collisionSum_move` for the occupancy-side swap cost) to get
+     `ellAQN(Ndim0, I') ≥ ellAQ(I) - 3*O(1+B/Q) = mAQ - O(1+B/Q)`.
+  3. Combine 1+2: `m0AQ = ell0AQ(consecutive) ≤ ellAQN(Ndim0,I') + O(1+B/Q)
+     ≤ mAQ + O(1+B/Q)`, closing (5.2)'s hard direction.
+  - Estimated ~15-25 new Lean lemmas total (index-swap mechanics + the
+    step-1 joint additive/collision bound). Multi-session effort; not
+    attempted in Lean yet (`Lemma55.lean` unchanged since the easy
+    direction landed).
+  - Scratch numerical-check scripts (not committed, session scratchpad):
+    swept `g(i)` monotonicity and the `ell0AQ(consecutive) vs ellAQN(I')`
+    gap across S∈{1..160}, B up to 3200, Q up to 2187, various adversarial
+    `I'` (same-residue-class, top-block, mid-block, random). Worth
+    re-deriving/keeping a copy in `.scratchpad/` if picking this up again,
+    to re-verify before investing further Lean effort.
+
 **2026-09-16 (later): (5.2)'s easy direction proved; found and fixed a real
 scaffold bug.** `CatalanSun/Lemma55.lean` now has `mAQ_le_m0AQ_add`
 (sorry-free): `mAQ B S Q f ≤ m0AQ B S Q f hS0 + S * (3/Q + 1)` — i.e. one
