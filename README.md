@@ -41,7 +41,7 @@ Theorem 5.1 / Theorem 1.1 remain open.
 | **Thm 5.1 COMB** | Φ_Q remainder (5.3); consecutive collision (5.15); balanced occupancy minimizes collisions | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-A/B/C** | `mAQ_le_ellAQ`; (5.16) `aQB_sub_ellAQ_consecutive`; (5.17) `phiQ_add_CAQ_le_phiQ_N` | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
-| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for `Q ≥ 2·Ndim B S + 2·B` (`sum_NKQ_tail_ge_of_Q_large`), `Q ≤ B` (`sum_NKQ_tail_ge_of_Q_small`), and `Q ≤ 2·B` (`sum_NKQ_tail_ge_of_Q_le_2B`, the max reach of the crude bound) | `Thm51.lean` | partial — gap `2·B < Q < 2·Ndim B S + 2·B` open |
+| **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`: proved for `Q ≥ 2·Ndim B S + 2·B`, `Q ≤ B`, `Q ≤ 2·B`, and (via exact floor-division, not the crude bound) `2·B < Q < 2·Ndim B S + 2·B` given the extra `hA1lt` hypothesis (`sum_NKQ_tail_ge_of_gap`) | `Thm51.lean` | partial — narrow sliver of ~2-4 odd `Q` values just above `2·B` (where `hA1lt` fails) still open |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -52,10 +52,14 @@ target `sum_NKQ_tail_ge`, with its remaining middle-`Q`-regime gap: `docs/THM51-
 
 ### Deferred (later sessions)
 
-Finish Theorem 5.1 proof — close the remaining `2·B < Q < 2·Ndim B S + 2·B` gap in
-`sum_NKQ_tail_ge` (the paper's (5.18)–(5.21) residue engine, now needing exact
-`phiQ_formula` case-splits since the crude `±Q/8` bound is maxed out at `Q ≤ 2·B`)
-and assemble `thm_5_1`; Lemma 5.3; Props 6.3/7.4; Mertens/PNT; Theorem 1.1.
+Finish Theorem 5.1 proof — close the narrow residual sliver in `sum_NKQ_tail_ge`
+(~2-4 odd `Q` values just above `2·B` where `sum_NKQ_tail_ge_of_gap`'s `hA1lt`
+hypothesis fails because `A1 = A3+B` wraps `Q` a second time; see
+`docs/THM51-REDUCTION-NOTES.md`'s "Session 2026-09-16 (continued)" for two
+candidate closing strategies), wire the four partial `sum_NKQ_tail_ge_of_*`
+lemmas into a single `Q`-range case split proving unconditional
+`sum_NKQ_tail_ge`, and assemble `thm_5_1`; Lemma 5.3; Props 6.3/7.4;
+Mertens/PNT; Theorem 1.1.
 
 ## Build
 

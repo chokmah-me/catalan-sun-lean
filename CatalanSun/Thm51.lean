@@ -230,6 +230,71 @@ theorem phiQ_sub_quadratic_le {Q n : ℕ} (hQ : 0 < Q) :
   rw [div_le_div_iff₀ hden (by norm_num : (0 : ℚ) < 8)]
   nlinarith [hAMQ]
 
+/-- The remainder term in `phiQ_sub_quadratic_eq`: `Corr Q n = r(Q−r)/(2Q)`
+where `r = n % Q`. Named per `docs/THM51-REDUCTION-NOTES.md`'s "What's left
+for (KI)" analysis, to state the no-wraparound difference identity below. -/
+def Corr (Q n : ℕ) : ℚ := ((n % Q : ℕ) : ℚ) * ((Q : ℚ) - ((n % Q : ℕ) : ℚ)) / (2 * Q)
+
+theorem phiQ_eq_quadratic_add_Corr {Q n : ℕ} (hQ : 0 < Q) :
+    (phiQ Q n : ℚ) = (n * n : ℚ) / (2 * Q) - (n : ℚ) / 2 + Corr Q n := by
+  have hn : n = (n / Q) * Q + n % Q := by rw [Nat.mul_comm, Nat.div_add_mod]
+  have hr : n % Q < Q := Nat.mod_lt n hQ
+  have heq := phiQ_sub_quadratic_eq (Q := Q) (n := n) (q := n / Q) (r := n % Q) hQ hr hn
+  unfold Corr
+  linarith [heq]
+
+/-- No-wraparound `Corr` difference identity (numerically verified in
+`docs/THM51-REDUCTION-NOTES.md`, "A candidate exact mechanism for the
+linear-decay region"): when adding `B` to `n` does not push `n % Q` past `Q`,
+`Corr` increases by an exact linear amount in `n % Q`. -/
+theorem Corr_add_sub_Corr_of_no_wrap {Q n B : ℕ} (hQ : 0 < Q)
+    (hwrap : n % Q + B < Q) :
+    Corr Q (n + B) - Corr Q n =
+      (B : ℚ) * ((Q : ℚ) - 2 * ((n % Q : ℕ) : ℚ) - (B : ℚ)) / (2 * Q) := by
+  have hmod : (n + B) % Q = n % Q + B := by
+    conv_lhs => rw [← Nat.mod_add_div n Q, Nat.add_right_comm]
+    rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hwrap]
+  unfold Corr
+  rw [hmod]
+  have hQQ : (Q : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hQ.ne'
+  have h2Q : (2 : ℚ) * Q ≠ 0 := mul_ne_zero two_ne_zero hQQ
+  rw [div_sub_div_same, div_eq_div_iff h2Q h2Q]
+  push_cast
+  ring
+
+/-- No-wraparound `phiQ` difference identity, the ℕ-level counterpart of
+`Corr_add_sub_Corr_of_no_wrap` (equivalent content, verified by direct
+computation in `docs/THM51-REDUCTION-NOTES.md`'s numeric exploration): if
+`[n, n+B)` contains no multiple of `Q`, every term `k / Q` for `k` in that
+range equals `n / Q`, so `phiQ` increases by exactly `B * (n / Q)`. -/
+theorem phiQ_add_eq_phiQ_add_of_no_wrap {Q n B : ℕ} (hwrap : n % Q + B < Q) :
+    phiQ Q (n + B) = phiQ Q n + B * (n / Q) := by
+  have hQ : 0 < Q := by
+    rcases Nat.eq_zero_or_pos Q with hQ0 | hQ0
+    · simp [hQ0] at hwrap
+    · exact hQ0
+  have hterm : ∀ k ∈ Ico n (n + B), k / Q = n / Q := by
+    intro k hk
+    obtain ⟨hk1, hk2⟩ := mem_Ico.mp hk
+    obtain ⟨j, hj⟩ := Nat.exists_eq_add_of_le hk1
+    have hjB : j < B := by omega
+    have hn : n = n % Q + Q * (n / Q) := (Nat.mod_add_div n Q).symm
+    have hkeq : k = (n % Q + j) + (n / Q) * Q := by
+      have : n / Q * Q = Q * (n / Q) := Nat.mul_comm _ _
+      omega
+    have hlt : n % Q + j < Q := by omega
+    rw [hkeq, Nat.add_mul_div_right _ _ hQ, Nat.div_eq_of_lt hlt, zero_add]
+  have hsum : ∑ k ∈ Ico n (n + B), k / Q = B * (n / Q) := by
+    rw [sum_congr rfl hterm, sum_const, Nat.card_Ico]
+    simp [Nat.mul_comm]
+  have hsplit : range (n + B) = range n ∪ Ico n (n + B) := by
+    rw [range_eq_Ico, range_eq_Ico,
+      Finset.Ico_union_Ico_eq_Ico (Nat.zero_le n) (Nat.le_add_right n B)]
+  have hdisj : Disjoint (range n) (Ico n (n + B)) := by
+    rw [range_eq_Ico]; exact Finset.Ico_disjoint_Ico_consecutive 0 n (n + B)
+  unfold phiQ
+  rw [hsplit, sum_union hdisj, hsum]
+
 /-! ## COMB-B: paper (5.15) consecutive collision identity -/
 
 /-- `{0, …, S−1}` as a `Finset (Fin N)` when `S ≤ N`. -/
@@ -1574,6 +1639,154 @@ theorem sum_NKQ_tail_ge_of_Q_le_2B {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
     rw [heqL, heqR] at hchain
     exact le_of_mul_le_mul_left hchain h8Q
   exact_mod_cast key
+
+/-- `phiQ`'s `B`-step forward difference is monotone in the base point: shifting
+the window `[n, n+B)` right only replaces terms `k/Q` with weakly larger ones.
+Stated additively (`phiQ(m+B)+phiQ(n) ≤ phiQ(n+B)+phiQ(m)` for `m ≤ n`) to
+avoid `ℕ` truncated subtraction. -/
+theorem phiQ_add_le_add_of_le {Q B m n : ℕ} (h : m ≤ n) :
+    phiQ Q (m + B) + phiQ Q n ≤ phiQ Q (n + B) + phiQ Q m := by
+  obtain ⟨d, hd⟩ := Nat.exists_eq_add_of_le h
+  subst hd
+  rw [phiQ_sum_Ico (Nat.le_add_right m B), phiQ_sum_Ico (Nat.le_add_right (m + d) B)]
+  have hmap : ∀ k ∈ Ico m (m + B), k / Q ≤ (k + d) / Q := fun k _ =>
+    Nat.div_le_div_right (Nat.le_add_right k d)
+  have hshift : ∑ k ∈ Ico (m + d) (m + d + B), k / Q = ∑ k ∈ Ico m (m + B), (k + d) / Q := by
+    have himg : Ico (m + d) (m + d + B) = (Ico m (m + B)).map ⟨(· + d), add_left_injective d⟩ := by
+      ext x
+      simp only [mem_Ico, Finset.mem_map, Function.Embedding.coeFn_mk]
+      constructor
+      · intro hx; exact ⟨x - d, by omega, by omega⟩
+      · rintro ⟨y, hy, rfl⟩; omega
+    rw [himg, sum_map]
+    simp only [Function.Embedding.coeFn_mk]
+  rw [hshift]
+  have : ∑ k ∈ Ico m (m + B), k / Q ≤ ∑ k ∈ Ico m (m + B), (k + d) / Q :=
+    Finset.sum_le_sum hmap
+  omega
+
+/-- (KI), closing most of the remaining `2B < Q < 2·Ndim B S + 2·B` gap: uses
+the exact floor-division identity `phiQ_add_eq_phiQ_add_of_no_wrap` instead of
+the crude `Corr(n) ≤ Q/8` bound that topped out at `Q ≤ 2B`. Writing `A3 =
+Ndim B S + 1 + r0Q Q`, `A4 = S + 1 + r0Q Q`, `A1 = A3+B`, `A2 = A4+B` (the two
+"tail" `sumT` arguments), the mechanism is: `A4 < Q ≤ A3` (so `⌊A4/Q⌋=0`,
+`⌊A3/Q⌋=1`) plus the extra hypothesis `hA1lt : A1 < 2*Q` (no *second*
+wraparound forming `A1` from `A3`) makes `phiQ (A1) - phiQ (A3) = B` and
+`phiQ (A2) = phiQ (A4)` exactly, reducing (KI) to a `phiQ N + 2 phiQ S ≤ 2B`
+quadratic-positivity fact (same technique as `_le_2B`). Numerically (see
+`docs/THM51-REDUCTION-NOTES.md`), `hA1lt` fails only on a narrow window just
+above `Q = 2*B` (e.g. `B=20`: `Q ∈ {41,43}` before `hA1lt` starts holding at
+`Q=45`) — that sliver is not yet covered by any lemma in this file and is the
+remaining gap after this one. -/
+theorem sum_NKQ_tail_ge_of_gap {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B)
+    (hS : S ≤ Ndim B S)
+    (hQlo : 2 * B < Q) (hQhi : Q < 2 * Ndim B S + 2 * B)
+    (hA1lt : Ndim B S + 2 * B + 1 + r0Q Q < 2 * Q) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ) := by
+  rw [sum_NKQ_tail_eq hQ hodd hS]
+  set N := Ndim B S with hNdef
+  set r := r0Q Q with hrdef
+  have hNv : N = 2 * B + S + 3 := hNdef
+  have hqr := two_mul_r0Q (Q := Q) hodd
+  have hA4ltQ : S + 1 + r < Q := by
+    have hSB' : S ≤ B := by
+      have : S * 20 ≤ B := hSB
+      omega
+    omega
+  have hA3eq : N + 1 + r = (S + 1 + r) + (2 * B + 3) := by rw [hNv]; ring
+  by_cases hA3ltQ : N + 1 + r < Q
+  · -- `d = 0` case: both `phiQ N` and `phiQ S` vanish, and the RHS is
+    -- `phiQ A1 + phiQ A4 - phiQ A2 - phiQ A3 ≥ 0` by `phiQ_add_le_add_of_le`
+    -- applied to `S ≤ N` (`A1 = N+(B+1)+r`, `A2 = S+(B+1)+r` differ from
+    -- `A4 = S+1+r`, `A3 = N+1+r` by the same shift `B`, so monotonicity of the
+    -- `B`-step difference in the base point gives exactly this inequality).
+    have hNleQ : N ≤ Q := by omega
+    have hSleQ : S ≤ Q := by omega
+    have hN0 : phiQ Q N = 0 := phiQ_of_lt hNleQ
+    have hS0 : phiQ Q S = 0 := phiQ_of_lt hSleQ
+    have hN0' : (phiQ Q N : ℤ) = 0 := by exact_mod_cast hN0
+    have hS0' : (phiQ Q S : ℤ) = 0 := by exact_mod_cast hS0
+    rw [hN0', hS0']
+    simp only [zero_add]
+    have hmn : S + 1 + r ≤ N + 1 + r := by omega
+    have hmono := phiQ_add_le_add_of_le (Q := Q) (B := B) hmn
+    have hA1eq : N + (B + 1) + r = (N + 1 + r) + B := by ring
+    have hA2eq : S + (B + 1) + r = (S + 1 + r) + B := by ring
+    rw [hA1eq, hA2eq]
+    have hcast : (phiQ Q (S + 1 + r + B) : ℤ) + (phiQ Q (N + 1 + r) : ℤ) ≤
+        (phiQ Q (N + 1 + r + B) : ℤ) + (phiQ Q (S + 1 + r) : ℤ) := by
+      exact_mod_cast hmono
+    linarith [hcast]
+  · -- `d = 1` case: `Q ≤ A3 < 2Q`, so `A1 = A3+B` and `A2 = A4+B` both avoid a
+    -- second wraparound relative to `A3`,`A4` respectively when compared via
+    -- the no-wrap floor identity anchored at `A4` and at `A3 - Q`.
+    simp only [not_lt] at hA3ltQ
+    have hA3ltQ2 : N + 1 + r < 2 * Q := by omega
+    have hA4mod : (S + 1 + r) % Q = S + 1 + r := Nat.mod_eq_of_lt hA4ltQ
+    have hA4wrap : (S + 1 + r) % Q + B < Q := by rw [hA4mod]; omega
+    -- `phiQ (A4+B) = phiQ A4 + B * (A4 / Q) = phiQ A4 + 0` since `A4 < Q`.
+    have hA4B : phiQ Q ((S + 1 + r) + B) = phiQ Q (S + 1 + r) + B * ((S + 1 + r) / Q) :=
+      phiQ_add_eq_phiQ_add_of_no_wrap (Q := Q) (n := S + 1 + r) (B := B) hA4wrap
+    have hA4div0 : (S + 1 + r) / Q = 0 := Nat.div_eq_of_lt hA4ltQ
+    rw [hA4div0, mul_zero, add_zero] at hA4B
+    have hA3sub : N + 1 + r - Q < Q := by omega
+    have hA3mod : (N + 1 + r) % Q = N + 1 + r - Q := by
+      have heq2 : (N + 1 + r) % Q = (N + 1 + r - Q) % Q := by
+        conv_lhs => rw [show N + 1 + r = (N + 1 + r - Q) + Q by omega]
+        rw [Nat.add_mod_right]
+      rw [heq2, Nat.mod_eq_of_lt hA3sub]
+    have hA1ltN : N + 2 * B + 1 + r < 2 * Q := hA1lt
+    have hA3wrap : (N + 1 + r) % Q + B < Q := by rw [hA3mod]; omega
+    -- `phiQ (A3+B) = phiQ A3 + B * (A3 / Q) = phiQ A3 + B` since `A3 / Q = 1`.
+    have hA3B : phiQ Q ((N + 1 + r) + B) = phiQ Q (N + 1 + r) + B * ((N + 1 + r) / Q) :=
+      phiQ_add_eq_phiQ_add_of_no_wrap (Q := Q) (n := N + 1 + r) (B := B) hA3wrap
+    have hA3div1 : (N + 1 + r) / Q = 1 := by
+      have := Nat.div_eq_of_lt_le (by omega : 1 * Q ≤ N + 1 + r)
+        (by omega : N + 1 + r < (1 + 1) * Q)
+      simpa using this
+    rw [hA3div1, mul_one] at hA3B
+    have hA1eq : N + (B + 1) + r = (N + 1 + r) + B := by ring
+    have hA2eq : S + (B + 1) + r = (S + 1 + r) + B := by ring
+    rw [hA1eq, hA2eq, hA3B, hA4B]
+    push_cast
+    -- Goal is now purely about `phiQ N`, `phiQ S`, `phiQ (N+1+r)`, `phiQ (S+1+r)`, and `B`.
+    have hgoal : (phiQ Q N : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+        2 * (((phiQ Q (N + 1 + r) : ℤ) + B) - (phiQ Q (S + 1 + r) : ℤ)
+          - (phiQ Q (N + 1 + r) : ℤ) + (phiQ Q (S + 1 + r) : ℤ)) := by
+      have hsimp : ((phiQ Q (N + 1 + r) : ℤ) + B) - (phiQ Q (S + 1 + r) : ℤ)
+          - (phiQ Q (N + 1 + r) : ℤ) + (phiQ Q (S + 1 + r) : ℤ) = (B : ℤ) := by ring
+      rw [hsimp]
+      -- Reduces to `phiQ N + 2*phiQ S ≤ 2B`: the quadratic-positivity fact,
+      -- via the exact `phiQ_sub_quadratic_le`/`phiQ_sub_quadratic_nonneg` bounds
+      -- at the *specific* arguments `N, S` only (no `r0Q Q` dependence at all).
+      have hN_le := phiQ_poly_le (Q := Q) (n := N) hQ
+      have hS_le := phiQ_poly_le (Q := Q) (n := S) hQ
+      have hQQ : (0:ℚ) < Q := Nat.cast_pos.mpr hQ
+      have hBQ : (20:ℚ) ≤ B := by exact_mod_cast hB
+      have hSBQ : (S:ℚ) * 20 ≤ B := by exact_mod_cast hSB
+      have hQlo' : (2:ℚ)*B < Q := by exact_mod_cast hQlo
+      have hNvQ : (N:ℚ) = 2*(B:ℚ)+S+3 := by rw [hNv]; push_cast; ring
+      have hQhi' : (Q:ℚ) < 2*(N:ℚ) + 2*B := by
+        have hh : (Q:ℕ) < 2 * N + 2 * B := hQhi
+        have hhQ : (Q:ℚ) < 2*(N:ℚ) + 2*(B:ℚ) := by exact_mod_cast hh
+        linarith
+      rw [hNvQ] at hN_le
+      have hfinal : (phiQ Q N : ℚ) + 2*(phiQ Q S : ℚ) ≤ 2*(B:ℚ) := by
+        have hpoly : (4 * (2*(B:ℚ)+S+3) * (2*(B:ℚ)+S+3) - 4 * (2*(B:ℚ)+S+3) * Q + Q * Q)
+              + 2 * (4 * (S:ℚ) * S - 4 * S * Q + Q * Q) ≤ 8 * Q * (2 * (B:ℚ)) := by
+          nlinarith [hQlo', hQhi', hBQ, hSBQ, sq_nonneg ((Q:ℚ) - 2*B),
+            mul_nonneg (Nat.cast_nonneg S : (0:ℚ) ≤ S) (by linarith : (0:ℚ) ≤ B - 20*S)]
+        have hchain : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S ≤ 8 * Q * (2 * (B:ℚ)) :=
+          le_trans (by linarith [hN_le, hS_le]) hpoly
+        have h8Q : (0:ℚ) < 8 * Q := by positivity
+        have heqL : 8 * (Q:ℚ) * phiQ Q N + 16 * (Q:ℚ) * phiQ Q S =
+            8 * (Q:ℚ) * ((phiQ Q N : ℚ) + 2 * (phiQ Q S : ℚ)) := by ring
+        rw [heqL] at hchain
+        exact le_of_mul_le_mul_left hchain h8Q
+      exact_mod_cast hfinal
+    linarith [hgoal]
 
 /-- Paper Theorem 5.1 as a proposition. -/
 def thm_5_1_statement : Prop :=

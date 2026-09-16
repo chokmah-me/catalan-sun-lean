@@ -391,6 +391,87 @@ case-split around it referencing the fixed offset `A3 − A4 = 2B+3` and
 `A1 − A2 = 2B+3` (same offset) to bound how many of the four points can
 simultaneously wrap.
 
+## Session 2026-09-16 (continued): gap closed via floor-division, not `Corr`
+
+Landed, `lake build`-verified, zero-`sorry`, in `CatalanSun/Thm51.lean`:
+`Corr` (def), `phiQ_eq_quadratic_add_Corr`, `Corr_add_sub_Corr_of_no_wrap`
+(the exact identity sketched above, formalized directly), and — the piece
+that actually closes almost all of the gap —
+`phiQ_add_eq_phiQ_add_of_no_wrap` (`phiQ Q (n+B) = phiQ Q n + B * (n/Q)`
+under the same no-wrap hypothesis `n%Q+B<Q`), `phiQ_add_le_add_of_le` (the
+`B`-step forward difference of `phiQ` is monotone in the base point — proved
+via `phiQ_sum_Ico` and a `Finset.map` shift, no `Corr` needed), and
+**`sum_NKQ_tail_ge_of_gap`**, which closes (KI) under `2B < Q < 2N+2B` plus
+one extra hypothesis (see below).
+
+**Why floor-division beat the `Corr`-difference route in practice.** The
+`Corr` identity above is mathematically equivalent to
+`phiQ_add_eq_phiQ_add_of_no_wrap` (checked symbolically:
+`q(n+B)-q(n) + Corr_diff = B*(n/Q)` where `q` is the quadratic part), but
+working directly with `phiQ` and `Nat.div`/`Nat.mod` avoided a lot of `ℚ`
+cast/field-arithmetic bookkeeping that made the `Corr`-based attempt at the
+four-term combination unwieldy. Concretely: writing `A3 = N+1+r0Q Q`,
+`A4 = S+1+r0Q Q` (`N = Ndim B S`), one has `A4 < Q` throughout the whole
+open gap (`S` is too small relative to `B` to reach `Q > 2B` — this needs
+only the ratio hypothesis) and `Q ≤ A3` once `Q < 2N+2B` — i.e. `⌊A4/Q⌋=0`,
+`⌊A3/Q⌋=1` — **except** `⌊A3/Q⌋` can jump to `2` for a narrow band of `Q`
+just above `2B` (`hA1lt` below is exactly the condition that rules this
+out). Given `⌊A4/Q⌋=0` and `⌊A3/Q⌋=1`,
+`phiQ_add_eq_phiQ_add_of_no_wrap` applied at `A4` and at `A3` gives
+`phiQ(A2) = phiQ(A4)` and `phiQ(A1) = phiQ(A3)+B` exactly (no approximation),
+collapsing sumT's four-term combination to `phiQ(A3) - phiQ(A4) + B`, and
+(KI) reduces to the *same* `phiQ N + 2·phiQ S ≤ 2B` quadratic-positivity
+fact that the `_le_2B`/`_of_Q_small` lemmas' pure-polynomial steps already
+established (reused here via `phiQ_poly_le` unconditionally — no
+`Corr(n) ≤ Q/8` bound needed at all for this piece, since it's now an exact
+identity rather than a bound).
+
+**The `d=0` sub-case** (`Q > N`, i.e. `A3 < Q` too) is handled separately:
+both `phiQ N` and `phiQ S` vanish (`phiQ_of_lt`), and the goal reduces to
+`phiQ(A2)+phiQ(A3) ≤ phiQ(A1)+phiQ(A4)`, which is exactly
+`phiQ_add_le_add_of_le` applied to `S+1+r0Q Q ≤ N+1+r0Q Q` (monotonicity of
+`phiQ`'s `B`-step difference in the base point — a clean, `Corr`-free,
+unconditional fact, no case-split on `Q` needed).
+
+**`sum_NKQ_tail_ge_of_gap`'s exact signature:**
+
+```lean
+theorem sum_NKQ_tail_ge_of_gap {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hB : 20 ≤ B) (hSB : S * 20 ≤ B) (hS : S ≤ Ndim B S)
+    (hQlo : 2 * B < Q) (hQhi : Q < 2 * Ndim B S + 2 * B)
+    (hA1lt : Ndim B S + 2 * B + 1 + r0Q Q < 2 * Q) :
+    (phiQ Q (Ndim B S) : ℤ) + 2 * (phiQ Q S : ℤ) ≤
+      2 * ∑ i ∈ tailFin B S hS, (NKQ B Q i.val : ℤ)
+```
+
+**Remaining gap after this session.** `hA1lt` is *not* implied by
+`hQlo`/`hQhi` alone — it fails on a narrow band of `Q` just above `2B`
+(verified numerically: `Q ∈ {2B+1, 2B+3}` for `B=20`, i.e. exactly 2-3 odd
+`Q` values before `hA1lt` starts holding, growing very slowly with `B`; see
+the `A1 ≥ 2Q` check in this session's Python scratch work). Root cause: in
+that band, forming `A1 = A3+B` wraps around `Q` a *second* time (`⌊A3/Q⌋=1`
+but `⌊A1/Q⌋=2`), so `phiQ_add_eq_phiQ_add_of_no_wrap`'s hypothesis
+genuinely fails there — it is not a proof-engineering gap, the mechanism
+itself doesn't apply. Two ways to close this residual sliver, neither
+attempted yet:
+(a) extend `sum_NKQ_tail_ge_of_Q_le_2B`'s technique (crude `Corr(n) ≤ Q/8`
+bound, concave-quadratic-in-`Q` endpoint argument) a small fixed amount past
+`2B` — it was already shown sufficient up to exactly `2B`, and the residual
+band is only ~2-4 values wide, so pushing the threshold by a small additive
+constant (not a new asymptotic regime) is plausible; or (b) prove a direct
+"at most double wrap" version of `phiQ_add_eq_phiQ_add_of_no_wrap` handling
+`⌊(n+B)/Q⌋ = ⌊n/Q⌋+1` (one extra wrap) with an explicit correction term,
+then a 3-way case split (`0`, `1`, or `2` wraps for `A3→A1`) instead of the
+current 2-way (`d=0` vs `d=1`) split.
+
+**Assembling `thm_5_1` still needs:** combining `sum_NKQ_tail_ge_of_Q_large`,
+`sum_NKQ_tail_ge_of_Q_le_2B`, and `sum_NKQ_tail_ge_of_gap` (which together
+cover all `Q` except the narrow `hA1lt`-failing sliver above) into the
+single `sum_NKQ_tail_ge` statement via a `Q`-range case split, once that
+sliver is closed. Not yet attempted this session — `sum_NKQ_tail_ge_of_gap`
+was landed as a standalone lemma with its own explicit hypotheses, not yet
+wired into a case-split dispatcher.
+
 ## Environment note for next session
 
 This session could not install Lean/elan: `elan toolchain install` failed
