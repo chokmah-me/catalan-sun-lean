@@ -7,6 +7,106 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-16 (latest): numerical counterexample found to
+`lemma_5_5_row_stability` as literally stated; Step 1 work HALTED pending
+review.** Working in worktree `lemma55-step1` (branch
+`worktree-lemma55-step1`, forked before the previous session's scoping
+note below was written on `main` — see `main`'s copy of this file for that
+note's full text on the "hard direction" scoping and the monotonicity
+disproof of `g(i)`). Before writing any Lean, re-verified the "load-bearing
+claim" identified in that scoping pass more thoroughly (fixed `S=10,
+B=200`, scanning `Q` from 3 up to 361, all odd prime powers, all `< 5B =
+1000` so within the paper's own claimed regime for the eventual `o(B^2)`
+sum):
+
+```
+Q=    3 consec=  -51 min0=   -54 gap=     3 budget= 67.67 ratio=   0.04
+Q=    5 consec=  -36 min0=   -40 gap=     4 budget= 41.00 ratio=   0.10
+Q=    7 consec=  -27 min0=   -34 gap=     7 budget= 29.57 ratio=   0.24
+Q=    9 consec=  -23 min0=   -31 gap=     8 budget= 23.22 ratio=   0.34
+Q=   11 consec=  -18 min0=   -31 gap=    13 budget= 19.18 ratio=   0.68
+Q=   25 consec=   -8 min0=   -28 gap=    20 budget=  9.00 ratio=   2.22
+Q=   27 consec=    4 min0=   -22 gap=    26 budget=  8.41 ratio=   3.09
+Q=   49 consec=    0 min0=   -24 gap=    24 budget=  5.08 ratio=   4.72
+Q=   81 consec=   11 min0=   -22 gap=    33 budget=  3.47 ratio=   9.51
+Q=  121 consec=   10 min0=   -20 gap=    30 budget=  2.65 ratio=  11.31
+Q=  169 consec=    0 min0=   -20 gap=    20 budget=  2.18 ratio=   9.16
+Q=  243 consec=   10 min0=   -30 gap=    40 budget=  1.82 ratio=  21.94
+Q=  289 consec=   10 min0=   -20 gap=    30 budget=  1.69 ratio=  17.73
+Q=  361 consec=   10 min0=   -20 gap=    30 budget=  1.55 ratio=  19.30
+```
+
+`gap = ell0AQ(consecutive)_noC − (local-search min of ellAQN over the
+Ndim0 model)_noC` (dropping the shared `CAQ` constant, which cancels
+identically since it doesn't depend on the row set), `budget = 1 + B/Q`,
+`ratio = gap/budget`. **The ratio grows with `Q`, with no sign of
+saturating at a fixed value** — this is the wrong shape for an *absolute*
+constant `C` bound (`lemma_5_5_row_stability` requires `ratio ≤ C`
+uniformly over **all** odd prime powers `Q`, and the paper's own proof
+sketch gives no upper cutoff on `Q` either). This reproduces and sharpens
+the previous session's spot-check (which found ratio ≈ 18-22 at `Q=243`
+alone but hadn't yet swept across `Q` to see the growth trend).
+
+Verification steps taken to rule out a transcription/search bug before
+accepting this as a real problem:
+- Re-derived `NKQ`/`FNQ`/`indicatorQle`/`CAQ`/`ellAQN` bit-for-bit from
+  `Thm51.lean` lines 42-93 in a **standalone Lean `#eval` script**
+  (`lean --run`, no Mathlib import, just core + `List`), confirming Lean
+  brute force over all card-3 subsets of a small `Fin(126)` space (i.e.
+  `S=3, B=60, Q=9`) agrees exactly with the Python local-search result on
+  the same parameters (both give `mAQ_noC = -9`, `ell0AQ_noC(consecutive)
+  = 1`, `min-over-Ndim0-model_noC = -8`; ratio there ≈ 1.3, fine).
+- Verified the Python local-search hill-climbing algorithm reproduces the
+  *exact* Lean brute-force optimum at that small scale (not just close),
+  giving confidence it also finds true optima (or very near them) at
+  larger scales where brute force is infeasible.
+- The growth trend (ratio increasing with `Q`, not bounded) is consistent
+  across two independently-written Python scripts in this session and the
+  prior session's single-point spot-check.
+
+**What this means:** either (a) `lemma_5_5_row_stability`'s Lean statement
+in `Lemma55.lean` has a transcription bug relative to the paper (e.g. a
+missing side constraint on `Q`, such as `Q ≤ c·B` for some constant tying
+it to `B`, that the paper's proof implicitly assumes even though its
+statement as quoted says "for every odd prime power `Q`"), (b) the paper's
+Lemma 5.5 proof sketch is itself incomplete/wrong at large `Q` relative to
+`S`/`B` (plausible — this is a terse, unrefereed Sept-2026 math.GM
+preprint; the proof text is "the two row sets have symmetric difference at
+most six... at most three replacements are needed, proving (5.2)" with no
+actual derivation of why 3 replacements suffice or how the bound behaves
+as `Q → ∞` relative to `S`), or (c) there's a numerical bug still
+unaccounted for despite the cross-checks above. **Did not proceed to write
+any Lean lemmas this session** given this open question. Scratch scripts
+(not committed to the repo, session scratchpad only): a `Q`-sweep script
+computing `ellAQN` minus the shared `CAQ` term via local-search
+hill-climbing with random restarts, plus the Lean `#eval` cross-check
+(`LemmaCheck.lean`, standalone re-derivation of `Thm51.lean`'s defs) — both
+worth recreating to re-verify if picking this up again.
+
+**Recommended next steps for whoever continues this:**
+1. Re-examine whether `Q` should be bounded (e.g. `Q ≤ c·B`) somewhere in
+   Lemma 5.5's actual hypotheses — check whether Corollary 5.2's use of
+   Lemma 5.5 only ever invokes it for `Q < 5B` (the `layerIndex`
+   restriction already present in `lemma_5_5_ledger_little_o`) and whether
+   the `∀ Q` in `lemma_5_5_row_stability` should instead read `∀ Q, Q < 5*B
+   → ...` or similar — note this does NOT obviously fix it, since
+   `Q=243 < 5B=1000` was already in the tested range above and still shows
+   ratio ≈ 22.
+2. Consider whether `S` needs to scale with `Q` in some way not captured
+   by the fixed `S*20 ≤ B` hypothesis alone, or whether an additional
+   relation between `Q` and `S` is implicit in the paper's argument (e.g.
+   the "every residue class contains at most `1+U/Q` admissible indices"
+   remark suggests the argument may implicitly assume `Q` is not too large
+   relative to `S`, since with `Q > S` every index sits in its own
+   residue class and the "occupancy" argument the paper leans on has no
+   force).
+3. If the discrepancy persists after investigating 1-2, this may be worth
+   flagging as a genuine gap in the paper itself (in the spirit of the
+   existing "Aside — the paper's 'Lemma 5.3'" numbering-gap note found
+   during the Thm 5.1 push) rather than treated as a scaffolding bug in
+   this repo — but that conclusion should not be reached without first
+   ruling out 1-2 above.
+
 **2026-09-16: Theorem 5.1 is now fully proved and unconditional** (see
 README and `docs/THM51-REDUCTION-NOTES.md` for the closed derivation
 history — `sum_NKQ_tail_ge` was finished via a 3-way quotient case split,
