@@ -154,8 +154,12 @@ feature in the stream). Exit 3 = error / OOM.
 
 CI: `.github/workflows/con-leche.yml` runs this on every push and PR.
 It pins `leanprover/con-leche` at `CON_LECHE_REV` and `lean4export` at
-`LEAN4EXPORT_REF`. GitHub-hosted runners have ~7 GB RAM; a Mathlib-scale
-export may OOM (exit 3) until a larger runner is used.
+`LEAN4EXPORT_REF`. Measured on `ubuntu-latest` (commit `8663999`,
+[run 2](https://github.com/chokmah-me/catalan-sun-lean/actions/runs/35216050384)):
+export 39 068 387 NDJSON lines, then
+`con-leche: accepted 362547 declarations (--verified)` in ~9.5 min
+(job ~13.5 min total). That is the kernel-level accept of the compiled
+library plus its Mathlib cone; it is not a proof of Theorem 1.1.
 
 ## Incoming (not on the default target)
 
