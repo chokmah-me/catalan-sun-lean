@@ -7,6 +7,71 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-17 (newest of all): LEMMA 5.5 IS COMPLETE. (5.3)
+(`lemma_5_5_ledger_little_o_holds`) is proved, unconditional, `lake build`
+clean, 0 sorry, axioms ⊆ classical three. Next target: Props 6.3/7.4.**
+
+**The headline: Chebyshev was not needed.** Every prior entry in this file
+assumed (5.3) required `∑_{p<5B} log p ≈ 5B` and flagged the ε-B₀ limit as "a
+different flavor from everything landed so far." Running the numeric gate first
+(this file's own standing rule) showed the **crudest possible bound — no prime
+number theory at all — is already `o(B²)` with ~10× margin**:
+
+* `(p,ν) ↦ p^ν` is injective on `layerIndex B` (unique factorization) with
+  values in `[1,5B)`. So `≤ 5B` layers, and `∑_{layers} 1/Q ≤ harmonic(5B)`.
+* `log p ≤ log Q ≤ log(5B)`.
+
+giving `SUM ≤ 111·B·log(5B)·(6+log 5B) = Θ(B log²B)`. The whole thing reduces
+to `log²x/x → 0` (`Real.tendsto_pow_log_div_mul_add_atTop`). Measured
+`RHS/B²`: 84.3 → 2.02 → 0.279 → 0.0047 for `B` = 10², 10⁴, 10⁵, 10⁷ — decaying
+`~½` per doubling. Scripts kept: `.scratchpad/lemma55/l53crudest.py`,
+`l53final.py`, `l53inj.py`, `l53shape.py`, `l53crude.py`.
+
+**A statement bug found and fixed — same class as the `m0AQ` one.** (5.3)'s
+`def` passed `pv.1` (the *prime* `p`) as the layer argument to
+`a0QB`/`m0AQ`/`aQB`/`mAQ`, not `pv.1 ^ pv.2`. The paper sums over `Q = p^ν`,
+and `thm_5_1_statement` quantifies its layer argument as `OddPrimePower Q`, so
+`p^ν` is correct — the two agree only at `ν = 1`. The `log p` weight correctly
+stays `log pv.1`. The as-written form was also `o(B²)`, so this was a fidelity
+fix, not the repair of a false claim. **Lesson repeated from the `m0AQ`
+episode: check each scaffolded statement against the paper before proving it,
+not after.**
+
+**`Mathlib.NumberTheory.Chebyshev` EXISTS at this pin** (Lean 4.32.2) and is
+rich — `theta_le_log4_mul_x` (θ(x) ≤ x log 4), `pi_le_log4_mul_div` (explicit
+π(x) upper bound), `psi_le_const_mul_self`, `pi_ge`, `theta_ge`,
+`Chebyshev.sum_PrimePow_eq_sum_sum`, plus `primorial_le_four_pow` and the
+`vonMangoldt` API. Not needed for (5.3), but this is exactly the machinery
+Props 6.3/7.4 and Mertens/PNT will want — **do not re-derive it from scratch.**
+
+**What landed** (`Lemma55.lean`, Stage G–I, all unconditional):
+- Stage G (pure ℕ): `layer_mem_iff`, `layer_oddPrimePower`, `layer_pow_injOn`,
+  `card_layerIndex_le` (`≤ 5B` — replaces the paper's undercounted
+  `O(√B log B)` layer count, which this proof never needs).
+- Stage H (ℝ): `layer_int_bound` (the two (5.2) halves combined, `≤ 111(B/Q+1)`),
+  `layer_term_le`, `sum_inv_layer_le` (the harmonic step), `ledger_sum_le`.
+- Stage I: `eventually_log_sq_le`, `lemma_5_5_ledger_little_o_holds`.
+
+**Lean pitfalls hit (all casts again, none combinatorial):**
+- The documented `push_cast`-vs-ℕ-division trap bit again, exactly as recorded
+  below: `push_cast` turned `((B/Q : ℕ) : ℝ)` into `↑B/↑Q` and broke the match.
+  The fix that worked is the one already in `lemma_5_5_row_stability_holds`:
+  `rw [Int.cast_mul, Int.cast_add, Int.cast_one, Int.cast_natCast]` then
+  `norm_num`, converting to real division exactly once via `Nat.cast_div_le`.
+- `abs_add` is now **`abs_add_le`**; `Nat.pos_pow_of_pos` is now
+  **`Nat.pow_pos`**; `Int.cast_le`'s type argument is `R`, not `α`.
+- `Nat.pow_right_injective` leaves a beta-redex goal — close with an explicit
+  `show x.1 ^ x.2 = x.1 ^ y.2` before `rw`.
+- Writing `(1:ℝ)/(n:ℝ)` inside a `Finset.image` sum elaborates `n` as a ℕ-power
+  and fails instance synthesis; annotate `((n : ℕ) : ℝ)`.
+- Editing these UTF-8 files from Python on Windows needs explicit
+  `encoding='utf-8'` — the cp1252 default raises `UnicodeDecodeError` mid-edit.
+
+**Not attempted:** Props 6.3/7.4, Mertens/PNT, Theorem 1.1, Corollary 5.2
+(whose "Lemma 5.3" is the cited-but-undisplayed trivial `[x]_+ = x` fact).
+
+---
+
 **2026-09-17 (newest of all): (5.2) IS FULLY PROVED — both directions,
 unconditional, absolute constant `C = 210`. `lemma_5_5_row_stability_holds`
 is in `Lemma55.lean`; `lake build` clean, 0 sorry, axioms ⊆ classical three.
@@ -76,7 +141,10 @@ so pin `(0 - 1) / Q = 0` with a `have` in the `N = 0` edge case. Also:
 `Finset.card_insert_of_not_mem` is now `card_insert_of_notMem`; `attachFin`
 takes a `Finset ℕ`, not a `Finset (Fin n)` — use `I.attach.image` instead.
 
-**Next target: (5.3)** (`lemma_5_5_ledger_little_o`). Now unblocked — it can
+**Next target: (5.3)** — **DONE 2026-09-17; route below is SUPERSEDED.** The
+Chebyshev summation prescribed here was never needed: layer injectivity gives
+`≤ 5B` layers and `∑ 1/Q ≤ harmonic(5B)`, which already yields `Θ(B log²B)`.
+See the top-of-file entry. Kept only as history. Now unblocked — it can
 consume the proved `lemma_5_5_row_stability_holds` plus the already-proved
 `abs_a0QB_sub_aQB_le` directly. Route: sum the per-layer `O(1+B/Q)` bound over
 `layerIndex B` via Chebyshev (`∑_{p<5B} log p ≈ 5B`, giving `Θ(B log² B)`),

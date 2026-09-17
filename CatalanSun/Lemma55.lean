@@ -60,6 +60,9 @@
 -/
 
 import CatalanSun.Thm51
+import Mathlib.NumberTheory.Harmonic.Bounds
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Order.Filter.AtTopBot.Basic
 
 set_option linter.style.header false
 set_option linter.unusedSimpArgs false
@@ -72,6 +75,7 @@ namespace CatalanSun.Lemma55
 
 open Finset CatalanSun.Thm51 CatalanSun.NewtonCompletion
 open Function
+open Filter Real
 
 /-! ## The consecutive-row cutoff `U₀` -/
 
@@ -1254,13 +1258,22 @@ every `ε > 0` there is `B₀` such that for all `B ≥ B₀`, the summed absolu
 ledger difference between the exact and consecutive-row models is at most
 `ε * B ^ 2` (i.e. `o(B²)` unwound to its `ε`-`B₀` definition). `f` is
 universally quantified per `B` since the bound must hold along any
-`Injective f` witness used in `thm_5_1_statement`. -/
+`Injective f` witness used in `thm_5_1_statement`.
+
+**Scaffold bug fixed 2026-09-17:** the layer arguments to `a0QB`/`m0AQ`/`aQB`/
+`mAQ` previously read `pv.1` (the *prime* `p`) rather than `pv.1 ^ pv.2` (the
+prime *power* `Q = p^ν`). The paper's (5.3) sums `a_{p^ν,B}`, `m^A_{p^ν,B}`,
+and `thm_5_1_statement` quantifies its layer argument as `OddPrimePower Q`, so
+`Q = p^ν` is the correct index; the two agree only when `ν = 1`. The `log p`
+weight correctly stays `Real.log pv.1` — it is `log p`, not `log Q`. (The
+as-written version happened to be `o(B²)` too, so this is a fidelity fix, not a
+repair of a false statement.) -/
 def lemma_5_5_ledger_little_o : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ B₀ : ℕ, ∀ B : ℕ, B₀ ≤ B →
     ∀ (f : Fin (B / 20) → Fin (B / 20 + 3)),
       ∑ pv ∈ layerIndex B,
-        (|(((a0QB B (B / 20) pv.1 - m0AQ B (B / 20) pv.1 f) -
-              (aQB B (B / 20) pv.1 - mAQ B (B / 20) pv.1 f) : ℤ) : ℝ)| : ℝ) *
+        (|(((a0QB B (B / 20) (pv.1 ^ pv.2) - m0AQ B (B / 20) (pv.1 ^ pv.2) f) -
+              (aQB B (B / 20) (pv.1 ^ pv.2) - mAQ B (B / 20) (pv.1 ^ pv.2) f) : ℤ) : ℝ)| : ℝ) *
           Real.log pv.1 ≤ ε * (B : ℝ) ^ 2
 
 /-! ## Stage F: assembly — (5.2) in full
@@ -1360,5 +1373,277 @@ theorem lemma_5_5_row_stability_holds : lemma_5_5_row_stability := by
     norm_num
   rw [hrw]
   linarith [hdiv]
+
+/-! ## Stage G-I: (5.3), the ledger `o(B^2)` bound
+
+The route is deliberately **elementary - no prime number theory**. Summing the
+proved (5.2) bound over `layerIndex B` needs only two facts about the layers:
+
+* `(p,ν) ↦ p^ν` is injective on `layerIndex B` (unique factorization) with all
+  values in `[1, 5B)`, so there are at most `5B` layers and
+  `∑ 1/Q ≤ harmonic (5B) ≤ 1 + log (5B)`;
+* `log p ≤ log Q ≤ log (5B)`, since `p ≤ Q < 5B`.
+
+These give `SUM ≤ 111 · B · log(5B) · (6 + log 5B) = Θ(B log² B) = o(B²)`.
+
+An earlier plan for this proof routed through Chebyshev's `∑_{p<5B} log p ≈ 5B`
+(`Mathlib.NumberTheory.Chebyshev` *is* available at this toolchain pin, and is
+rich). It is **not needed**: the crude count above already gives `o(B²)` with
+roughly a factor-10 margin, verified numerically before any Lean was written
+(`.scratchpad/lemma55/l53crudest.py`, `l53final.py`). This also makes the proof
+independent of the paper's undercounted `O(√B log B)` layer claim: the crude
+`≤ 5B` bound suffices, so nothing here reproduces or repairs that count. -/
+
+theorem layer_mem_iff {B : ℕ} {pv : ℕ × ℕ} :
+    pv ∈ layerIndex B ↔
+      (pv.1 < 5 * B ∧ pv.2 < 5 * B) ∧
+        (pv.1.Prime ∧ Odd pv.1 ∧ 1 ≤ pv.2 ∧ pv.1 ^ pv.2 < 5 * B) := by
+  unfold layerIndex
+  rw [Finset.mem_filter, Finset.mem_product, Finset.mem_range, Finset.mem_range]
+
+/-- Each layer's `p ^ ν` is an odd prime power — the hypothesis (5.2) consumes. -/
+theorem layer_oddPrimePower {B : ℕ} {pv : ℕ × ℕ} (h : pv ∈ layerIndex B) :
+    OddPrimePower (pv.1 ^ pv.2) := by
+  obtain ⟨-, hp, hodd, hnu, -⟩ := layer_mem_iff.mp h
+  exact ⟨⟨pv.1, pv.2, hp.prime, hnu, rfl⟩, hodd.pow⟩
+
+theorem layer_pow_injOn {B : ℕ} :
+    Set.InjOn (fun pv : ℕ × ℕ => pv.1 ^ pv.2) (layerIndex B) := by
+  intro x hx y hy hxy
+  simp only [Finset.mem_coe, layer_mem_iff] at hx hy
+  obtain ⟨-, hpx, -, hnx, -⟩ := hx
+  obtain ⟨-, hpy, -, hny, -⟩ := hy
+  simp only at hxy
+  -- bases agree
+  have hp : x.1 = y.1 := by
+    have hdvd : x.1 ∣ y.1 ^ y.2 := by rw [← hxy]; exact dvd_pow_self x.1 (by omega)
+    exact (Nat.prime_dvd_prime_iff_eq hpx hpy).mp (hpx.dvd_of_dvd_pow hdvd)
+  -- exponents agree
+  have hexp : x.2 = y.2 := by
+    apply Nat.pow_right_injective hpx.two_le
+    show x.1 ^ x.2 = x.1 ^ y.2
+    rw [hxy, hp]
+  exact Prod.ext hp hexp
+
+theorem card_layerIndex_le (B : ℕ) : (layerIndex B).card ≤ 5 * B := by
+  classical
+  have := Finset.card_le_card_of_injOn (f := fun pv : ℕ × ℕ => pv.1 ^ pv.2)
+    (s := layerIndex B) (t := Finset.range (5 * B))
+    (fun pv hpv => Finset.mem_range.mpr (layer_mem_iff.mp hpv).2.2.2.2)
+    layer_pow_injOn
+  simpa using this
+
+theorem layer_int_bound {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hS0 : 0 < S)
+    (hSB : S * 20 ≤ B) (f : Fin S → Fin (S + 3)) :
+    |((a0QB B S Q - m0AQ B S Q f) - (aQB B S Q - mAQ B S Q f) : ℤ)|
+      ≤ 111 * (((B / Q : ℕ) : ℤ) + 1) := by
+  have h1 : |a0QB B S Q - aQB B S Q| ≤ 6 * ((B / Q : ℕ) : ℤ) + 6 :=
+    abs_a0QB_sub_aQB_le hQ hodd
+  have h2 : |(mAQ B S Q f : ℤ) - m0AQ B S Q f| ≤ 105 * (((B / Q : ℕ) : ℤ) + 1) :=
+    abs_mAQ_sub_m0AQ_le hQ hodd hS0 hSB f
+  have hsplit : ((a0QB B S Q - m0AQ B S Q f) - (aQB B S Q - mAQ B S Q f) : ℤ)
+      = (a0QB B S Q - aQB B S Q) + ((mAQ B S Q f : ℤ) - m0AQ B S Q f) := by ring
+  rw [hsplit]
+  calc |(a0QB B S Q - aQB B S Q) + ((mAQ B S Q f : ℤ) - m0AQ B S Q f)|
+      ≤ |a0QB B S Q - aQB B S Q| + |(mAQ B S Q f : ℤ) - m0AQ B S Q f| := abs_add_le _ _
+    _ ≤ 111 * (((B / Q : ℕ) : ℤ) + 1) := by linarith
+
+theorem layer_term_le {B : ℕ} (hB0 : 0 < B / 20) {pv : ℕ × ℕ}
+    (hpv : pv ∈ layerIndex B) (f : Fin (B / 20) → Fin (B / 20 + 3)) :
+    (|(((a0QB B (B / 20) (pv.1 ^ pv.2) - m0AQ B (B / 20) (pv.1 ^ pv.2) f) -
+        (aQB B (B / 20) (pv.1 ^ pv.2) - mAQ B (B / 20) (pv.1 ^ pv.2) f) : ℤ) : ℝ)|)
+      * Real.log pv.1
+      ≤ 111 * ((B : ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ) + 1) * Real.log (5 * B) := by
+  set Q := pv.1 ^ pv.2 with hQdef
+  obtain ⟨-, hp, hodd, hnu, hQlt⟩ := layer_mem_iff.mp hpv
+  have hOPP : OddPrimePower Q := ⟨⟨pv.1, pv.2, hp.prime, hnu, rfl⟩, hodd.pow⟩
+  have hQ : 0 < Q := hOPP.pos
+  have hSB : (B / 20) * 20 ≤ B := Nat.div_mul_le_self B 20
+  -- integer bound, cast to ℝ
+  have hint := layer_int_bound (B := B) (S := B / 20) (Q := Q) hQ hOPP.odd hB0 hSB f
+  have hcast : (|(((a0QB B (B / 20) Q - m0AQ B (B / 20) Q f) -
+      (aQB B (B / 20) Q - mAQ B (B / 20) Q f) : ℤ) : ℝ)|)
+      ≤ 111 * ((((B / Q : ℕ)) : ℝ) + 1) := by
+    have h := (Int.cast_le (R := ℝ)).mpr hint
+    rw [Int.cast_abs] at h
+    refine h.trans (le_of_eq ?_)
+    rw [Int.cast_mul, Int.cast_add, Int.cast_one, Int.cast_natCast]
+    norm_num
+  -- ℕ-division to real division (done once, per the plan)
+  have hdiv : (((B / Q : ℕ)) : ℝ) ≤ (B : ℝ) / (Q : ℝ) := Nat.cast_div_le
+  have habs_le : (|(((a0QB B (B / 20) Q - m0AQ B (B / 20) Q f) -
+      (aQB B (B / 20) Q - mAQ B (B / 20) Q f) : ℤ) : ℝ)|)
+      ≤ 111 * ((B : ℝ) / (Q : ℝ) + 1) := by linarith
+  -- log p ≤ log (5B)
+  have hp2 : 2 ≤ pv.1 := hp.two_le
+  have hple : pv.1 ≤ Q := by rw [hQdef]; exact Nat.le_self_pow (by omega) _
+  have hlogp : Real.log pv.1 ≤ Real.log (5 * B) := by
+    apply Real.log_le_log (by positivity)
+    have : pv.1 < 5 * B := lt_of_le_of_lt hple hQlt
+    exact_mod_cast this.le
+  have hlogp0 : 0 ≤ Real.log pv.1 := Real.log_natCast_nonneg _
+  have habs0 : (0:ℝ) ≤ |(((a0QB B (B / 20) Q - m0AQ B (B / 20) Q f) -
+      (aQB B (B / 20) Q - mAQ B (B / 20) Q f) : ℤ) : ℝ)| := abs_nonneg _
+  have hrhs0 : (0:ℝ) ≤ 111 * ((B : ℝ) / (Q : ℝ) + 1) := by
+    have : (0:ℝ) ≤ (B : ℝ) / (Q : ℝ) := by positivity
+    linarith
+  calc _ ≤ (111 * ((B : ℝ) / (Q : ℝ) + 1)) * Real.log pv.1 := by
+          exact mul_le_mul_of_nonneg_right habs_le hlogp0
+    _ ≤ (111 * ((B : ℝ) / (Q : ℝ) + 1)) * Real.log (5 * B) :=
+          mul_le_mul_of_nonneg_left hlogp hrhs0
+    _ = 111 * ((B : ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ) + 1) * Real.log (5 * B) := by
+          rw [← hQdef]
+
+theorem sum_inv_layer_le (B : ℕ) :
+    ∑ pv ∈ layerIndex B, (1 : ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ) ≤ (harmonic (5 * B) : ℝ) := by
+  classical
+  -- rewrite the layer sum as a sum over the image
+  have himg : ∑ pv ∈ layerIndex B, (1 : ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ)
+      = ∑ n ∈ (layerIndex B).image (fun pv => pv.1 ^ pv.2), (1 : ℝ) / ((n : ℕ) : ℝ) := by
+    rw [Finset.sum_image]
+    intro a ha b hb h
+    exact layer_pow_injOn ha hb h
+  rw [himg]
+  -- harmonic (5B) = ∑_{i<5B} 1/(i+1)
+  have hharm : (harmonic (5 * B) : ℝ) = ∑ i ∈ Finset.range (5 * B), ((i : ℝ) + 1)⁻¹ := by
+    unfold harmonic
+    push_cast
+    ring_nf
+  -- reindex the harmonic sum over Icc 1 (5B) shape: use image of (·+1)
+  have hsub : (layerIndex B).image (fun pv => pv.1 ^ pv.2)
+      ⊆ (Finset.range (5 * B)).image (fun i => i + 1) := by
+    intro n hn
+    rw [Finset.mem_image] at hn
+    obtain ⟨pv, hpv, rfl⟩ := hn
+    obtain ⟨-, hp, -, hnu, hlt⟩ := layer_mem_iff.mp hpv
+    have hpos : 0 < pv.1 ^ pv.2 := Nat.pow_pos hp.pos
+    rw [Finset.mem_image]
+    exact ⟨pv.1 ^ pv.2 - 1, Finset.mem_range.mpr (by omega), by omega⟩
+  have hrhs : ∑ i ∈ Finset.range (5 * B), ((i : ℝ) + 1)⁻¹
+      = ∑ n ∈ (Finset.range (5 * B)).image (fun i => i + 1), (1 : ℝ) / ((n : ℕ) : ℝ) := by
+    rw [Finset.sum_image (by intro a _ b _ h; simp only [] at h; omega)]
+    apply Finset.sum_congr rfl
+    intro i _
+    push_cast
+    rw [one_div]
+  rw [hharm, hrhs]
+  apply Finset.sum_le_sum_of_subset_of_nonneg hsub
+  intro n _ _
+  positivity
+
+theorem eventually_log_sq_le {ε : ℝ} (hε : 0 < ε) :
+    ∀ᶠ B : ℕ in atTop, 111 * Real.log (5 * B) * (6 + Real.log (5 * B)) ≤ ε * (B : ℝ) := by
+  -- Work with L := log 5 + log B ≥ log (5B) for B ≥ 1.
+  -- 111*L*(6+L) = 111*L^2 + 666*L.  Need this ≤ ε*B.
+  -- Use (log B)^2/B → 0 and (log B)/B → 0 and 1/B → 0.
+  have h2 : Filter.Tendsto (fun x : ℝ => Real.log x ^ 2 / (1 * x + 0)) atTop (nhds 0) :=
+    Real.tendsto_pow_log_div_mul_add_atTop 1 0 2 one_ne_zero
+  have h1 : Filter.Tendsto (fun x : ℝ => Real.log x ^ 1 / (1 * x + 0)) atTop (nhds 0) :=
+    Real.tendsto_pow_log_div_mul_add_atTop 1 0 1 one_ne_zero
+  have h0 : Filter.Tendsto (fun x : ℝ => Real.log x ^ 0 / (1 * x + 0)) atTop (nhds 0) :=
+    Real.tendsto_pow_log_div_mul_add_atTop 1 0 0 one_ne_zero
+  -- combine: F x := 222*log x^2/x + (666+444*log 5)*log x/x + (111*log5^2+666*log5)/x → 0
+  set c1 : ℝ := 222
+  set c2 : ℝ := 666 + 444 * Real.log 5
+  set c3 : ℝ := 111 * Real.log 5 ^ 2 + 666 * Real.log 5
+  have hF : Filter.Tendsto
+      (fun x : ℝ => c1 * (Real.log x ^ 2 / (1 * x + 0))
+                  + c2 * (Real.log x ^ 1 / (1 * x + 0))
+                  + c3 * (Real.log x ^ 0 / (1 * x + 0))) atTop (nhds 0) := by
+    have := ((h2.const_mul c1).add (h1.const_mul c2)).add (h0.const_mul c3)
+    simpa using this
+  -- pull back along ℕ → ℝ
+  have hFN := hF.comp tendsto_natCast_atTop_atTop
+  have hev := hFN.eventually (eventually_lt_nhds hε)
+  filter_upwards [hev, eventually_ge_atTop 1] with B hB hB1
+  simp only [Function.comp_apply, one_mul, add_zero, pow_one, pow_zero] at hB
+  have hBpos : (0:ℝ) < (B:ℝ) := by exact_mod_cast hB1
+  have hlogB : Real.log (5 * (B:ℝ)) = Real.log 5 + Real.log B := by
+    rw [Real.log_mul (by norm_num) (ne_of_gt hBpos)]
+  have hlogBnn : 0 ≤ Real.log B := Real.log_natCast_nonneg _
+  have hlog5 : (0:ℝ) ≤ Real.log 5 := Real.log_nonneg (by norm_num)
+  -- clear denominators in hB
+  have hB' : c1 * Real.log B ^ 2 + c2 * Real.log B + c3 < ε * (B:ℝ) := by
+    have hcomb : c1 * (Real.log B ^ 2 / (B:ℝ)) + c2 * (Real.log B / (B:ℝ))
+        + c3 * (1 / (B:ℝ))
+        = (c1 * Real.log B ^ 2 + c2 * Real.log B + c3) / (B:ℝ) := by
+      field_simp
+    rw [hcomb] at hB
+    exact (div_lt_iff₀ hBpos).mp hB
+  rw [hlogB]
+  simp only [c1, c2, c3] at hB'
+  nlinarith [hB', hlogBnn, hlog5, hBpos]
+
+/-- The assembled ledger bound: `SUM ≤ 111 * B * log(5B) * (6 + log(5B))`. -/
+theorem ledger_sum_le {B : ℕ} (hB0 : 0 < B / 20) (hB1 : 1 ≤ B)
+    (f : Fin (B / 20) → Fin (B / 20 + 3)) :
+    ∑ pv ∈ layerIndex B,
+      (|(((a0QB B (B / 20) (pv.1 ^ pv.2) - m0AQ B (B / 20) (pv.1 ^ pv.2) f) -
+          (aQB B (B / 20) (pv.1 ^ pv.2) - mAQ B (B / 20) (pv.1 ^ pv.2) f) : ℤ) : ℝ)|)
+        * Real.log pv.1
+      ≤ 111 * (B : ℝ) * Real.log (5 * B) * (6 + Real.log (5 * B)) := by
+  classical
+  have hBpos : (0:ℝ) < (B:ℝ) := by exact_mod_cast hB1
+  have hlog5B : 0 ≤ Real.log (5 * B) := by
+    apply Real.log_nonneg
+    have h : (1:ℝ) ≤ (B:ℝ) := by exact_mod_cast hB1
+    linarith
+  have hterm : ∀ pv ∈ layerIndex B,
+      (|(((a0QB B (B / 20) (pv.1 ^ pv.2) - m0AQ B (B / 20) (pv.1 ^ pv.2) f) -
+          (aQB B (B / 20) (pv.1 ^ pv.2) - mAQ B (B / 20) (pv.1 ^ pv.2) f) : ℤ) : ℝ)|)
+        * Real.log pv.1
+        ≤ (111 * Real.log (5 * B)) * ((B:ℝ) * ((1:ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ)))
+          + 111 * Real.log (5 * B) := by
+    intro pv hpv
+    have h := layer_term_le hB0 hpv f
+    have hQpos : (0:ℝ) < ((pv.1 ^ pv.2 : ℕ) : ℝ) := by
+      have hp := (layer_oddPrimePower hpv).pos
+      exact_mod_cast hp
+    calc _ ≤ 111 * ((B : ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ) + 1) * Real.log (5 * B) := h
+      _ = (111 * Real.log (5 * B)) * ((B:ℝ) * ((1:ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ)))
+            + 111 * Real.log (5 * B) := by field_simp
+  refine (Finset.sum_le_sum hterm).trans ?_
+  rw [Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_const, nsmul_eq_mul]
+  have hinv : ∑ pv ∈ layerIndex B, (B:ℝ) * ((1:ℝ) / ((pv.1 ^ pv.2 : ℕ) : ℝ))
+      ≤ (B:ℝ) * (1 + Real.log (5 * B)) := by
+    rw [← Finset.mul_sum]
+    have h1 := sum_inv_layer_le B
+    have h2 : (harmonic (5 * B) : ℝ) ≤ 1 + Real.log ((5 * B : ℕ) : ℝ) :=
+      harmonic_le_one_add_log (5 * B)
+    have h3 : ((5 * B : ℕ) : ℝ) = 5 * (B:ℝ) := by push_cast; ring
+    rw [h3] at h2
+    exact mul_le_mul_of_nonneg_left (h1.trans h2) (le_of_lt hBpos)
+  have hcard : ((layerIndex B).card : ℝ) ≤ 5 * (B:ℝ) := by
+    have hc := card_layerIndex_le B
+    have h5 : ((5 * B : ℕ) : ℝ) = 5 * (B:ℝ) := by push_cast; ring
+    calc ((layerIndex B).card : ℝ) ≤ ((5 * B : ℕ) : ℝ) := by exact_mod_cast hc
+      _ = 5 * (B:ℝ) := h5
+  have hc0 : (0:ℝ) ≤ 111 * Real.log (5 * B) := by positivity
+  nlinarith [hinv, hcard, hc0, hlog5B, hBpos]
+
+/-- **Paper (5.3)**: `lemma_5_5_ledger_little_o` holds.
+
+With (5.2) proved, the layer sum is `O(B log² B)`, hence `o(B²)`. `B₀` is taken
+past both the analytic threshold and `20`, the latter so that `S = B/20` is
+positive; the other (5.2) hypothesis `S * 20 ≤ B` holds automatically for
+`ℕ`-division. -/
+theorem lemma_5_5_ledger_little_o_holds : lemma_5_5_ledger_little_o := by
+  intro ε hε
+  obtain ⟨B₁, hB₁⟩ := Filter.eventually_atTop.mp (eventually_log_sq_le hε)
+  refine ⟨max B₁ 20, ?_⟩
+  intro B hB f
+  have hB1' : B₁ ≤ B := le_trans (le_max_left _ _) hB
+  have hB20 : 20 ≤ B := le_trans (le_max_right _ _) hB
+  have hB0 : 0 < B / 20 := Nat.div_pos hB20 (by norm_num)
+  have hB1 : 1 ≤ B := by omega
+  have hBpos : (0:ℝ) < (B:ℝ) := by exact_mod_cast hB1
+  have hsum := ledger_sum_le hB0 hB1 f
+  have hlim := hB₁ B hB1'
+  have hrw : 111 * (B : ℝ) * Real.log (5 * B) * (6 + Real.log (5 * B))
+      = (B:ℝ) * (111 * Real.log (5 * B) * (6 + Real.log (5 * B))) := by ring
+  rw [hrw] at hsum
+  calc _ ≤ (B:ℝ) * (111 * Real.log (5 * B) * (6 + Real.log (5 * B))) := hsum
+    _ ≤ (B:ℝ) * (ε * (B:ℝ)) := mul_le_mul_of_nonneg_left hlim (le_of_lt hBpos)
+    _ = ε * (B:ℝ) ^ 2 := by ring
 
 end CatalanSun.Lemma55

@@ -6,8 +6,9 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
 column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
-now **Lemma 5.5's row-stability bound (5.2)** are proved; Theorem 1.1 remains
-open. Lemma 5.5's ledger bound (5.3) is the next target.
+now **Lemma 5.5 in full** — both the row-stability bound (5.2) and the ledger
+bound (5.3) — are proved; Theorem 1.1 remains open. Next targets are
+Props 6.3/7.4.
 
 ## Status
 
@@ -48,6 +49,8 @@ open. Lemma 5.5's ledger bound (5.3) is the next target.
 | **Lemma 5.5, (5.2) hard** | `m0AQ_le_mAQ_add`: `m0AQ ≤ mAQ + 105(1+B/Q)`, via termwise swap costs (`nQr_le`, `FNQ_le`, `abs_gTerm_le`), the single-swap collision bound `abs_collTerm_swap_le` (direct `Finset` splitting — **not** `collisionSum_move`, whose hypothesis only covers balance-improving moves), and the `≤3`-step descent `swap_descent_aux` out of `topBlock` | `Lemma55.lean` | **proved** |
 | **Lemma 5.5 (5.2)** | `lemma_5_5_row_stability_holds` — both directions, absolute `C = 210` | `Lemma55.lean` | **proved** |
 | **`a0QB`/`aQB` bound** | `abs_a0QB_sub_aQB_le`: `\|a0QB − aQB\| ≤ 6(1+B/Q)`, exact and unconditional (no minimization), via `NKQ_le` (arithmetic-progression count bound) | `Lemma55.lean` | **proved** |
+| **Lemma 5.5 (5.3)** | `lemma_5_5_ledger_little_o_holds` — the layer sum is `o(B²)`. Elementary: layer injectivity (`layer_pow_injOn`) gives `≤ 5B` layers and `∑ 1/Q ≤ harmonic(5B)`; **no Chebyshev / prime counting needed** | `Lemma55.lean` | **proved** |
+| **Lemma 5.5** | both (5.2) and (5.3) — **complete** | `Lemma55.lean` | **proved** |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -107,18 +110,40 @@ instead.
 the useless direction, and the genuine counting bound `sum_FNQ_shift_le` is
 required. Worth knowing before touching either direction.
 
+**Note (Lemma 5.5, (5.3) layer index — scaffold bug fixed):** the (5.3)
+statement previously passed `pv.1` (the *prime* `p`) as the layer argument to
+`a0QB`/`m0AQ`/`aQB`/`mAQ`, rather than `pv.1 ^ pv.2` (the prime power
+`Q = p^ν`). The paper sums `a_{p^ν,B}`/`m^A_{p^ν,B}`, and
+`thm_5_1_statement` quantifies its layer argument as `OddPrimePower Q`, so
+`Q = p^ν` is correct; the two readings agree only when `ν = 1`. The `log p`
+weight correctly stays `Real.log pv.1`. The as-written version happened to be
+`o(B²)` as well, so this was a fidelity fix rather than the repair of a false
+statement — but it is the same class of transcription bug as the earlier
+`m0AQ` fixed-set error, and worth the same scrutiny on any new statement.
+
+**Note (Lemma 5.5, (5.3) proof route):** (5.3) needs **no prime number
+theory**. Summing the proved (5.2) bound over `layerIndex B` needs only that
+`(p,ν) ↦ p^ν` is injective with values in `[1,5B)` — giving `≤ 5B` layers and
+`∑ 1/Q ≤ harmonic(5B) ≤ 1+log(5B)` — and `log p ≤ log(5B)`. That yields
+`Θ(B log²B)`, hence `o(B²)`, with about a factor-10 margin over the true sum.
+The crude bound was checked numerically at every inequality before any Lean was
+written (`.scratchpad/lemma55/l53crudest.py`, `l53final.py`); `RHS/B²` decays
+`~½` per doubling. The one analytic step is `log²x/x → 0`
+(`Real.tendsto_pow_log_div_mul_add_atTop`).
+
 ### Deferred (later sessions)
 
-Theorem 5.1 and **Lemma 5.5's (5.2) are now fully proved** (both directions,
-absolute constant, unconditional). Remaining work: **(5.3)** itself
-(`lemma_5_5_ledger_little_o`) — now the only open piece of Lemma 5.5, to be
-derived by summing the proved (5.2) bound over `layerIndex` via Chebyshev
-(`∑ log p ≈ 5B`) rather than reproducing the paper's undercounted
-`O(√B log B)` layer count; its numerics look favorable (`SUM/B²` decays
-0.32 → 0.06 for `B` from 100 to 800). Corollary 5.2 uses a "Lemma 5.3" that is
-cited but never displayed in the arXiv v1 PDF — almost certainly the trivial
-`[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes. Then Props
-6.3/7.4; Mertens/PNT; Theorem 1.1.
+Theorem 5.1 and **Lemma 5.5 are now fully proved** — (5.2) in both directions
+with an absolute constant, and (5.3) as an unconditional `o(B²)` bound. Neither
+needed Chebyshev: (5.3) follows from layer injectivity (at most `5B` layers,
+`∑ 1/Q ≤ harmonic(5B)`) plus `log²x/x → 0`, using no prime number theory, so
+the paper's undercounted `O(√B log B)` layer claim never has to be reproduced
+or repaired. Corollary 5.2 uses a "Lemma 5.3" that is cited but never displayed
+in the arXiv v1 PDF — almost certainly the trivial `[x]_+ = x` fact for
+`x ≥ 0`, content-free for Lean purposes. Remaining: Props 6.3/7.4;
+Mertens/PNT; Theorem 1.1. (`Mathlib.NumberTheory.Chebyshev` **is** available at
+this toolchain pin — `theta_le_log4_mul_x`, `pi_le_log4_mul_div`,
+`psi_le_const_mul_self` — which should help those later targets.)
 
 ## Build
 

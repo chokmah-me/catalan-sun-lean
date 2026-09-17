@@ -157,3 +157,9 @@ import CatalanSun.Lemma55
 #print axioms CatalanSun.Lemma55.m0AQ_le_mAQ_add
 #print axioms CatalanSun.Lemma55.abs_mAQ_sub_m0AQ_le
 #print axioms CatalanSun.Lemma55.lemma_5_5_row_stability_holds
+#print axioms CatalanSun.Lemma55.layer_pow_injOn
+#print axioms CatalanSun.Lemma55.card_layerIndex_le
+#print axioms CatalanSun.Lemma55.sum_inv_layer_le
+#print axioms CatalanSun.Lemma55.ledger_sum_le
+#print axioms CatalanSun.Lemma55.eventually_log_sq_le
+#print axioms CatalanSun.Lemma55.lemma_5_5_ledger_little_o_holds
