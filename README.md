@@ -136,30 +136,9 @@ Toolchain: Lean 4.32.2 / Mathlib v4.32.2 (same pin as `aria-moebius`).
 
 ## External kernel check (con-leche)
 
-`con-leche` is an external Lean kernel checker with a machine-checked
-consistency argument. It does not read `.lean` files; it reads a raw
-`lean4export` NDJSON of the compiled library.
-
-```text
-lake exe cache get
-lake build
-# lean4export at tag v4.32.2 (same as lean-toolchain)
-lean4export CatalanSun > catalan-sun.ndjson
-con-leche --verified catalan-sun.ndjson
-```
-
-Exit 0 = accept. Exit 1 = reject (the stream is not a valid kernel
-environment). Exit 2 = decline (checker does not yet support some
-feature in the stream). Exit 3 = error / OOM.
-
-CI: `.github/workflows/con-leche.yml` runs this on every push and PR.
-It pins `leanprover/con-leche` at `CON_LECHE_REV` and `lean4export` at
-`LEAN4EXPORT_REF`. Measured on `ubuntu-latest` (commit `8663999`,
-[run 2](https://github.com/chokmah-me/catalan-sun-lean/actions/runs/35216050384)):
-export 39 068 387 NDJSON lines, then
-`con-leche: accepted 362547 declarations (--verified)` in ~9.5 min
-(job ~13.5 min total). That is the kernel-level accept of the compiled
-library plus its Mathlib cone; it is not a proof of Theorem 1.1.
+Independent re-check of the exported library (not a proof of Theorem 1.1).
+What it is, why we run it, and what CI accepted: [`docs/con-leche.md`](docs/con-leche.md).
+Workflow: `.github/workflows/con-leche.yml`.
 
 ## Incoming (not on the default target)
 
