@@ -1,4 +1,4 @@
-# Workplan: continuing past Theorem 5.1 toward Lemma 5.5
+# Workplan: §§2–5 formalized; the paper's §9 claim measured and failing
 
 **Repo:** https://github.com/chokmah-me/catalan-sun-lean (public)
 **Paper:** Z.-W. Sun, *Catalan's constant is irrational*, arXiv:2609.04176v1.
@@ -7,12 +7,57 @@
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 
+> **Status, 2026-09-17.** The §§2–5 formalization target is met: Thm 2.1,
+> Prop 3.1, Cauchy–Binet, Thm 5.1, Lemma 5.5, and Cor 5.2's §5 content are
+> proved, `lake build` clean, 0 `sorry`, axioms ⊆ the classical three.
+> **Separately, the paper's own Theorem 9.1 has been measured numerically and
+> fails**: the quantity it needs `≤ −0.0097` measures `≈ +1.85`, dominated by
+> a `2 log 2 · B²` real-place term that Remark 9.3 assigns to a constant 221×
+> too small. See [`FORMALIZATION-NOTES.md#scalar-verdict`](FORMALIZATION-NOTES.md#scalar-verdict).
+> **Consequence for planning:** further formalization of §§6–9 toward Theorem
+> 1.1 is not worth starting. The §4→§5 valuation lemma below remains the only
+> mathematically interesting open item, and it is now optional rather than
+> on a path to Theorem 1.1.
+
 ## Next session pointer
 
 **→ Start with [`HANDOFF-NEXT-SESSION.md`](HANDOFF-NEXT-SESSION.md)**, which
 condenses everything below into an actionable brief for a cold start.
 
-**2026-09-17 (newest of all): STAGE D CLOSED — (5.3) re-proved over
+**2026-09-17 (newest of all): THE PAPER'S §9 CLAIM MEASURED — AND IT FAILS.**
+
+The tail-band note named mirroring the (4.5) closed form as the decisive next
+computation. It turned out `Ξ_I` was not needed: the paper's own (3.5),
+(5.13)-summed-over-odd-`p`, and (5.24) collapse Theorem 9.1's left side to
+
+```
+log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p
+```
+
+with every term directly computable. Theorem 9.1 asserts this is
+`≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measured (`scripts/gates/gate_scalar.py`):
+
+| `B` | 200 | 400 | 800 |
+|---|---|---|---|
+| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 |
+
+Converging upward to `≈ +1.86`. The dominant term is
+`v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the numerator of (3.5) with
+`v₂(F_B) ~ 2B²`, and (5.24) sums over odd `p` only. **Remark 9.3 names this
+exact term** and folds it into `c_odd = 0.00628` — 221× too small.
+
+A structural check that raises confidence: `log|det R|/B²` rises by `+0.069`
+per doubling while `−∑m log p/B²` falls by `−0.068`. They cancel to ~5%,
+which is exactly the `B² log B` cancellation Prop 9.5 asserts. **The paper's
+own mechanism is working in the data; what survives it is `+1.86`.**
+
+Validated three independent ways plus `det R` against brute force. Full note
+and all caveats: `FORMALIZATION-NOTES.md#scalar-verdict`. **No `.lean` file
+changed; the formalization claims no part of §9 and is unaffected.**
+
+---
+
+**2026-09-17 (earlier): STAGE D CLOSED — (5.3) re-proved over
 `layerIndexFull`, and the two (5.24) ledgers agree to `o(B²)`. `lake build`
 clean (2957 jobs), 0 sorry, 150 audited declarations, axioms ⊆ classical
 three.**

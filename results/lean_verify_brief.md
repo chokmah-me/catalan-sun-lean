@@ -1,5 +1,11 @@
 # Lean proof verification — pass
 
+> **Scope.** This attests that the Lean in this repo builds and is free of
+> holes. It says nothing about whether the *paper's* Theorem 1.1 holds. As of
+> 2026-09-17 the paper's §9 conclusion has been measured numerically and
+> fails; the Lean does not depend on §9 and is unaffected. See
+> [`../docs/FORMALIZATION-NOTES.md#scalar-verdict`](../docs/FORMALIZATION-NOTES.md#scalar-verdict).
+
 - project: `C:\Users\danie\Projects\catalan-sun-lean`
 - target: `CatalanSun` (full import root)
 - build_exit: 0 (2957 jobs)

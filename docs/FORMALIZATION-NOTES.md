@@ -332,6 +332,23 @@ the real place. So the term is named but absorbed into a constant two orders
 of magnitude too small to hold it. The
 remaining `+0.47…+0.61` is `log|det R|/B²`, which is still rising.
 
+*A structural check that the measurement is meaningful.* The two large
+components move in opposite directions and nearly cancel:
+
+| per doubling of `B` | change |
+|---|---|
+| `log\|det R\|/B²` | `+0.0692`, `+0.0693` |
+| `−∑ m log p/B²` | `−0.0638`, `−0.0720` |
+
+They agree to about 5%. That is precisely the `B² log B` cancellation
+Proposition 9.5 asserts ("the `B² log B` terms cancel because the denominator
+baseline `a_{Q,B}` and the real normalization come from the same fixed
+scalar"). **So the flatness of `SCALAR` is not a coincidence of the fit: it is
+the paper's own cancellation mechanism visible in the data.** What survives
+the cancellation is the `B²` coefficient, and it is `+1.86`, not `−δ₀`.
+Neither component alone converges; only their difference does, which is why
+the total must be measured rather than bounded piecewise.
+
 *How far this was checked.* Three independent routes agree:
 
 1. The algebraic route above.

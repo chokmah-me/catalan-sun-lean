@@ -6,9 +6,23 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
 column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
-now **Lemma 5.5 in full** — both the row-stability bound (5.2) and the ledger
-bound (5.3) — are proved; Theorem 1.1 remains open. Next targets are
-Props 6.3/7.4.
+**Lemma 5.5 in full** — both the row-stability bound (5.2) and the ledger
+bound (5.3) — are proved, together with Corollary 5.2's §5 content.
+
+> ### The paper's §9 conclusion does not survive measurement
+>
+> Independently of the Lean, the paper's own §§3 and 5 reduce Theorem 9.1 to
+> an inequality in three directly computable quantities. Evaluated at
+> `B = 200, 400, 800`, it comes out **`+1.83, +1.85, +1.85`** where it must be
+> **`≤ −0.0097`** — wrong by `≈ 1.86` in the `B²` coefficient and converging,
+> not drifting. The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`, which
+> Remark 9.3 names and assigns to a constant 221× too small to hold it.
+> Checked three independent ways; `det R` validated against brute force.
+> **This changes nothing about the Lean below**, which claims no part of §9.
+> Details, caveats and the gate: [`docs/FORMALIZATION-NOTES.md#scalar-verdict`](docs/FORMALIZATION-NOTES.md#scalar-verdict).
+
+Props 6.3/7.4 were the next formalization targets; in light of the above they
+are not being pursued.
 
 ## Status
 
