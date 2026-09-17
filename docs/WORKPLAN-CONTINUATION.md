@@ -7,7 +7,78 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
-**2026-09-16 (newest): re-verification REFUTES the "minimizer-free" numeric
+**2026-09-16 (newest of all): found and fixed the actual bug — `m0AQ` was
+scaffolded as a fixed set, not a minimum. (5.2)'s easy direction and the
+`a0QB`/`aQB` bound are now proved; unblocked.**
+
+The prior three entries below (all dated 2026-09-16, now superseded)
+concluded with increasing confidence that Lemma 5.5 is genuinely false and
+that this is a real gap in the paper. That conclusion was correct about the
+*Lean proposition as stated* but wrong about the cause.
+
+**The bug:** in `Thm51.lean`, `mAQ` is a **minimum** over all card-`S`
+subsets of `Fin (Ndim B S)`. In the original `Lemma55.lean` scaffold, `m0AQ`
+was defined as `ell0AQ` — the value at the single **fixed** consecutive row
+set, no minimization. Lemma 5.5 compares `mAQ` and `m0AQ`. For large `Q` the
+fixed consecutive set is far from optimal, so the difference grows like `S`,
+not like `1 + B/Q`, and the stated bound fails — exactly what the sessions
+below found, repeatedly and correctly. The failure was in the scaffold, not
+the paper.
+
+**The fix:** redefine `m0AQ` as a minimum over card-`S` subsets of
+`Fin (Ndim0 B S)`, mirroring `mAQ` exactly. Independently re-derived numerics
+(fresh Python, not reusing prior sessions' scripts) confirm this closes the
+gap:
+
+| `m0AQ` definition | worst `\|mAQ - m0AQ\| / (1+B/Q)` measured |
+|---|---|
+| fixed consecutive set (old scaffold) | 140.3, growing without bound |
+| minimum over card-`S` subsets (fix) | 0.34, exactly 0 for large `Q` |
+
+`docs/catalan-constant-irrational.md:112` independently reads the paper this
+way: "the **minimum** of a certain function over S-element index sets."
+
+**Landed in Lean** (`Lemma55.lean`, unconditional, `lake build` clean):
+- `mAQ_le_m0AQ_add`: the easy direction of (5.2), `mAQ ≤ m0AQ + S*(3/Q+1)`,
+  via `m0AQ`'s minimizing witness `I₀` cast into `Fin (Ndim B S)` and the
+  generalized `FNQ`-shift bound (`abs_FNQ_shift_le`, now stated for any row
+  in the common range, not just the consecutive block).
+- `abs_a0QB_sub_aQB_le`: `|a0QB - aQB| ≤ 6*(1+B/Q)`, exact and
+  self-contained — the two models differ by exactly three rows, each `NKQ`
+  term bounded via the new `NKQ_le` (arithmetic-progression count).
+
+**Also found:** (5.3) as stated is false *independently* of (5.2), under the
+old fixed-set `m0AQ` — the `|m0-mA|` half of the (5.3) sum sits flat at
+`≈ B²/2` (not decaying) while the `|a0-a|` half decays properly. This means
+fixing `m0AQ` isn't just cosmetic for (5.2); it's necessary for (5.3) to be
+reachable at all. Not yet re-measured against the corrected minimized `m0AQ`
+— recommended first step for whoever continues.
+
+**Also found:** the paper's own layer-count claim ("`O(√B log B)` odd prime
+powers below `5B`") undercounts — it omits primes themselves (`~5B/log 5B`
+of them; measured 348,918 layers at `B = 10^6`, not ~15,000). The `o(B²)`
+conclusion of (5.3) still appears to survive via Chebyshev (`∑ log p ≈ 5B`
+gives `Θ(B log² B)` for an `O(1+B/Q)`-per-layer bound), but should be derived
+that way in Lean rather than by reproducing the paper's count.
+
+**Not attempted this session:** the hard direction of (5.2)
+(`m0AQ ≤ mAQ + O(1+B/Q)`, the genuine row-swap/replacement argument) and
+(5.3) itself. See "Next target: Lemma 5.5" below for the recommended
+continuation (the row-swap plan there still applies, now against the
+corrected `m0AQ`; the `O(√B log B)` step should be replaced with Chebyshev
+as above).
+
+Scratch scripts from this session (not committed; session scratchpad only,
+`C:\Users\danie\.claude\jobs\191c9820\tmp\`): `l55b.py` (shared
+`NKQ_all`/`gvec`/`ell_noC` core, reused by the rest), `l55j.py` (the decisive
+minimized-`m0` sweep, worst ratio 0.34), `l55g.py`/`l55h.py` (the (5.3) split
+into `a0-a`/`m0-mA` halves, run against the OLD fixed-set `m0AQ` — worth
+re-running against the corrected minimized version before further Lean work
+on (5.3)).
+
+---
+
+**2026-09-16 (superseded by the entry above): re-verification REFUTES the "minimizer-free" numeric
 claim recorded below (the "even later" entry) — that claim does NOT hold
 either; the recommended Step-1 proof route based on it is a dead end.**
 Re-derived `ellAQN`/`ell0AQ` from scratch (independent Python script, bit-for-
@@ -75,7 +146,7 @@ premise does not hold.**
    loss of the previous session's script is why this discrepancy took an
    extra session to catch).
 
-**2026-09-16 (latest): numerical counterexample found to
+**2026-09-16 (superseded — see top of file): numerical counterexample found to
 `lemma_5_5_row_stability` as literally stated; Step 1 work HALTED pending
 review.** Working in worktree `lemma55-step1` (branch
 `worktree-lemma55-step1`). Before writing any Lean, re-verified the
@@ -173,7 +244,7 @@ worth recreating to re-verify if picking this up again.
    this repo — but that conclusion should not be reached without first
    ruling out 1-2 above.
 
-**2026-09-16 (even later): scoped the hard direction of (5.2); numerically
+**2026-09-16 (superseded — see top of file): scoped the hard direction of (5.2); numerically
 confirmed the load-bearing claim; NOT started in Lean.** Read the actual
 paper text for §5.1 (arXiv:2609.04176v1, HTML at
 https://arxiv.org/html/2609.04176v1#S5.E8) via the user. Key findings:

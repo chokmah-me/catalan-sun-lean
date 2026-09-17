@@ -43,7 +43,8 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`, now **unconditional**: dispatches over `Q ≤ 2·B`, `Q ≥ 2·Ndim B S + 2·B`, and (splitting the middle gap in two) `sum_NKQ_tail_ge_of_gap` / `sum_NKQ_tail_ge_of_gap2` | `Thm51.lean` | **proved** |
 | **Thm 5.1** | `thm_5_1 : thm_5_1_statement`, assembled from PROOF-A–E via `linarith` | `Thm51.lean` | **proved** |
-| **Lemma 5.5 scaffold** | `Ndim0`/`ell0AQ`/`m0AQ`/`a0QB` (consecutive-row analogues); `lemma_5_5_row_stability` (5.2) + `lemma_5_5_ledger_little_o` (5.3) targets | `Lemma55.lean` | defs |
+| **Lemma 5.5, (5.2) partial** | `m0AQ` corrected to a **minimum** over card-`S` subsets at `Ndim0 B S` (not the fixed consecutive set — see divergence note below); `mAQ_le_m0AQ_add` (easy direction, unconditional); `m0AQ_le_ell0AQ` | `Lemma55.lean` | **proved** (easy direction only; hard direction and (5.3) open) |
+| **`a0QB`/`aQB` bound** | `abs_a0QB_sub_aQB_le`: `\|a0QB − aQB\| ≤ 6(1+B/Q)`, exact and unconditional (no minimization), via `NKQ_le` (arithmetic-progression count bound) | `Lemma55.lean` | **proved** |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
 
@@ -52,11 +53,27 @@ Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5
 
 **Note:** paper’s written `f_i = T_i D + P` cannot yield a polynomial `P` under `Π_i = ∏_{h=1}^B`; Lean uses the `T_{i+1}` form. M5/M6 take `A = P − f = T_{i+1} D` so ClearedEq23 matches with positive sign. PC0 uses the matching `T_{i+1}` leading sign `(-1)^{j-1}`.
 
+**Note (Lemma 5.5, `m0AQ`):** the paper's `m^{(0)}_{Q,B}` is formalized as a
+**minimum** over card-`S` subsets at dimension `Ndim0 B S`, mirroring `mAQ`,
+not as the value at the fixed consecutive row set alone (an earlier scaffold
+used the fixed-set reading; it makes (5.2) demonstrably false — the fixed set
+is far from optimal once `Q` is large relative to `S`, so the gap grows like
+`S` rather than `1+B/Q`; see `docs/WORKPLAN-CONTINUATION.md` for the
+numerics). `docs/catalan-constant-irrational.md`'s reading of the paper
+independently supports the minimized version. Separately, the paper's claim
+of `O(√B log B)` odd prime powers below `5B` undercounts — it omits the
+primes themselves (`~5B/log 5B` of them); the `o(B²)` conclusion of (5.3)
+still appears to survive via Chebyshev (`∑ log p ≈ 5B`), but Lean should
+derive it that way rather than reproduce the paper's count.
+
 ### Deferred (later sessions)
 
-Theorem 5.1 is now fully proved. Remaining work: Lemma 5.5 (the `o(B^2)`
-row-replacement ledger bound; Corollary 5.2 uses a "Lemma 5.3" that is cited
-but never displayed in the arXiv v1 PDF — almost certainly the trivial
+Theorem 5.1 is now fully proved. Remaining work: Lemma 5.5's hard direction
+of (5.2) (`m0AQ ≤ mAQ + C(1+B/Q)`, needing the paper's row-swap/replacement
+argument — not yet attempted against the corrected minimized `m0AQ`) and
+(5.3) itself (`lemma_5_5_ledger_little_o`, to be derived via Chebyshev over
+`layerIndex`, not yet attempted); Corollary 5.2 uses a "Lemma 5.3" that is
+cited but never displayed in the arXiv v1 PDF — almost certainly the trivial
 `[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes); Props 6.3/7.4;
 Mertens/PNT; Theorem 1.1.
 

@@ -145,3 +145,7 @@ import CatalanSun.Lemma55
 #print axioms CatalanSun.Thm51.collisionSum_ge_phiQ
 #print axioms CatalanSun.Thm51.sum_NKQ_tail_ge
 #print axioms CatalanSun.Thm51.thm_5_1
+#print axioms CatalanSun.Lemma55.NKQ_le
+#print axioms CatalanSun.Lemma55.abs_a0QB_sub_aQB_le
+#print axioms CatalanSun.Lemma55.m0AQ_le_ell0AQ
+#print axioms CatalanSun.Lemma55.mAQ_le_m0AQ_add

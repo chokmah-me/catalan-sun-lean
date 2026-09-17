@@ -3,8 +3,8 @@
 
   Sun arXiv:2609.04176v1 §5.1 "Corrected full-row stability", Lemma 5.5.
 
-  Scaffold only: definitions for the consecutive-row-set analogue `m^{(0)}_{Q,B}`
-  of `mAQ` (using cutoff `U_0 = 2B+S-1` in place of `U = N-1 = 2B+S+2`), and the
+  Definitions for the `Ndim0 B S`-dimension analogue `m^{(0)}_{Q,B}` of `mAQ`
+  (using cutoff `U_0 = 2B+S-1` in place of `U = N-1 = 2B+S+2`), and the
   statement of Lemma 5.5's two claims:
 
     (5.2)  |m^A_{Q,B} - m^{(0)}_{Q,B}| ≤ C * (1 + B/Q)   for an absolute C,
@@ -14,19 +14,37 @@
     (5.3)  ∑_{p odd, ν≥1} |(a_{p^ν,B} - m^A_{p^ν,B}) - (a^{(0)}_{p^ν,B} - m^{(0)}_{p^ν,B})| log p
              = o(B^2).
 
-  Not proved here. The paper's argument (p.12) is genuinely asymptotic, unlike
-  everything else landed in `Thm51.lean`:
-    - the two row sets (exact selected rows vs. consecutive `{0,...,S-1}`) have
-      symmetric difference at most six;
-    - swapping `U = N-1` for `U_0` changes `⌊(U-i)/Q⌋` for at most `O(1+B/Q)`
-      indices `i` on the common range, and every residue class mod `Q`
-      contains at most `1 + U/Q` admissible indices, so each replacement's
-      local cost (both the additive term and the double-Vandermonde/collision
-      occupancy) changes by `O(1+B/Q)`;
-    - at most three replacements suffice, giving (5.2);
-    - nonzero layers satisfy `p^ν < 5B`; summing `O(1+B/Q)` over
-      `O(√B log B)` prime powers below `5B` (via the trivial bound on the
-      count of prime powers `< 5B`) gives `O(B log B) = o(B²)`, proving (5.3).
+  **Divergence from the paper (`m0AQ`):** `m^{(0)}_{Q,B}` is formalized here as
+  a **minimum** of `ellAQN` over all card-`S` subsets of `Fin (Ndim0 B S)`,
+  mirroring `mAQ`'s definition — not as the value at the single fixed
+  consecutive row set `{0,...,S-1}`. An earlier scaffold used the fixed-set
+  reading (`m0AQ := ell0AQ`); that makes (5.2) demonstrably false, since the
+  fixed set is far from optimal once `Q` is large relative to `S` (the gap
+  grows like `S`, not `1+B/Q` — worst measured ratio 140+, unbounded).
+  `docs/catalan-constant-irrational.md`'s reading of the paper — "the
+  **minimum** of a certain function over S-element index sets" — supports the
+  minimized version, which is numerically solid (worst ratio ≈ 0.34, exactly 0
+  for large `Q`). See `docs/WORKPLAN-CONTINUATION.md` for the full numeric
+  history, including the earlier sessions' (correct) refutation of the
+  fixed-set reading.
+
+  Landed this session (unconditional, `m0AQ` under the corrected definition):
+    - `abs_a0QB_sub_aQB_le`: `|a0QB - aQB| ≤ 6*(1+B/Q)`, exact and
+      self-contained (no minimization) — the two models differ by exactly
+      three rows, each `NKQ` term bounded via `NKQ_le`.
+    - `mAQ_le_m0AQ_add`: the easy direction of (5.2),
+      `mAQ ≤ m0AQ + S*(3/Q+1)`.
+
+  Not yet proved: the hard direction of (5.2) (`m0AQ ≤ mAQ + O(1+B/Q)`, the
+  paper's genuine row-swap/replacement argument), and (5.3) itself.
+
+  **Divergence from the paper (layer count):** the paper claims
+  `O(√B log B)` odd prime powers below `5B`; this undercounts, since it omits
+  the primes themselves (`~5B/log 5B` of them — measured 348,918 layers at
+  `B = 10^6`, not the ~15,000 the paper's count would suggest). The `o(B²)`
+  conclusion of (5.3) still appears reachable via Chebyshev (`∑_{p<5B} log p
+  ≈ 5B`), giving `O(B log B) = o(B²)` for an `O(1+B/Q)`-per-layer bound — but
+  Lean should derive it that way rather than reproduce the paper's count.
 
   See `docs/WORKPLAN-CONTINUATION.md` for the reduction plan.
 -/
@@ -82,10 +100,21 @@ def ell0AQ (B S Q : ℕ) (f : Fin S → Fin (S + 3)) (hS : S ≤ Ndim0 B S) : �
     (CatalanSun.Thm51.consecutiveInitial (N := Ndim0 B S) S hS)
     (CatalanSun.Thm51.consecutiveInitial_card hS)
 
-/-- `m^{(0)}_{Q,B}` (paper §5.1): since the consecutive row set is fixed (not
-minimized over), `m^{(0)}` is just `ell0AQ` at that set. -/
-def m0AQ (B S Q : ℕ) (f : Fin S → Fin (S + 3)) (hS : S ≤ Ndim0 B S) : ℤ :=
-  ell0AQ B S Q f hS
+/-- `m^{(0)}_{Q,B}` (paper §5.1): the minimum of `ellAQN` over **all** card-`S`
+subsets of `Fin (Ndim0 B S)` — the `Ndim0`-dimension analogue of `mAQ`, not
+the value at the fixed consecutive set alone. (An earlier scaffold defined
+`m0AQ := ell0AQ`, i.e. the value at the fixed consecutive set with no
+minimization; that reading makes (5.2) false — the fixed set is far from
+optimal once `Q` is large relative to `S`, so `|mAQ - ell0AQ|` grows like `S`
+rather than `1 + B/Q`. `docs/catalan-constant-irrational.md`'s reading of the
+paper — "the **minimum** of a certain function over S-element index sets" —
+and the numerics in `docs/WORKPLAN-CONTINUATION.md` both support the
+minimized reading below. See `m0AQ_le_ell0AQ` for the link to `ell0AQ`.) -/
+noncomputable def m0AQ (B S Q : ℕ) (f : Fin S → Fin (S + 3)) : ℤ :=
+  let s :=
+    ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).image fun I =>
+      if hI : I.card = S then ellAQN B S Q f (Ndim0 B S) I hI else 0
+  if h : s.Nonempty then s.min' h else 0
 
 /-- `a^{(0)}_{Q,B}` (paper §5.1): `aQB`'s formula with the row range cut at
 `Ndim0 B S` (i.e. `U₀ + 1`) instead of `Ndim B S`. -/
@@ -151,15 +180,15 @@ Since `consecutiveInitial (N := Ndim0 B S) S hS`, mapped into
 `consecutiveInitial (N := Ndim B S) S hS`, the two `ellAQN` evaluations
 differ by exactly the sum of `FNQ` differences over `i < S`. -/
 
-/-- The `FNQ` shift for `N = Ndim B S` vs `N' = Ndim0 B S = N - 3`, at an
-index `i < S ≤ Ndim0 B S`: bounded by `3/Q + 1` via `abs_div_shift_le`. -/
-theorem abs_FNQ_shift_le {B S Q i : ℕ} (hQ : 0 < Q) (hi : i < S)
-    (hS0 : S ≤ Ndim0 B S) :
+/-- The `FNQ` shift for `N = Ndim B S` vs `N' = Ndim0 B S = N - 3`, at any
+index `i < Ndim0 B S`: bounded by `3/Q + 1` via `abs_div_shift_le`. (Holds for
+every row in the common range, not just the consecutive block `i < S`.) -/
+theorem abs_FNQ_shift_le {B S Q i : ℕ} (hQ : 0 < Q) (hiN0 : i < Ndim0 B S) :
     (|(FNQ (Ndim B S) Q i : ℤ) - (FNQ (Ndim0 B S) Q i : ℤ)| : ℤ) ≤
       ((3 / Q : ℕ) : ℤ) + 1 := by
-  have hiN0 : i < Ndim0 B S := lt_of_lt_of_le hi hS0
   have key := abs_div_shift_le (Ndim0 B S - 1 - i) 3 Q hQ
   have heq1 : Ndim0 B S - 1 - i + 3 = Ndim B S - 1 - i := by
+    unfold Ndim0 at hiN0
     unfold Ndim0 CatalanSun.NewtonCompletion.Ndim
     omega
   rw [heq1] at key
@@ -174,23 +203,65 @@ theorem abs_FNQ_shift_le {B S Q i : ℕ} (hQ : 0 < Q) (hi : i < S)
   rw [heq2]
   exact key
 
-/-- `nQr` is invariant under the `castLE` embedding of the consecutive set:
-the residue-`r` count among `{0,…,S-1} ⊆ Fin (Ndim0 B S)` equals the same
-count after re-embedding into `Fin (Ndim B S)`, since `castLE` preserves
-`.val` and hence `% Q`. -/
-theorem nQr_consecutiveInitial_castLE {B S Q r : ℕ} (hS : S ≤ Ndim0 B S) :
-    nQr Q r
-        ((consecutiveInitial (N := Ndim0 B S) S hS).map
-          ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩) =
-      nQr Q r (consecutiveInitial (N := Ndim0 B S) S hS) := by
+/-- `nQr` is invariant under the `castLE` embedding, for **any** row set `I`:
+`castLE` preserves `.val` and hence `% Q`, so the residue-`r` count among `I`
+equals the same count after re-embedding `I` into `Fin (Ndim B S)`. -/
+theorem nQr_castLE {B S Q r : ℕ} (I : Finset (Fin (Ndim0 B S))) :
+    nQr Q r (I.map ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩) =
+      nQr Q r I := by
   unfold nQr
   rw [Finset.filter_map]
   simp only [Function.Embedding.coeFn_mk, Fin.val_castLE, Function.comp]
   rw [Finset.card_map]
 
+/-- `nQr` is invariant under the `castLE` embedding of the consecutive set:
+the residue-`r` count among `{0,…,S-1} ⊆ Fin (Ndim0 B S)` equals the same
+count after re-embedding into `Fin (Ndim B S)`, since `castLE` preserves
+`.val` and hence `% Q`. Specialization of `nQr_castLE`. -/
+theorem nQr_consecutiveInitial_castLE {B S Q r : ℕ} (hS : S ≤ Ndim0 B S) :
+    nQr Q r
+        ((consecutiveInitial (N := Ndim0 B S) S hS).map
+          ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩) =
+      nQr Q r (consecutiveInitial (N := Ndim0 B S) S hS) :=
+  nQr_castLE _
+
 /-- The row-level layer sum (`NKQ`/`indicatorQle`/`FNQ` terms of `ellAQN`) is
-invariant under `castLE` except for the `FNQ` piece, since `NKQ`/
-`indicatorQle` depend only on `.val`. -/
+invariant under `castLE` except for the `FNQ` piece, for **any** row set `I`,
+since `NKQ`/`indicatorQle` depend only on `.val`. -/
+theorem ellAQN_castLE_sub_eq_general {B S Q : ℕ} (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim0 B S))) (hI : I.card = S) :
+    ellAQN B S Q f (Ndim B S)
+        (I.map ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩)
+        (by rw [Finset.card_map]; exact hI) -
+      ellAQN B S Q f (Ndim0 B S) I hI =
+      ∑ i ∈ I, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
+  unfold ellAQN
+  set e : Fin (Ndim0 B S) ↪ Fin (Ndim B S) :=
+    ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩
+  have hnQr : ∀ r, nQr Q r (I.map e) = nQr Q r I := fun r => nQr_castLE I
+  have hsum1 :
+      ∑ i ∈ I.map e,
+          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
+            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) =
+        ∑ i ∈ I,
+          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
+            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
+    rw [Finset.sum_map]
+    rfl
+  simp only [hnQr, hsum1]
+  have hfinal :
+      ∑ i ∈ I,
+          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
+            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) -
+        ∑ i ∈ I,
+          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
+            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) =
+      ∑ i ∈ I, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
+    rw [← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun i _ => by ring
+  linarith [hfinal]
+
+/-- Specialization of `ellAQN_castLE_sub_eq_general` to the consecutive set. -/
 theorem ellAQN_castLE_sub_eq {B S Q : ℕ} (f : Fin S → Fin (S + 3))
     (hS : S ≤ Ndim0 B S) :
     ellAQN B S Q f (Ndim B S)
@@ -200,34 +271,8 @@ theorem ellAQN_castLE_sub_eq {B S Q : ℕ} (f : Fin S → Fin (S + 3))
       ellAQN B S Q f (Ndim0 B S) (consecutiveInitial (N := Ndim0 B S) S hS)
         (consecutiveInitial_card hS) =
       ∑ i ∈ consecutiveInitial (N := Ndim0 B S) S hS,
-        ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
-  unfold ellAQN
-  set J := consecutiveInitial (N := Ndim0 B S) S hS
-  set e : Fin (Ndim0 B S) ↪ Fin (Ndim B S) :=
-    ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩
-  have hnQr : ∀ r, nQr Q r (J.map e) = nQr Q r J := fun r =>
-    nQr_consecutiveInitial_castLE (B := B) (S := S) (Q := Q) (r := r) hS
-  have hsum1 :
-      ∑ i ∈ J.map e,
-          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
-            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) =
-        ∑ i ∈ J,
-          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
-            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
-    rw [Finset.sum_map]
-    rfl
-  simp only [hnQr, hsum1]
-  have hfinal :
-      ∑ i ∈ J,
-          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
-            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) -
-        ∑ i ∈ J,
-          ((2 * NKQ B Q i.val : ℤ) - (NKQ S Q i.val : ℤ) -
-            (2 * indicatorQle Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) =
-      ∑ i ∈ J, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) := by
-    rw [← Finset.sum_sub_distrib]
-    exact Finset.sum_congr rfl fun i _ => by ring
-  linarith [hfinal]
+        ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) :=
+  ellAQN_castLE_sub_eq_general f _ (consecutiveInitial_card hS)
 
 /-- The `castLE`-image of the consecutive set at `Ndim0 B S` is literally the
 consecutive set at `Ndim B S` (both are `{i : i.val < S}`). -/
@@ -276,34 +321,193 @@ theorem abs_ellAQ_consecutive_sub_ell0AQ_le {B S Q : ℕ} (hQ : 0 < Q)
       Finset.abs_sum_le_sum_abs _ _
     _ ≤ ∑ _i ∈ consecutiveInitial (N := Ndim0 B S) S hS0,
           (((3 / Q : ℕ) : ℤ) + 1) := by
-        refine Finset.sum_le_sum fun i hi => ?_
+        refine Finset.sum_le_sum fun i _hi => ?_
         rw [abs_sub_comm]
-        exact abs_FNQ_shift_le hQ ((mem_consecutiveInitial_iff hS0 i).mp hi) hS0
+        exact abs_FNQ_shift_le hQ i.isLt
     _ = (S : ℤ) * (((3 / Q : ℕ) : ℤ) + 1) := by
         rw [Finset.sum_const, consecutiveInitial_card]
         push_cast
         ring
 
-/-- One direction of (5.2): `m^A_{Q,B} ≤ m^{(0)}_{Q,B} + S * (3/Q + 1)`, via
-`mAQ ≤ ellAQ(consecutive)` and the `ellAQ`/`ell0AQ` bridge. -/
+/-- Extract `m0AQ`'s minimizing row set: `m0AQ` equals `ellAQN` at `Ndim0 B S`
+for some particular card-`S` subset `I₀`. -/
+theorem m0AQ_eq_ellAQN_min {B S Q : ℕ} (f : Fin S → Fin (S + 3))
+    (hne : ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).Nonempty) :
+    ∃ (I₀ : Finset (Fin (Ndim0 B S))) (hI₀ : I₀.card = S),
+      m0AQ B S Q f = ellAQN B S Q f (Ndim0 B S) I₀ hI₀ := by
+  classical
+  unfold m0AQ
+  set s :=
+    ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).image fun I =>
+      if hI : I.card = S then ellAQN B S Q f (Ndim0 B S) I hI else 0
+  have hsne : s.Nonempty := hne.image _
+  simp only [hsne, ↓reduceDIte]
+  obtain ⟨I₀, hI₀mem, hI₀eq⟩ := mem_image.mp (Finset.min'_mem s hsne)
+  refine ⟨I₀, ?_, ?_⟩
+  · exact (mem_powersetCard.mp hI₀mem).2
+  · rw [← hI₀eq]
+    simp [(mem_powersetCard.mp hI₀mem).2]
+
+/-- `m0AQ` is at most `ellAQN` at any card-`S` subset of `Fin (Ndim0 B S)`. -/
+theorem m0AQ_le_ellAQN {B S Q : ℕ} (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin (Ndim0 B S))) (hI : I.card = S) :
+    m0AQ B S Q f ≤ ellAQN B S Q f (Ndim0 B S) I hI := by
+  classical
+  unfold m0AQ
+  set s :=
+    ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).image fun J =>
+      if hJ : J.card = S then ellAQN B S Q f (Ndim0 B S) J hJ else 0
+  have hmem : ellAQN B S Q f (Ndim0 B S) I hI ∈ s := by
+    refine mem_image.mpr ⟨I, ?_, ?_⟩
+    · rw [mem_powersetCard]; exact ⟨subset_univ _, hI⟩
+    · simp [hI]
+  have hne : s.Nonempty := ⟨_, hmem⟩
+  simp only [hne, ↓reduceDIte]
+  exact min'_le _ _ hmem
+
+/-- `m0AQ` is at most `ell0AQ` (the fixed consecutive set is one candidate
+among the card-`S` subsets `m0AQ` minimizes over). -/
+theorem m0AQ_le_ell0AQ {B S Q : ℕ} (f : Fin S → Fin (S + 3)) (hS : S ≤ Ndim0 B S) :
+    m0AQ B S Q f ≤ ell0AQ B S Q f hS :=
+  m0AQ_le_ellAQN f _ (consecutiveInitial_card hS)
+
+/-- One direction of (5.2): `m^A_{Q,B} ≤ m^{(0)}_{Q,B} + S * (3/Q + 1)`. Takes
+`m0AQ`'s minimizing set `I₀`, casts it into `Fin (Ndim B S)` as a candidate
+for `mAQ`'s minimization, and bounds the resulting `FNQ` shift exactly as in
+`abs_ellAQ_consecutive_sub_ell0AQ_le`, but for the arbitrary set `I₀` instead
+of the fixed consecutive block (via the generalized `abs_FNQ_shift_le`). -/
 theorem mAQ_le_m0AQ_add {B S Q : ℕ} (hQ : 0 < Q) (f : Fin S → Fin (S + 3))
     (hS0 : S ≤ Ndim0 B S) :
-    (mAQ B S Q f : ℤ) ≤ m0AQ B S Q f hS0 + (S : ℤ) * (((3 / Q : ℕ) : ℤ) + 1) := by
-  have hSN : S ≤ Ndim B S := S_le_Ndim0 B S |>.trans (Ndim0_le_Ndim B S)
-  have h1 := mAQ_le_ellAQ_consecutive (B := B) (S := S) (Q := Q) f hSN
-  have h2 := abs_ellAQ_consecutive_sub_ell0AQ_le (B := B) (S := S) (Q := Q) hQ f hS0
-  have h2' := (abs_le.mp h2).2
-  unfold m0AQ
-  have h1' : (mAQ B S Q f : ℤ) ≤
-      ellAQ B S Q f (consecutiveInitial (N := Ndim B S) S hSN) (consecutiveInitial_card hSN) := by
-    exact_mod_cast h1
-  have hconsist :
-      ellAQ B S Q f (consecutiveInitial (N := Ndim B S) S
-          (S_le_Ndim0 B S |>.trans (Ndim0_le_Ndim B S))) (consecutiveInitial_card _) =
-        ellAQ B S Q f (consecutiveInitial (N := Ndim B S) S hSN) (consecutiveInitial_card hSN) :=
-    rfl
-  rw [hconsist] at h2'
-  linarith
+    (mAQ B S Q f : ℤ) ≤ m0AQ B S Q f + (S : ℤ) * (((3 / Q : ℕ) : ℤ) + 1) := by
+  have hne : ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).Nonempty := by
+    refine ⟨consecutiveInitial (N := Ndim0 B S) S hS0, ?_⟩
+    rw [mem_powersetCard]
+    exact ⟨subset_univ _, consecutiveInitial_card hS0⟩
+  obtain ⟨I₀, hI₀, hI₀eq⟩ := m0AQ_eq_ellAQN_min (B := B) (S := S) (Q := Q) f hne
+  set e : Fin (Ndim0 B S) ↪ Fin (Ndim B S) :=
+    ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩
+  have hI₀mapcard : (I₀.map e).card = S := by rw [Finset.card_map]; exact hI₀
+  have h1 : (mAQ B S Q f : ℤ) ≤ ellAQN B S Q f (Ndim B S) (I₀.map e) hI₀mapcard :=
+    mAQ_le_ellAQ f (I₀.map e) hI₀mapcard
+  have hbridge := ellAQN_castLE_sub_eq_general (B := B) (S := S) (Q := Q) f I₀ hI₀
+  have hbound :
+      (|∑ i ∈ I₀, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ))| : ℤ) ≤
+        (S : ℤ) * (((3 / Q : ℕ) : ℤ) + 1) := by
+    calc
+      (|∑ i ∈ I₀, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ))| : ℤ)
+          ≤ ∑ i ∈ I₀, (|(FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)| : ℤ) :=
+        Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ _i ∈ I₀, (((3 / Q : ℕ) : ℤ) + 1) := by
+          refine Finset.sum_le_sum fun i _hi => ?_
+          rw [abs_sub_comm]
+          exact abs_FNQ_shift_le hQ i.isLt
+      _ = (S : ℤ) * (((3 / Q : ℕ) : ℤ) + 1) := by
+          rw [Finset.sum_const, hI₀]; push_cast; ring
+  have h2 := (abs_le.mp hbound).2
+  rw [hI₀eq]
+  linarith [hbridge]
+
+/-! ## `a0QB` vs `aQB`: an exact, self-contained bound
+
+`a0QB`/`aQB` differ only in how many rows `NKQ B Q i.val` is summed over
+(`Ndim0 B S = 2B+S` vs `Ndim B S = 2B+S+3`, i.e. exactly three extra terms);
+the `phiQ Q (Dref B)` term is identical in both and cancels. Each `NKQ` term
+is itself bounded by an elementary arithmetic-progression count, giving a
+clean, unconditional `O(1+B/Q)` bound with no minimization involved. -/
+
+/-- `NKQ K Q i ≤ K/Q + 1`: the solutions `h ∈ [1,K]` to `Q ∣ 2i+2h+1` form (at
+most) an arithmetic progression with common difference `Q` — any two
+solutions `a,b` satisfy `Q ∣ 2(a-b)`, hence `Q ∣ (a-b)` since `Q` is odd — so
+there are at most `K/Q + 1` of them. -/
+theorem NKQ_le {Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (K i : ℕ) :
+    NKQ K Q i ≤ K / Q + 1 := by
+  unfold NKQ
+  set T := (Icc 1 K).filter (fun h => Q ∣ 2 * i + 2 * h + 1) with hTdef
+  rcases T.eq_empty_or_nonempty with hemp | hne
+  · simp [hemp]
+  obtain ⟨h0, h0mem, h0min⟩ := T.exists_min_image id hne
+  have hcop : Nat.gcd Q 2 = 1 := Nat.coprime_two_right.mpr hodd
+  -- Any solution `h` satisfies `2*h ≡ 2*h0 [MOD Q]` (both `2i+2h+1` and
+  -- `2i+2h0+1` are `≡ 0`), hence `h ≡ h0 [MOD Q]` after cancelling `2`.
+  have hmod : ∀ h ∈ T, h ≡ h0 [MOD Q] := by
+    intro h hmem
+    have hh' := mem_filter.mp hmem
+    have h0' := mem_filter.mp h0mem
+    have hcong2 : 2 * h ≡ 2 * h0 [MOD Q] := by
+      have e1 : (2 * i + 2 * h + 1) ≡ 0 [MOD Q] := (Nat.modEq_zero_iff_dvd).mpr hh'.2
+      have e2 : (2 * i + 2 * h0 + 1) ≡ 0 [MOD Q] := (Nat.modEq_zero_iff_dvd).mpr h0'.2
+      have e3 := e1.trans e2.symm
+      have hcomm1 : 2 * i + 2 * h + 1 = 2 * h + (2 * i + 1) := by ring
+      have hcomm2 : 2 * i + 2 * h0 + 1 = 2 * h0 + (2 * i + 1) := by ring
+      rw [hcomm1, hcomm2] at e3
+      exact (Nat.ModEq.add_right_cancel' (2 * i + 1) e3)
+    exact hcong2.cancel_left_of_coprime hcop
+  have hinj : Set.InjOn (fun h => (h - h0) / Q) T := by
+    intro a ha b hb hab
+    simp only at hab
+    have hage : h0 ≤ a := h0min a ha
+    have hbge : h0 ≤ b := h0min b hb
+    have hda : Q ∣ (a - h0) := (Nat.modEq_iff_dvd' hage).mp (hmod a ha).symm
+    have hdb : Q ∣ (b - h0) := (Nat.modEq_iff_dvd' hbge).mp (hmod b hb).symm
+    obtain ⟨qa, hqa⟩ := hda
+    obtain ⟨qb, hqb⟩ := hdb
+    rw [hqa, hqb, Nat.mul_div_cancel_left _ hQ, Nat.mul_div_cancel_left _ hQ] at hab
+    subst hab
+    omega
+  have hmaps : ∀ h ∈ T, (h - h0) / Q ∈ range (K / Q + 1) := by
+    intro h hmem
+    have hK : h ≤ K := (mem_Icc.mp (mem_filter.mp hmem).1).2
+    have hh0K : h0 ≤ K := (mem_Icc.mp (mem_filter.mp h0mem).1).2
+    have hle : h - h0 ≤ K := by omega
+    have hdiv : (h - h0) / Q ≤ K / Q := Nat.div_le_div_right hle
+    rw [mem_range]
+    omega
+  calc T.card ≤ (range (K / Q + 1)).card :=
+        Finset.card_le_card_of_injOn _ hmaps hinj
+    _ = K / Q + 1 := card_range _
+
+/-- `a0QB` restricted to `Fin (Ndim0 B S)` plus the three extra top rows
+recovers `aQB` on `Fin (Ndim B S)`: `Ndim B S = Ndim0 B S + 3`, and both share
+the same `phiQ Q (Dref B)` correction term. -/
+theorem aQB_sub_a0QB_eq {B S Q : ℕ} :
+    aQB B S Q - a0QB B S Q =
+      2 * ((NKQ B Q (Ndim0 B S) : ℤ) + (NKQ B Q (Ndim0 B S + 1) : ℤ) +
+        (NKQ B Q (Ndim0 B S + 2) : ℤ)) := by
+  unfold aQB a0QB
+  have hNdim : Ndim B S = Ndim0 B S + 3 := by
+    unfold Ndim0 CatalanSun.NewtonCompletion.Ndim
+    ring
+  have hsplit :
+      ∑ i : Fin (Ndim B S), (NKQ B Q i.val : ℤ) =
+        ∑ i : Fin (Ndim0 B S), (NKQ B Q i.val : ℤ) +
+          ((NKQ B Q (Ndim0 B S) : ℤ) + (NKQ B Q (Ndim0 B S + 1) : ℤ) +
+            (NKQ B Q (Ndim0 B S + 2) : ℤ)) := by
+    rw [hNdim]
+    rw [show Ndim0 B S + 3 = Ndim0 B S + 1 + 1 + 1 from by ring]
+    rw [Fin.sum_univ_castSucc, Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
+    simp only [Fin.val_castSucc, Fin.val_last]
+    ring
+  rw [hsplit]
+  ring
+
+/-- `|a0QB - aQB| ≤ 6 * (1 + B/Q)`, an exact, self-contained, unconditional
+bound (no minimization): exactly three extra `NKQ B Q` terms separate the two
+models, each bounded via `NKQ_le`. -/
+theorem abs_a0QB_sub_aQB_le {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) :
+    (|a0QB B S Q - aQB B S Q| : ℤ) ≤ 6 * ((B / Q : ℕ) : ℤ) + 6 := by
+  have hkey := aQB_sub_a0QB_eq (B := B) (S := S) (Q := Q)
+  have hb1 : NKQ B Q (Ndim0 B S) ≤ B / Q + 1 := NKQ_le hQ hodd B (Ndim0 B S)
+  have hb2 : NKQ B Q (Ndim0 B S + 1) ≤ B / Q + 1 := NKQ_le hQ hodd B (Ndim0 B S + 1)
+  have hb3 : NKQ B Q (Ndim0 B S + 2) ≤ B / Q + 1 := NKQ_le hQ hodd B (Ndim0 B S + 2)
+  have hb1' : (NKQ B Q (Ndim0 B S) : ℤ) ≤ ((B / Q : ℕ) : ℤ) + 1 := by exact_mod_cast hb1
+  have hb2' : (NKQ B Q (Ndim0 B S + 1) : ℤ) ≤ ((B / Q : ℕ) : ℤ) + 1 := by exact_mod_cast hb2
+  have hb3' : (NKQ B Q (Ndim0 B S + 2) : ℤ) ≤ ((B / Q : ℕ) : ℤ) + 1 := by exact_mod_cast hb3
+  have hnn1 : (0 : ℤ) ≤ (NKQ B Q (Ndim0 B S) : ℤ) := Int.natCast_nonneg _
+  have hnn2 : (0 : ℤ) ≤ (NKQ B Q (Ndim0 B S + 1) : ℤ) := Int.natCast_nonneg _
+  have hnn3 : (0 : ℤ) ≤ (NKQ B Q (Ndim0 B S + 2) : ℤ) := Int.natCast_nonneg _
+  rw [abs_le]
+  constructor <;> [skip; nlinarith [hkey]]
+  nlinarith [hkey]
 
 /-! ## Lemma 5.5, target statements -/
 
@@ -315,8 +519,8 @@ constant." -/
 def lemma_5_5_row_stability : Prop :=
   ∃ C : ℚ, 0 < C ∧
     ∀ (B S Q : ℕ), OddPrimePower Q → 0 < S → S * 20 ≤ B →
-      ∀ (f : Fin S → Fin (S + 3)) (hS : S ≤ Ndim0 B S),
-        (|(mAQ B S Q f : ℚ) - (m0AQ B S Q f hS : ℚ)| : ℚ) ≤
+      ∀ (f : Fin S → Fin (S + 3)),
+        (|(mAQ B S Q f : ℚ) - (m0AQ B S Q f : ℚ)| : ℚ) ≤
           C * (1 + (B : ℚ) / (Q : ℚ))
 
 /-- The finite index set of layers summed in (5.3) and (5.24): odd primes `p`
@@ -331,14 +535,14 @@ def layerIndex (B : ℕ) : Finset (ℕ × ℕ) :=
 /-- Paper (5.3): fixing `S` at the paper's canonical ratio `S = B / 20`, for
 every `ε > 0` there is `B₀` such that for all `B ≥ B₀`, the summed absolute
 ledger difference between the exact and consecutive-row models is at most
-`ε * B ^ 2` (i.e. `o(B²)` unwound to its `ε`-`B₀` definition). `f`/`hS` are
+`ε * B ^ 2` (i.e. `o(B²)` unwound to its `ε`-`B₀` definition). `f` is
 universally quantified per `B` since the bound must hold along any
 `Injective f` witness used in `thm_5_1_statement`. -/
 def lemma_5_5_ledger_little_o : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ B₀ : ℕ, ∀ B : ℕ, B₀ ≤ B →
-    ∀ (f : Fin (B / 20) → Fin (B / 20 + 3)) (hS : B / 20 ≤ Ndim0 B (B / 20)),
+    ∀ (f : Fin (B / 20) → Fin (B / 20 + 3)),
       ∑ pv ∈ layerIndex B,
-        (|(((a0QB B (B / 20) pv.1 - m0AQ B (B / 20) pv.1 f hS) -
+        (|(((a0QB B (B / 20) pv.1 - m0AQ B (B / 20) pv.1 f) -
               (aQB B (B / 20) pv.1 - mAQ B (B / 20) pv.1 f) : ℤ) : ℝ)| : ℝ) *
           Real.log pv.1 ≤ ε * (B : ℝ) ^ 2
 
