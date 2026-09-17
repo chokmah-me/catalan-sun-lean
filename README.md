@@ -72,8 +72,19 @@ not exist here. While scoping it, a third transcription-class finding surfaced:
 band; (5.3) was therefore re-proved over the corrected index set. Reading §8
 directly then showed the paper's large-prime integral stops at `(2+ρ)B`,
 while the exact `m`-layers carry `(39/200)·B²` beyond it — numerically the
-paper's own raw quadratic. Whether that is bookkeeping or an omission is the
-repo's current top question; see `FORMALIZATION-NOTES.md#tail-band`.
+paper's own raw quadratic. See `FORMALIZATION-NOTES.md#tail-band`.
+
+**The paper's `B²` claim has now been measured directly, and it does not
+hold at this level of bookkeeping.** Its own §§3 and 5 reduce Theorem 9.1 to
+`log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p ≤ −δ₀B² + o(B²)`
+with `δ₀ > 0.0097`. Every term is computable; at `B = 200, 400, 800` the left
+side is `+1.826, +1.846, +1.851`, converging upward to about `+1.86`. The
+dominant piece is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the
+numerator of (3.5), `v₂(F_B) ~ 2B²`, and the odd-prime ledger (5.24) never
+removes it. Three independent routes agree and `det R` is validated against
+brute force. This says nothing about the Lean, which claims no part of §9.
+Full note and caveats: `FORMALIZATION-NOTES.md#scalar-verdict`; gate:
+`scripts/gates/gate_scalar.py`.
 
 **Picking this up fresh? Start with
 [`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)** — current

@@ -42,6 +42,7 @@ Re-run it after any change to `Thm51.lean`'s `NKQ` / `phiQ` / `nQr` / `CAQ` /
 | `gate_mass.py` | How much ledger mass the `Q < 5B` truncation drops (S=1, so it reaches larger B). |
 | `gate_ratio2.py` | The same at the paper's regime `S = B/20`, via `fast2`. This produced the `drop/B² ≈ 0.627` figure. |
 | `gate_ledger_vs_paper.py` | `compute` writes one row per nonzero layer at `S = B/20` (`data/ledger_S_B20_B200-1200.csv`, ~1 min at B=1200); `analyze` compares the exact `m/B` profile with the paper's `Λ_mid` (7.14), (8.2), and the tail above `(2+ρ)B` that §8 does not integrate. See `FORMALIZATION-NOTES.md#tail-band`. |
+| `gate_scalar.py` | **The verdict gate.** Computes `SCALAR(B) = log\|det R[A,J]\| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p`, which is what (3.5), (5.13) and (5.24) reduce Theorem 9.1's left side to. `layers` recomputes all odd prime-power layers including `a = m` rows (the ledger CSV keeps only `a > m`); `detR` evaluates `det R` in fixed point; `detR-exact` does it with exact integers as a slow reference; `scalar` prints the verdict table. See `FORMALIZATION-NOTES.md#scalar-verdict`. |
 | `gate_full53.py` | Sanity gate for the widened (5.3) bound used in `Cor52.ledgerFull_little_o`: checks `layerBound B (B/20) ≤ 12B` and that `111·B·log(12B)·(13+log 12B)/B²` decays to 0. A gate on the *bound*, not on the layer defs. |
 
 ## What these established
@@ -49,9 +50,12 @@ Re-run it after any change to `Thm51.lean`'s `NKQ` / `phiQ` / `nQr` / `CAQ` /
 - `Lemma55.layerIndex`'s `p^ν < 5B` cutoff is too small for Cor 5.2's (5.24):
   the exact support runs to `6B + 2S + 5`, and the truncated band carries
   `≈ 0.627·B²` — `Θ(B²)`, not `o(B²)`.
-- That band is nonetheless covered by the paper's §8 (`Δ_{>B}` is a closed form
-  in `ρ` with no cutoff), so `δ₀` is not threatened. See
-  `docs/FORMALIZATION-NOTES.md#cor-52-cutoff`.
+- ~~That band is nonetheless covered by the paper's §8.~~ **Withdrawn**: §8
+  integrates only to `(2+ρ)B`. See `FORMALIZATION-NOTES.md#tail-band`.
+- **The paper's `B²` claim, measured directly, fails.** `SCALAR/B²` is
+  `+1.826, +1.846, +1.851` at `B = 200, 400, 800`, converging to `≈ +1.86`,
+  where Theorem 9.1 needs `≤ −0.0097`. Dominant term `v₂(F_B) log 2 → 2 log 2`.
+  See `FORMALIZATION-NOTES.md#scalar-verdict`.
 - `∑ aQB·log p ≈ 2.5·B²·log(5B)` — the ledger is `Θ(B² log B)`, so bounding
   `aQB` and discarding `mAQ` is not a viable proof route.
 

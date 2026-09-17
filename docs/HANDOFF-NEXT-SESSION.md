@@ -93,12 +93,41 @@ recorded in full at `docs/FORMALIZATION-NOTES.md#tail-band`:
   `log|Ξ_I| − ∑_p m_p log p ≤ −δ₀B² + o(B²)`, with `Ξ_I` the (4.5) closed
   form that `PascalCauchy.Xi_closed_form` already states.
 
-**Start here: mirror `Xi_closed_form` in Python** (log-gamma for the
-factorials and Vandermondes, `mpmath` for the weighted tails `T_i`, which
-depend on `G`), evaluate `log|Ξ_I| − ∑_p m_p log p` at `B = 200…1200` using
-the committed `m` data, and compare with `−δ₀B²`. The `B² log B` terms must
-cancel; the `B²` coefficient is the verdict. No Lean needed. Gate it against
-the paper's own worked numbers if any are given in §9.
+**This has now been done — and it did not need `Ξ_I` at all.** Full note:
+`docs/FORMALIZATION-NOTES.md#scalar-verdict`. Summary below in §4a.
+
+## 4a. The verdict: the `B²` claim fails by `≈ 1.87` as the paper reduces it
+
+`scripts/gates/gate_scalar.py`. Rather than the (4.5) closed form, use the
+paper's own reduction. From (3.5), (5.13) summed over odd `p`, and (5.24),
+everything cancels except three computable terms:
+
+```
+log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p
+```
+
+Theorem 9.1 asserts this is `≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measured:
+
+| `B` | 200 | 400 | 800 |
+|---|---|---|---|
+| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 |
+
+Converging upward to `≈ +1.86`, not drifting logarithmically (increments fall
+~4× per doubling). **The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`.**
+`F_B` is in the numerator of (3.5) and `v₂(F_B) ~ 2B²`; (5.24) sums over odd
+`p` only, so that mass is never removed. The paper's only treatment of the
+prime 2 is Lemma 5.4 and Remark 6.2's `(19/200)log 2`, neither of which
+touches it.
+
+Validated three ways (algebraic, direct-from-(3.5), and the (5.13) identity
+to `1.6e-16`); `det R` checked against brute-force `polygamma` at
+`B = 20,40,60`, against an exact-integer evaluation at `B = 200,400`, and
+across four row sets `A`.
+
+**This does not impugn the Lean**, which claims nothing in §9 and is
+unaffected. If you want to continue on the paper: find where `2 log 2 · B²`
+is cancelled, or treat Theorem 9.1 as unsupported. If you want to continue on
+the formalization, §5 below is unchanged and still the real work.
 
 ## 5. The bigger missing piece — start here (scope before starting)
 
@@ -148,8 +177,10 @@ the pattern `thm_5_1_statement` followed for several sessions.
 
 ## 7. Suggested order
 
-0. **The (4.5) mirror and the `−δ₀B²` check (§4).** Decides whether the
-   paper's ledger closes before anything else is worth formalizing.
+0. ~~The (4.5) mirror and the `−δ₀B²` check.~~ **Done — see §4a.** The
+   paper's ledger does not close as reduced: `+1.86` against a needed
+   `−0.0097`. Decide whether to keep formalizing §5 in light of that; the
+   Lean itself is unaffected and makes no §9 claim.
 1. Scope the §4→§5 odd-`p` valuation lemma (§5) before committing to it. If
    staged, land `LayerValuationInput` as an explicit hypothesis and Cor 5.2's
    deductive step against it; keep `logHmin` out of the namespace until the

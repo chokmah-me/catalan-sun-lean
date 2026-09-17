@@ -38,6 +38,9 @@ Companion documents:
 - [The tail band above `(2+ρ)B`](#tail-band) — §8 integrates only to
   `2+ρ`; the exact `m`-layers carry `(39/200)·B²` beyond it; decisive next
   computation named.
+- [**The reduced `B²` claim, measured**](#scalar-verdict) — that computation,
+  run. Theorem 9.1 needs `≤ −0.0097`; it measures **`+1.85`**, converging to
+  `≈ +1.86`. Dominant term: `v₂(F_B) log 2 → 2 log 2`.
 
 ---
 
@@ -270,3 +273,85 @@ caught by gating numerically before writing Lean. Scripts and the full tables:
 **`scripts/gates/`** (committed; `layers.py` brute-force mirror, `fast2.py`
 accelerated and cross-validated, `check.py` regression runner). A free consistency check fell out of the
 sweep: **0 violations of `thm_5_1` (`aQB ≥ mAQ`)** across every layer tested.
+
+---
+
+<a id="scalar-verdict"></a>
+**Note (the reduced `B²` claim, measured directly — 2026-09-17, later).**
+The computation the tail-band note called decisive has now been run.
+**Result: the quantity the paper needs to be `≤ −δ₀ = −0.0097` measures
+`+1.85` and is converging upward to roughly `+1.86`.** Gate:
+`scripts/gates/gate_scalar.py`.
+
+*What was computed, and why it is the right quantity.* Combining the paper's
+own equations, with no appeal to `Ξ_I` or to any choice of `I`:
+
+- (3.5) `q̂_B = ± F_B · det R[A,J] / ∏_i Π_i`
+- (5.13) summed over odd `p`: `∑_{odd Q} a_Q log p = log ∏Π_i − log F_B +
+  v₂(F_B) log 2` (the `v₂` term appears because `Π_i` is odd, so only the odd
+  part of `F_B` is counted on the left)
+- (5.24) `log H_B^min ≤ ∑_{odd Q} (a_Q − m_Q) log p`
+
+Adding the first two to the third, everything except three terms cancels:
+
+```
+log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p
+```
+
+up to the `O(B)` from `q^S`. Call the right side `SCALAR(B)`. Theorem 9.1
+asserts exactly `SCALAR(B) ≤ −δ₀B² + o(B²)`. Every term is directly
+computable: `m_Q` from the committed `fast2` mirror over **all** odd prime
+powers (not only the `a > m` rows the ledger CSV keeps), `v₂(F_B)` by
+Legendre, and `det R[A,J]` from (2.1).
+
+| `B` | `log\|det R\|/B²` | `v₂(F_B)log2/B²` | `−∑m log p/B²` | **`SCALAR/B²`** |
+|---|---|---|---|---|
+| 200 | +0.475164 | +1.353994 | −0.003012 | **+1.826146** |
+| 400 | +0.544358 | +1.368411 | −0.066843 | **+1.845926** |
+| 800 | +0.613610 | +1.376486 | −0.138860 | **+1.851237** |
+
+The paper needs `≤ −0.009662`. The increments fall by ~4× per doubling and an
+`a·log B` fit collapses (`a = 0.0285 → 0.0077` across the three pairs), so
+this converges to a finite positive constant near `+1.86`; it is not
+logarithmic drift that `o(B²)` could absorb.
+
+*Where it comes from.* The dominant term is `v₂(F_B) log 2 → 2 log 2 =
+1.3863`. `F_B = ∏_{r<2B} r!` sits in the **numerator** of (3.5), and
+`v₂(F_B) ~ 2B²`. That 2-adic mass is real-place mass in `log|q̂_B|` that the
+odd-prime ledger (5.24) never removes, because (5.24) sums over odd `p` only.
+The paper's only discussion of the prime 2 is Lemma 5.4 (`[A_{2,B} −
+R_{2,B}]₊ = 0`, about `H_B^min`'s 2-part) and Remark 6.2, which considers a
+`(19/200)log 2` constant. Neither addresses the `2 log 2 · B²` above. The
+remaining `+0.47…+0.61` is `log|det R|/B²`, which is still rising.
+
+*How far this was checked.* Three independent routes agree:
+
+1. The algebraic route above.
+2. A direct route computing `log|q̂_B|` from (3.5) and the (5.24) bound
+   separately, never using the combined identity: `+1.826146` and
+   `+1.845926` at `B = 200, 400` — identical to the table.
+3. The summed (5.13) identity verified numerically at each `B` (relative
+   difference `≤ 1.6e-16`).
+
+`det R` itself was validated against a brute-force `polygamma` computation of
+(2.1) at `B = 20, 40, 60` (agreement `~1e-13`), the tail `T_m` against two
+independent formulas and against the paper's identity (1.4), and the
+fixed-point evaluation against an exact-integer one at `B = 200, 400` (every
+printed digit). `log|det R|` is insensitive to the row set `A`: four choices
+at `B = 200` agree to `1e-4` in the `B²` coefficient. Both precisions in
+every run agree, with the alternating sum's cancellation (`~6000` bits at
+`B = 800`) far below the working precision.
+
+*What this does and does not establish.* It does **not** exhibit an error in
+a specific line of the paper; §9's proof sketch is compressed, and the
+grouping of factors there is not reproduced here term by term. What it
+establishes is that **the inequality Theorem 9.1 states, in the form its own
+§§3 and 5 reduce it to, fails numerically by about `1.87` in the `B²`
+coefficient, with the prime 2's contribution to `F_B` the largest identified
+component.** Anyone continuing should either locate where `2 log 2 · B²` is
+cancelled — nothing in §§3–9 appears to do so — or treat Theorem 9.1 as
+unsupported at this level of bookkeeping.
+
+**This supersedes the tail-band note's open question.** The `(39/200)B²`
+coincidence noted there is not the binding issue; `SCALAR` is computed
+without reference to that band at all.
