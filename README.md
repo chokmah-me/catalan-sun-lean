@@ -51,8 +51,20 @@ Props 6.3/7.4.
 | **`a0QB`/`aQB` bound** | `abs_a0QB_sub_aQB_le`: `\|a0QB − aQB\| ≤ 6(1+B/Q)`, exact and unconditional (no minimization), via `NKQ_le` (arithmetic-progression count bound) | `Lemma55.lean` | **proved** |
 | **Lemma 5.5 (5.3)** | `lemma_5_5_ledger_little_o_holds` — the layer sum is `o(B²)`. Elementary: layer injectivity (`layer_pow_injOn`) gives `≤ 5B` layers and `∑ 1/Q ≤ harmonic(5B)`; **no Chebyshev / prime counting needed** | `Lemma55.lean` | **proved** |
 | **Lemma 5.5** | both (5.2) and (5.3) — **complete** | `Lemma55.lean` | **proved** |
+| **Cor 5.2 "Lemma 5.3"** | `posPart_eq_self_of_nonneg` — the paper's cited-but-never-displayed lemma (`[x]₊ = x` for `x ≥ 0`), plus 1-Lipschitzness `abs_posPart_sub_le` | `Cor52.lean` | proved |
+| **Cor 5.2 index set** | `layerBound B S = 6B+2S+5` (the exact cutoff, `= 2(N−1)+2B+1`) and `layerIndexFull`; `layerIndex_subset_layerIndexFull`. **Diverges from `layerIndex`'s `5B`** — see notes | `Cor52.lean` | proved |
+| **Cor 5.2 ledger** | `posPartLedger` = (5.24) RHS; `posPartLedger_nonneg` | `Cor52.lean` | defs + proved |
+| **Cor 5.2 core** | `posPart_layer_eq` / `posPartLedger_eq_raw` — Thm 5.1 ⇒ `[a−m]₊ = a−m`, the ledger loses nothing to the positive part | `Cor52.lean` | **proved** |
 
-`lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
+Verification: **pass** (0 sorry, 0 native_decide, axioms ⊆ classical three,
+2957 jobs). See `results/lean_verify_brief.md`.
+
+**Corollary 5.2 is partly landed** (`Cor52.lean`): (5.24)'s right-hand side is
+defined and its positive parts are discharged via Theorem 5.1. It establishes
+**nothing** about `H_B^min` or integerizers — that bridge needs the §4→§5 odd-`p`
+valuation lemma, which does not exist here. While scoping it, a third
+transcription-class finding surfaced: `layerIndex`'s `5B` cutoff is too small
+for (5.24) and truncates a `Θ(B²)` band. Details in `FORMALIZATION-NOTES.md`.
 
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5_1`
 (now complete) is in `docs/THM51-REDUCTION-NOTES.md`.

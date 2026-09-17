@@ -30,6 +30,7 @@ import CatalanSun.Lemma54
 import CatalanSun.PascalCauchy
 import CatalanSun.Thm51
 import CatalanSun.Lemma55
+import CatalanSun.Cor52
 
 /-! ## Axiom audit (picked up by lean-proof-forge from the build log) -/
 
@@ -163,3 +164,14 @@ import CatalanSun.Lemma55
 #print axioms CatalanSun.Lemma55.ledger_sum_le
 #print axioms CatalanSun.Lemma55.eventually_log_sq_le
 #print axioms CatalanSun.Lemma55.lemma_5_5_ledger_little_o_holds
+
+#print axioms CatalanSun.Cor52.posPart_eq_self_of_nonneg
+#print axioms CatalanSun.Cor52.abs_posPart_sub_le
+#print axioms CatalanSun.Cor52.layerBound_eq
+#print axioms CatalanSun.Cor52.layerFull_oddPrimePower
+#print axioms CatalanSun.Cor52.posPartLedger_nonneg
+#print axioms CatalanSun.Cor52.posPart_layer_eq
+#print axioms CatalanSun.Cor52.posPartLedger_eq_raw
+#print axioms CatalanSun.Cor52.two_not_mem_layerIndexFull
+#print axioms CatalanSun.Cor52.layerIndex_subset_layerIndexFull
+#print axioms CatalanSun.Cor52.abs_layer_diff_le

@@ -9,6 +9,77 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-17 (newest of all): COROLLARY 5.2 PARTLY LANDED — and the numeric
+gate found a third transcription-class bug, this time in the layer cutoff.
+`lake build` clean (2957 jobs), 0 sorry, axioms ⊆ classical three.**
+
+**The finding, and it is load-bearing.** `Lemma55.layerIndex B` filters odd
+prime powers by `p^ν < 5*B`. That is **too small for Cor 5.2's (5.24)**:
+`[a_{Q,B} − m^A_{Q,B}]₊` is *nonzero* for `Q ≥ 5B`. The exact support is
+`Q ≤ 2(N−1)+2B+1 = 6B+2S+5` (`N = Ndim B S`), because `aQB` counts solutions
+of `Q ∣ 2i+2h+1` over `i < N`, `1 ≤ h ≤ B`, and that is the largest value the
+modulus argument attains — above it `NKQ`, `aQB` and `mAQ` all vanish. Every
+odd prime power in `[5B, 6B+2S+5]` gives a nonzero layer; every one above
+gives exactly zero.
+
+The truncated band is **`Θ(B²)`, not `o(B²)`**: measured `drop/B²` = 0.599,
+0.663, 0.632, 0.628, **0.627** at `B` = 100, 200, 400, 800, 1200 with
+`S = B/20` — stable, not decaying, and about **65× the paper's `δ₀ ≈ 0.00966`
+margin**. So this is not a cosmetic index quibble.
+
+**Consequence: Lemma 5.5's (5.3) cannot be consumed as-is by Cor 5.2.**
+`lemma_5_5_ledger_little_o_holds` remains true — it is a correct statement
+about its own index set — but it is indexed over `layerIndex B`, whereas
+(5.24) needs `layerIndexFull B S`. `Cor52.layerIndex_subset_layerIndexFull`
+records the containment; the gap is the `[5B, 6B+2S+5]` band.
+
+**What landed** (`CatalanSun/Cor52.lean`, all unconditional):
+- Stage A: `posPart_eq_self_of_nonneg` (the paper's phantom "Lemma 5.3"),
+  `posPart_nonneg`, `abs_posPart_sub_le` (1-Lipschitz, via Mathlib's
+  `abs_max_sub_max_le_max` at `b = d = 0`).
+- Stage B: `layerBound`/`layerBound_eq`/`five_mul_lt_layerBound`,
+  `layerIndexFull`/`layerFull_mem_iff`/`layerFull_oddPrimePower`,
+  `layerLogTerm`, `posPartLedger`, and their nonnegativity.
+- Stage C (the heart): `posPart_layer_eq` — Thm 5.1 ⇒ `[a−m]₊ = a−m` — and
+  `posPartLedger_eq_raw`. Genuinely easy, as predicted; the four hypothesis
+  discharges are copied from `lemma_5_5_ledger_little_o_holds`.
+- Stage D (honest partial): `posPartLedger0`, `layerIndex_subset_layerIndexFull`,
+  `abs_layer_diff_le` (the termwise comparison, which *is* index-set
+  independent). The summed `o(B²)` comparison is **not** claimed.
+- Stage E: `two_not_mem_layerIndexFull`, recording the `p = 2` omission that
+  `lemma_5_4_det` justifies.
+
+**Not claimed, and stated so in the file header, README, and brief:** anything
+about `H_B^min`, integerizers, or `q̂_B`. That bridge needs the §4→§5 odd-`p`
+valuation lemma `v_p(Ξ_I) ≥ ℓ^A_Q(I) − …`, which does not exist — there is no
+`padicVal` anywhere in `Thm51.lean` or `Lemma55.lean`, and the only
+valuation↔determinant bridge in the repo (`lemma_5_4_det`) is `p = 2` only.
+Nothing is named `logHmin`.
+
+**Start here next, in priority order:**
+1. **Re-prove (5.3) over `layerIndexFull`.** The existing proof's shape should
+   survive: `card_layerIndex_le` becomes `≤ 6B+2S+5`-many layers,
+   `sum_inv_layer_le` becomes `harmonic(6B+2S+5)`, and the `log²x/x → 0` step
+   is unchanged. This is the single highest-value next step — it makes Stage D
+   closeable and repairs the one real gap this session opened.
+2. Then close Stage D (`posPartLedger` vs `posPartLedger0` to `o(B²)`) via
+   `Finset.abs_sum_le_sum_abs` + `abs_layer_diff_le` + the re-proved (5.3).
+   Watch the sign order: (5.3)'s summand is `|((a0−m0) − (a−m))|`, needing one
+   `abs_sub_comm`.
+3. Only then consider the conditional bridge (`LayerValuationInput` +
+   `cor_5_2_conditional`), or leave it as a `def … : Prop`.
+4. Props 6.3/7.4 remain certified-numerics work, not Lean work.
+
+**Numeric gate scripts kept** (`.scratchpad/cor52/`, gitignored):
+`layers.py` (verbatim brute-force mirror of the Lean defs), `fast2.py`
+(O(1) `NKQ` via modular inverse + an exact DP minimizer over residue classes,
+cross-validated against `layers.py` on 189 layers, 0 mismatches),
+`gate_support.py`, `gate_threshold.py`, `gate_mass.py`, `FINDINGS.md`.
+A free consistency check fell out: **0 violations of `thm_5_1` (`aQB ≥ mAQ`)**
+across every layer tested — the Python mirror agrees with proved Lean.
+
+---
+
 **2026-09-17 (newest of all): LEMMA 5.5 IS COMPLETE. (5.3)
 (`lemma_5_5_ledger_little_o_holds`) is proved, unconditional, `lake build`
 clean, 0 sorry, axioms ⊆ classical three. Next target: Props 6.3/7.4.**

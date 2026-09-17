@@ -33,6 +33,8 @@ Companion documents:
   transcription bug.
 - [Lemma 5.5: (5.3)'s proof route](#lemma-55-53-proof-route) — why Chebyshev
   was not needed.
+- [Cor 5.2: `layerIndex`'s `5B` cutoff is too small](#cor-52-cutoff) — the
+  third transcription-class finding; a `Θ(B²)` truncation.
 
 ---
 
@@ -116,3 +118,36 @@ The crude bound was checked numerically at every inequality before any Lean was
 written (`.scratchpad/lemma55/l53crudest.py`, `l53final.py`); `RHS/B²` decays
 `~½` per doubling. The one analytic step is `log²x/x → 0`
 (`Real.tendsto_pow_log_div_mul_add_atTop`).
+
+<a id="cor-52-cutoff"></a>
+**Note (Cor 5.2, the layer cutoff — found 2026-09-17, before any Lean was
+written):** `Lemma55.layerIndex B` filters odd prime powers by `p^ν < 5*B`.
+That cutoff is **too small for Corollary 5.2's (5.24)**: `[a_{Q,B} −
+m^A_{Q,B}]₊` is *not* zero for `Q ≥ 5B`.
+
+The exact support is `Q ≤ 2(N−1) + 2B + 1 = 6B + 2S + 5`, where
+`N = Ndim B S = 2B+S+3`. The reason is structural: `aQB` counts solutions of
+`Q ∣ 2i+2h+1` over `i < N` and `1 ≤ h ≤ B`, and `2(N−1)+2B+1` is the largest
+value that modulus argument can take, so `NKQ` — and with it both `aQB` and
+`mAQ` — vanishes identically above it. Verified: every odd prime power in
+`[5B, 6B+2S+5]` gives a nonzero layer, and every one above gives `aQB = 0`
+*and* `mAQ = 0`.
+
+At `ρ = 1/20` the threshold is `≈ 6.1·B`, so `[5B, 6.1B]` is a
+constant-fraction band that always contains nonzero layers. The truncated
+mass is **`Θ(B²)`, not `o(B²)`** — measured `drop/B²` = 0.599, 0.663, 0.632,
+0.628, 0.627 at `B` = 100, 200, 400, 800, 1200 (`S = B/20`), i.e. stable
+rather than decaying, and roughly **65× the proof's `δ₀ ≈ 0.00966` margin**.
+
+Consequence: `Cor52` must **not** index over `layerIndex B`. The clean route
+is to sum over all odd prime powers and prove the vanishing above
+`6B + 2S + 5`, since that vanishing is structural rather than asymptotic.
+
+This does **not** invalidate `lemma_5_5_ledger_little_o_holds`, which is a true
+statement about the sum over `layerIndex B` as defined — but it does mean that
+theorem cannot be consumed directly for a ledger indexed over the larger set.
+Third finding of the same class as the `m0AQ` and `p`-vs-`p^ν` bugs, and again
+caught by gating numerically before writing Lean. Scripts and the full tables:
+`.scratchpad/cor52/` (`layers.py` brute-force mirror, `fast2.py` accelerated
+and cross-validated, `FINDINGS.md`). A free consistency check fell out of the
+sweep: **0 violations of `thm_5_1` (`aQB ≥ mAQ`)** across every layer tested.
