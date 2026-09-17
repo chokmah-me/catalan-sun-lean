@@ -32,7 +32,7 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
 | **Cor 2.1 (absolute)** | Nonvanishing minor without rank hypothesis | `Thm21.lean` | proved |
 | **Prop 3.1** | `det Atilde = ± F_B · det R[A,J]` via DiffMat + fromBlocks | `NewtonCompletion.lean` | proved |
 | **`qhat_ne_zero`** | ∃ injective `o` with `det (Ahat B S o) ≠ 0` | `Qhat.lean` | proved |
-| **Cauchy–Binet** | `det(A*B) = ∑_{|s|=m} det(cols_s A)·det(rows_s B)` | `CauchyBinet.lean` | proved |
+| **Cauchy–Binet** | `det(A*B) = ∑` over size-`m` subsets `s`, `det(cols_s A)·det(rows_s B)` | `CauchyBinet.lean` | proved |
 | **PC0–PC1** | Pascal×Diag×Cauchy factorization of residual minor; CB → `∑ Ξ_I` | `PascalCauchy.lean` | proved |
 | **PC2** | Lemma 4.2 odd-Cauchy instance (`lemma_4_2_odd_cauchy`) + row-minor bridge | `PascalCauchy.lean` | proved |
 | **PC3** | Lemma 4.1 factorization via `paperP` / integer `PsiA : ℤ` (`det_polyEval_dvd_vandermonde`) | `PascalCauchy.lean` | proved |

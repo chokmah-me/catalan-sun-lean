@@ -7,6 +7,74 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-16 (newest): re-verification REFUTES the "minimizer-free" numeric
+claim recorded below (the "even later" entry) — that claim does NOT hold
+either; the recommended Step-1 proof route based on it is a dead end.**
+Re-derived `ellAQN`/`ell0AQ` from scratch (independent Python script, bit-for-
+bit against the current `Thm51.lean`/`Lemma55.lean` source, dropping only the
+shared `CAQ` constant as before) and validated the hill-climbing minimizer
+search against **exact brute force** on two small cases (including one with
+`Q` large relative to `N`, the regime where growth appears) — brute force and
+hill-climb agreed exactly both times, so the search itself is not at fault.
+
+Sweeping `ell0AQ(consecutive) - min_{I'} ellAQN(Ndim0, I')` over arbitrary
+card-`S` subsets `I'` (same-residue-class, top-block, mid-block, random, plus
+hill-climbed near-minimizers — not just adversarial near-minimizers) gives
+`ratio/S` (ratio = gap / (1+B/Q)) that **grows with `Q`, not saturating**:
+
+```
+S=10,  B=200:  ratio/S = 2.19 at Q=243
+S=40,  B=800:  ratio/S = 1.87 at Q=1331
+S=160, B=3200: ratio/S = 1.22 at Q=2187, still rising
+```
+
+This is the same unbounded-growth shape as the original counterexample to
+`lemma_5_5_row_stability` itself (see "latest" entry immediately below),
+**not** the "ratio/S stays under ~1.8, bounded" pattern the prior session
+reported for the same claim. The prior session's scratch scripts were never
+committed, so the exact source of the discrepancy between the two numeric
+runs is unknown — but this re-derivation was checked directly against the
+current Lean definitions and validated against brute force, so it is taken
+as the more trustworthy result going forward.
+
+Also fetched the paper's actual §5.1 HTML text directly (arXiv:2609.04176v1)
+to double check for a missed constraint: confirmed there is **no stated
+relation between `Q` and `B`/`S`** anywhere in Lemma 5.5's statement or proof
+sketch, beyond "odd prime power `Q`" and the separate `p^ν < 5B` restriction
+used later in (5.3)'s summation range. The proof text gives no mechanism
+explaining why the bound wouldn't blow up as `Q` grows relative to `S`/`B`.
+
+**Conclusion:** both the literal `lemma_5_5_row_stability` statement AND the
+stronger minimizer-free strengthening of it appear to be genuinely false /
+unprovable as stated, for the same underlying reason. This now looks like a
+real gap in the paper's Lemma 5.5 argument (option (b) from the original
+halt note below), not a transcription bug in this repo's Lean scaffold, and
+not fixable via the minimizer-free shortcut previously proposed. **Do not
+pursue the 3-step proof route in the "even later" entry below — its Step 1
+premise does not hold.**
+
+**Recommended next steps:**
+1. Consider whether a *weaker, differently-scoped* restatement of Lemma 5.5
+   might still be true and still sufficient for (5.3) — e.g. bounding
+   `|m^A - m^{(0)}|` by `C(1+B/Q)` only for `Q ≤ c·√B` or some other relation
+   tying `Q`'s growth to `B`/`S`, then handling large `Q` separately (if the
+   large-`Q` contribution to the (5.3) sum is negligible for a different
+   reason — e.g. there may be few odd prime powers in that range, or the
+   `log p` weighting may suppress it). This has NOT been checked numerically
+   yet.
+2. Alternatively, treat this as a genuine gap in the arXiv v1 preprint worth
+   flagging explicitly (in the spirit of the existing "Aside — the paper's
+   'Lemma 5.3'" note), and consider whether (5.3)'s `o(B²)` conclusion can be
+   reached by a different route that doesn't require the per-`Q` bound to be
+   uniform in `Q` at all — only that the SUM over `layerIndex B` (`p^ν < 5B`)
+   is `o(B²)`, which is a weaker requirement than a uniform per-layer bound.
+3. Before any further Lean work, re-verify numerically whichever restatement
+   is chosen, keeping the verification script this time
+   (`.scratchpad/lemma55-reverify/` — not committed to the repo per existing
+   convention, but worth keeping locally across sessions this time, since the
+   loss of the previous session's script is why this discrepancy took an
+   extra session to catch).
+
 **2026-09-16 (latest): numerical counterexample found to
 `lemma_5_5_row_stability` as literally stated; Step 1 work HALTED pending
 review.** Working in worktree `lemma55-step1` (branch
