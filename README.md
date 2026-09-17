@@ -5,8 +5,9 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
-column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
-5.1** are proved; Theorem 1.1 remains open.
+column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
+now **Lemma 5.5's row-stability bound (5.2)** are proved; Theorem 1.1 remains
+open. Lemma 5.5's ledger bound (5.3) is the next target.
 
 ## Status
 
@@ -83,6 +84,28 @@ derivation and a list of `ℕ`-division arithmetic pitfalls hit while proving
 it (`Nat.div_lt_iff_lt_mul`'s argument order, `omega`'s inability to unify
 differently-ordered products, etc.), worth reading before further div-heavy
 Lean work in this file.
+
+**Note (Lemma 5.5, hard direction):** `m0AQ ≤ mAQ + 105(1+B/Q)` is proved by
+swapping the `≤ 3` indices of `mAQ`'s minimizer that lie in `topBlock` — the
+indices of `Fin (Ndim B S)` with no counterpart in `Fin (Ndim0 B S)` — for
+free indices of the common range. **Any** free index works: no greedy choice,
+occupancy pigeonhole, or minimizer characterization is needed, because each
+swap's cost is bounded *termwise* (`nQr_le`/`FNQ_le`/`NKQ_le` for the additive
+part, `abs_collTerm_swap_le` for the collision part). This was checked
+numerically before any Lean was written — the *adversarially worst*
+replacement still saturates at `≈ 10(1+B/Q)` across `B ≤ 6000`, and the
+end-to-end gap at `≈ 0.5(1+B/Q)` — and it collapsed what earlier scoping had
+budgeted as the main combinatorial stage. Note `Thm51.lean`'s
+`collisionSum_move` is *not* usable here: its hypothesis `c b + 2 ≤ c a` only
+covers balance-improving moves, whereas an arbitrary swap can go either way;
+`abs_collTerm_swap_le` proves the two-sided bound by direct `Finset` splitting
+instead.
+
+**Note (Lemma 5.5, a sign trap):** the `FNQ` shift sum runs *opposite* ways in
+(5.2)'s two directions. The easy direction gets it free from
+`FNQ_shift_nonneg`; in the hard direction that same lemma yields the bound in
+the useless direction, and the genuine counting bound `sum_FNQ_shift_le` is
+required. Worth knowing before touching either direction.
 
 ### Deferred (later sessions)
 
