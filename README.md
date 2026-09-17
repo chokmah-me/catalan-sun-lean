@@ -94,6 +94,19 @@ Mertens/PNT; Theorem 1.1. (`Mathlib.NumberTheory.Chebyshev` **is** available at
 this toolchain pin — `theta_le_log4_mul_x`, `pi_le_log4_mul_div`,
 `psi_le_const_mul_self` — which should help those later targets.)
 
+## Numeric gates
+
+Before proving a scaffolded statement, this repo gates it numerically — four
+statement-level bugs have been found that way. The Python mirrors of the Lean
+layer definitions live in [`scripts/gates/`](scripts/gates/):
+
+```text
+python scripts/gates/check.py
+```
+
+Exit 0 means the mirror still agrees with the Lean definitions (it also
+re-checks `thm_5_1` numerically). Re-run it after touching any layer def.
+
 ## Build
 
 ```text

@@ -1,0 +1,60 @@
+# Numeric gates
+
+Python mirrors of the Lean layer definitions, used to **check a statement
+before proving it**. This repo's standing rule — recorded in
+`docs/FORMALIZATION-NOTES.md` — is that no scaffolded target gets a Lean proof
+until it has been gated numerically, because four statement-level bugs have
+been found this way and at least one of them (`m0AQ` as a fixed set) made a
+stated lemma outright false.
+
+These were scratch scripts; they are committed because the findings in
+`FORMALIZATION-NOTES.md` are only as trustworthy as the instrument that
+produced them, and because the next person to touch a layer definition needs a
+way to tell whether they broke something.
+
+## Run the regression check first
+
+```text
+cd scripts/gates
+python check.py
+```
+
+Exit 0 means the Python mirror still agrees with the Lean definitions. It
+asserts:
+
+1. `fast2.py` reproduces `layers.py` exactly (189 layers, 0 mismatches).
+2. `thm_5_1` holds numerically (`aQB ≥ mAQ`) — a free check of the mirror
+   against proved Lean. **If this fails, the mirror has drifted, not the Lean.**
+3. The support threshold `6B+2S+5` still bounds the nonzero layers.
+
+Re-run it after any change to `Thm51.lean`'s `NKQ` / `phiQ` / `nQr` / `CAQ` /
+`FNQ` / `ellAQN` / `mAQ` / `aQB`, or `Lemma55.lean`'s `Ndim0` / `a0QB` / `m0AQ`.
+
+## The files
+
+| file | what it is |
+|---|---|
+| `layers.py` | Verbatim brute-force mirror of the Lean defs. Readable, slow, the reference. `mAQ` enumerates all `C(2B+S+3, S)` subsets, so it dies past B≈80. |
+| `fast2.py` | Same quantities, fast. `NKQ` in O(1) via modular inverse (`h ≡ 2⁻¹(−2i−1) mod Q`); `mAQ` by an **exact** DP over residue classes (within a class, take the `k` smallest `g`-values; collision cost is `2·C(k,2)`; then knapsack over classes). Reaches B=1200 in ~70s. |
+| `check.py` | The regression check above. |
+| `gate_support.py` | Finds the exact support of `[aQB − mAQ]₊` in `Q`, against the `5B` and `6B+2S+5` candidates. |
+| `gate_threshold.py` | Confirms the threshold is exact: every odd prime power in `[5B, thr]` is nonzero, everything above is zero. |
+| `gate_mass.py` | How much ledger mass the `Q < 5B` truncation drops (S=1, so it reaches larger B). |
+| `gate_ratio2.py` | The same at the paper's regime `S = B/20`, via `fast2`. This produced the `drop/B² ≈ 0.627` figure. |
+
+## What these established
+
+- `Lemma55.layerIndex`'s `p^ν < 5B` cutoff is too small for Cor 5.2's (5.24):
+  the exact support runs to `6B + 2S + 5`, and the truncated band carries
+  `≈ 0.627·B²` — `Θ(B²)`, not `o(B²)`.
+- That band is nonetheless covered by the paper's §8 (`Δ_{>B}` is a closed form
+  in `ρ` with no cutoff), so `δ₀` is not threatened. See
+  `docs/FORMALIZATION-NOTES.md#cor-52-cutoff`.
+- `∑ aQB·log p ≈ 2.5·B²·log(5B)` — the ledger is `Θ(B² log B)`, so bounding
+  `aQB` and discarding `mAQ` is not a viable proof route.
+
+## Caveat
+
+These are gates, not proofs. They check finitely many `(B, S, Q)` and are only
+evidence about asymptotic claims. Their job is to stop a false statement before
+it costs a session — not to substitute for the Lean.

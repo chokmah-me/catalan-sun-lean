@@ -6,3 +6,6 @@ results/lake_build*.txt
 .scratchpad/
 /_tmp/
 *.ndjson
+
+# gate scripts live in scripts/gates/ (committed); keep their bytecode out
+scripts/gates/__pycache__/

@@ -182,6 +182,6 @@ purely technical: `layerIndex`'s cutoff is wrong for (5.24)'s ledger, so
 
 Third finding of the same class as the `m0AQ` and `p`-vs-`p^ν` bugs, and again
 caught by gating numerically before writing Lean. Scripts and the full tables:
-`.scratchpad/cor52/` (`layers.py` brute-force mirror, `fast2.py` accelerated
-and cross-validated, `FINDINGS.md`). A free consistency check fell out of the
+**`scripts/gates/`** (committed; `layers.py` brute-force mirror, `fast2.py`
+accelerated and cross-validated, `check.py` regression runner). A free consistency check fell out of the
 sweep: **0 violations of `thm_5_1` (`aQB ≥ mAQ`)** across every layer tested.

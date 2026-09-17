@@ -136,18 +136,18 @@ the pattern `thm_5_1_statement` followed for several sessions.
 
 ## 6. Tooling notes that will save you time
 
-- **The numeric gate lives in `.scratchpad/cor52/`** (gitignored, local only):
-  - `layers.py` — verbatim brute-force Python mirror of the Lean defs.
+- **The numeric gates are committed at `scripts/gates/`** — see its README.
+  **Run `python scripts/gates/check.py` first** (exit 0 = the Python mirror
+  still agrees with the Lean definitions), and re-run it after any change to a
+  layer definition in `Thm51.lean` or `Lemma55.lean`.
+  - `layers.py` — verbatim brute-force mirror of the Lean defs; dies past B≈80
+    because `mAQ` enumerates `C(2B+S+3, S)` subsets.
   - `fast2.py` — O(1) `NKQ` via modular inverse (`h ≡ 2⁻¹(−2i−1) mod Q`) plus an
-    **exact** DP minimizer for `mAQ` over residue classes. Cross-validated
-    against `layers.py` on 189 layers, **0 mismatches**. Brute force is
-    `C(2B+S+3, S)` and dies past B≈80; the DP reaches B=1200 in ~70s.
-  - `FINDINGS.md`, `gate_support.py`, `gate_threshold.py`, `gate_mass.py`.
-  - **Free consistency check:** 0 violations of `thm_5_1` (`aQB ≥ mAQ`) across
-    every layer tested — the Python mirror agrees with proved Lean. Re-run this
-    first if you modify any layer definition.
-  - Consider promoting these to a committed regression check; they are the most
-    reusable asset here and are one `rm -rf` from gone.
+    **exact** DP minimizer for `mAQ` over residue classes. Validated against
+    `layers.py` on 189 layers, **0 mismatches**; reaches B=1200 in ~70s.
+  - `check.py` also asserts `thm_5_1` (`aQB ≥ mAQ`) numerically — a free check
+    of the mirror against proved Lean. **If it fails, the mirror drifted, not
+    the Lean.**
 - **Known Lean traps** (all in `FORMALIZATION-NOTES.md`): `push_cast` destroys
   `((B/Q : ℕ) : ℝ)` — use `rw [Int.cast_mul, Int.cast_add, Int.cast_one,
   Int.cast_natCast]` then `norm_num`. `abs_add` is now `abs_add_le`;
