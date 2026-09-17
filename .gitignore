@@ -4,3 +4,5 @@
 results/lake_build*.txt
 
 .scratchpad/
+/_tmp/
+*.ndjson

@@ -1,0 +1,112 @@
+# External kernel check: export CatalanSun with lean4export, then run
+# con-leche --verified.  Exit 0 = accept; 1 reject; 2 decline (checker
+# coverage gap); 3 error/OOM.  CI fails on anything but 0.
+#
+# CON_LECHE_REV is pinned so this job does not float with upstream
+# master.  Bump it deliberately.  LEAN4EXPORT_REF must match this
+# repo's lean-toolchain.
+#
+# ubuntu-latest has ~7 GB RAM.  A Mathlib-scale stream may OOM; --jobs 1
+# is the first mitigation.  If this job dies with exit 3, use a larger
+# runner.
+
+name: con-leche
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: con-leche-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CON_LECHE_REV: c431b1ca1b7a93486dd3e0440d3ee82abe90ccd0
+  LEAN4EXPORT_REF: v4.32.2
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout CatalanSun
+        uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Cache CatalanSun .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lakefile.toml', 'lake-manifest.json') }}-${{ github.sha }}
+          restore-keys: |
+            lake-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lakefile.toml', 'lake-manifest.json') }}-
+            lake-${{ runner.os }}-
+
+      - name: lake exe cache get
+        run: lake exe cache get
+
+      - name: lake build
+        run: lake build
+
+      - name: Checkout lean4export
+        uses: actions/checkout@v4
+        with:
+          repository: leanprover/lean4export
+          ref: ${{ env.LEAN4EXPORT_REF }}
+          path: _tmp/lean4export
+
+      - name: Build lean4export
+        working-directory: _tmp/lean4export
+        run: lake build
+
+      - name: Checkout con-leche
+        uses: actions/checkout@v4
+        with:
+          repository: leanprover/con-leche
+          ref: ${{ env.CON_LECHE_REV }}
+          path: _tmp/con-leche
+
+      - name: Cache con-leche .lake
+        uses: actions/cache@v4
+        with:
+          path: _tmp/con-leche/.lake
+          key: con-leche-${{ runner.os }}-${{ env.CON_LECHE_REV }}
+          restore-keys: |
+            con-leche-${{ runner.os }}-${{ env.CON_LECHE_REV }}
+
+      - name: Build con-leche
+        working-directory: _tmp/con-leche
+        run: lake build con-leche
+
+      - name: Export CatalanSun
+        run: |
+          set -euo pipefail
+          mkdir -p _tmp
+          LEAN_PATH="$(lake env printenv LEAN_PATH)"
+          export LEAN_PATH
+          _tmp/lean4export/.lake/build/bin/lean4export CatalanSun > _tmp/catalan-sun.ndjson
+          wc -l _tmp/catalan-sun.ndjson
+
+      - name: con-leche --verified
+        run: |
+          set -euo pipefail
+          _tmp/con-leche/.lake/build/bin/con-leche --verified --jobs=1 _tmp/catalan-sun.ndjson
+
+      - name: Upload export on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalan-sun-ndjson
+          path: _tmp/catalan-sun.ndjson
+          retention-days: 7
+          if-no-files-found: ignore

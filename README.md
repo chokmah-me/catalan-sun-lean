@@ -91,6 +91,29 @@ python ../lean-proof-forge/scripts/verify_lean_project.py --project .
 
 Toolchain: Lean 4.32.2 / Mathlib v4.32.2 (same pin as `aria-moebius`).
 
+## External kernel check (con-leche)
+
+`con-leche` is an external Lean kernel checker with a machine-checked
+consistency argument. It does not read `.lean` files; it reads a raw
+`lean4export` NDJSON of the compiled library.
+
+```text
+lake exe cache get
+lake build
+# lean4export at tag v4.32.2 (same as lean-toolchain)
+lean4export CatalanSun > catalan-sun.ndjson
+con-leche --verified catalan-sun.ndjson
+```
+
+Exit 0 = accept. Exit 1 = reject (the stream is not a valid kernel
+environment). Exit 2 = decline (checker does not yet support some
+feature in the stream). Exit 3 = error / OOM.
+
+CI: `.github/workflows/con-leche.yml` runs this on every push and PR.
+It pins `leanprover/con-leche` at `CON_LECHE_REV` and `lean4export` at
+`LEAN4EXPORT_REF`. GitHub-hosted runners have ~7 GB RAM; a Mathlib-scale
+export may OOM (exit 3) until a larger runner is used.
+
 ## Incoming (not on the default target)
 
 Sun eq. 1.4 (Catalan tail recurrence) lives in `CatalanSun/Tail.lean` (sorry-free).
