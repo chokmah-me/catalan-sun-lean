@@ -7,6 +7,87 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-17 (newest of all): (5.2) IS FULLY PROVED — both directions,
+unconditional, absolute constant `C = 210`. `lemma_5_5_row_stability_holds`
+is in `Lemma55.lean`; `lake build` clean, 0 sorry, axioms ⊆ classical three.
+Lemma 5.5's only remaining open piece is (5.3).**
+
+**The numeric gate, run first (and it passed).** Per this file's own standing
+recommendation — two prior sessions were lost to skipping it — no Lean was
+written until the claim was checked. Two independent measurements:
+
+| check | measured | shape |
+|---|---|---|
+| end-to-end `(m0AQ−mAQ)/(1+B/Q)`, both sides minimized, `B ≤ 800`, `Q ≤ 2187` | worst **0.523** | saturates |
+| adversarially-worst 3-swap repair cost / `(1+B/Q)`, `B ≤ 6000`, `Q ≤ 2B` | worst **10.16** | saturates |
+| `nQr Q r I ≤ (N−1)/Q + 1` | 0 violations, tight at `r=0` | — |
+
+Saturating, not growing — the opposite of the shape that (correctly) refuted
+the earlier fixed-set formulations. Scripts kept this time:
+`.scratchpad/lemma55/l55gate_hard.py`, `l55gate_swap.py` (gitignored, local).
+
+**The insight that collapsed the work.** Every prior sketch in this file
+assumed the replacement index had to be chosen well (greedy / min-occupancy),
+implying minimizer extraction, an occupancy pigeonhole, and an exchange
+argument. It does not: **any** free index works, because every per-swap cost
+is bounded *termwise*. The adversarial gate above is what establishes this.
+The entire feared "genuinely new combinatorics" stage reduced to one direct
+`Finset`-splitting lemma plus a ≤3-step induction. Landed in 16 declarations
+across six stages, all first- or second-try.
+
+**What landed** (`Lemma55.lean`, all unconditional):
+- Stage A: `nQr_le` (was missing; via the already-public
+  `card_range_filter_mod_eq`), `FNQ_le`, `indicatorQle_le_one`.
+- Stage B: `gTerm`, `three_mul_div_le` (extraction of code previously inlined
+  in `sum_FNQ_shift_le`), `abs_gTerm_le` (`≤ 7*(B/Q)+9`).
+- Stage C: `collTerm`, `nQr_insert`, `collTerm_insert`, `collTerm_erase`,
+  `abs_collTerm_swap_le` — the only genuinely new combinatorics, and routine.
+- Stage D: `card_insert_erase_eq`, `ellAQN_eq_collTerm_add`,
+  `abs_ellAQN_swap_le` (`≤ 30*(B/Q)+30` per swap).
+- Stage E: `mAQ_eq_ellAQ_min` (the mechanical mirror this file flagged as
+  missing), `topBlock`/`card_topBlock`, `exists_free_common`,
+  `card_inter_topBlock_swap`, `swap_descent_aux`,
+  `exists_preimage_of_disjoint_topBlock`.
+- Stage F: `m0AQ_le_mAQ_add`, `abs_mAQ_sub_m0AQ_le`,
+  `lemma_5_5_row_stability_holds`.
+
+**Corrections #1 and #2 in the 2026-09-17 entry below were both right and
+both load-bearing.** `collisionSum_move` really is unusable for an arbitrary
+swap (its `c b + 2 ≤ c a` hypothesis only covers balance-improving moves), and
+`mAQ_eq_ellAQ_min` really did need adding. Correction #3's "termwise
+`O(1+B/Q)`" observation is exactly what made the whole thing cheap.
+
+**One sign trap worth recording.** In the hard direction the `FNQ` shift sum
+runs the *opposite* way from the easy direction. In the easy direction
+`FNQ_shift_nonneg` makes it automatically `≤ 0`; here that same lemma gives
+the bound in the **wrong** direction (it yields `ellAQN(Ndim0,J) ≥
+ellAQN(Ndim,J.map e)`, which is useless), and the genuine counting bound
+`sum_FNQ_shift_le` is required. This is precisely why the 2026-09-17 entry
+kept `sum_FNQ_shift_le` as a standalone lemma — that call was correct.
+
+**Lean pitfalls hit (all casts, none combinatorial).** `push_cast` rewrites
+`((B / Q : ℕ) : ℤ)` — ℕ-division — into `↑B / ↑Q`, silently destroying the
+match against every lemma stated with the ℕ-division cast. It does this even
+inside a `have` whose statement is written the other way. Cost several
+`linarith` failures whose context *looked* correct. Fix: never `push_cast` a
+goal containing a ℕ-division cast; use `Int.cast_mul`/`Int.cast_natCast`
+explicitly, or `set` the atom first. Also: `omega` treats `(0-1)/Q` as opaque,
+so pin `(0 - 1) / Q = 0` with a `have` in the `N = 0` edge case. Also:
+`Finset.card_insert_of_not_mem` is now `card_insert_of_notMem`; `attachFin`
+takes a `Finset ℕ`, not a `Finset (Fin n)` — use `I.attach.image` instead.
+
+**Next target: (5.3)** (`lemma_5_5_ledger_little_o`). Now unblocked — it can
+consume the proved `lemma_5_5_row_stability_holds` plus the already-proved
+`abs_a0QB_sub_aQB_le` directly. Route: sum the per-layer `O(1+B/Q)` bound over
+`layerIndex B` via Chebyshev (`∑_{p<5B} log p ≈ 5B`, giving `Θ(B log² B)`),
+**not** via the paper's `O(√B log B)` layer count, which undercounts (it omits
+the primes themselves). Numerics already favorable: `SUM/B²` decays
+monotonically 0.32 → 0.06 for `B` from 100 to 800 (`.scratchpad/lemma55/l53min.py`).
+Note the ε-B₀ form of the statement will need a real-analysis limit argument,
+a different flavor from everything landed so far.
+
+---
+
 **2026-09-17 (newest of all): sharpened (5.2)'s easy direction from an
 `O(S)` constant to a genuine `O(1+B/Q)` constant — the previously-committed
 `mAQ_le_m0AQ_add` could never establish `lemma_5_5_row_stability` as stated.
@@ -419,6 +500,13 @@ https://arxiv.org/html/2609.04176v1#S5.E8) via the user. Key findings:
   just near-minimizers) — i.e. a genuinely stronger and cleaner lemma than
   the paper's own argument requires, and one that sidesteps needing to
   characterize the minimizer's structure at all.
+- **OBSOLETE (2026-09-17) — do not follow this route.** It was written when
+  `m0AQ` was still the fixed consecutive set. Under the corrected minimized
+  `m0AQ`, step 1 below ("the actual hard content", via `phiQ` machinery and a
+  joint additive/collision bound) collapses to the single already-proved line
+  `m0AQ_le_ellAQN`, and the greedy/occupancy reasoning it assumes is
+  unnecessary — any free replacement index works. (5.2) was proved without it;
+  see the top-of-file entry. Kept only as history.
 - **Recommended proof route for next session** (combines two prior
   planning passes + this numeric check):
   1. Prove the strengthened, minimizer-free claim: `∀ I' : Finset (Fin

@@ -28,15 +28,25 @@
   history, including the earlier sessions' (correct) refutation of the
   fixed-set reading.
 
-  Landed this session (unconditional, `m0AQ` under the corrected definition):
+  **(5.2) is fully proved** (`lemma_5_5_row_stability_holds`, absolute
+  constant `C = 210`, unconditional):
+    - easy direction `mAQ_le_m0AQ_add_sharp`: `mAQ ≤ m0AQ + 9*(1+B/Q)`.
+    - hard direction `m0AQ_le_mAQ_add`: `m0AQ ≤ mAQ + 105*(1+B/Q)`, by
+      swapping the `≤ 3` indices of `mAQ`'s minimizer that lie in `topBlock`
+      (the indices of `Fin (Ndim B S)` with no counterpart in
+      `Fin (Ndim0 B S)`) for *arbitrary* free indices of the common range.
+      No greedy choice or occupancy argument is needed: each swap's cost is
+      bounded termwise (`nQr_le`/`FNQ_le`/`NKQ_le` for the additive part,
+      `abs_collTerm_swap_le` for the collision part), which the numeric gate
+      in `docs/WORKPLAN-CONTINUATION.md` confirms saturates.
     - `abs_a0QB_sub_aQB_le`: `|a0QB - aQB| ≤ 6*(1+B/Q)`, exact and
-      self-contained (no minimization) — the two models differ by exactly
-      three rows, each `NKQ` term bounded via `NKQ_le`.
-    - `mAQ_le_m0AQ_add`: the easy direction of (5.2),
-      `mAQ ≤ m0AQ + S*(3/Q+1)`.
+      self-contained (no minimization).
 
-  Not yet proved: the hard direction of (5.2) (`m0AQ ≤ mAQ + O(1+B/Q)`, the
-  paper's genuine row-swap/replacement argument), and (5.3) itself.
+  **Sign trap:** the `FNQ` shift sum runs opposite ways in the two directions.
+  The easy direction gets it free from `FNQ_shift_nonneg`; the hard direction
+  needs the genuine counting bound `sum_FNQ_shift_le`.
+
+  Not yet proved: (5.3) itself (`lemma_5_5_ledger_little_o`).
 
   **Divergence from the paper (layer count):** the paper claims
   `O(√B log B)` odd prime powers below `5B`; this undercounts, since it omits
@@ -779,6 +789,443 @@ theorem abs_a0QB_sub_aQB_le {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) :
   constructor <;> [skip; nlinarith [hkey]]
   nlinarith [hkey]
 
+/-! ## Stage A–C toward (5.2)'s hard direction: termwise bounds and the
+single-swap collision cost
+
+The hard direction replaces the `≤ 3` row indices of `mAQ`'s minimizer that lie
+in the top block `{Ndim0, Ndim0+1, Ndim0+2}` (which has no counterpart in
+`Fin (Ndim0 B S)`) by arbitrary free indices in the common range. The numeric
+gate (see `docs/WORKPLAN-CONTINUATION.md`) shows the cost of the *adversarially
+worst* such replacement still saturates at `≈ 10 * (1 + B/Q)`, so no greedy
+choice, occupancy pigeonhole, or minimizer characterization is needed — every
+per-swap cost is bounded termwise.
+
+Note `collTerm` is `ellAQN`'s collision term in its literal shape (a `range Q`
+sum in `ℤ`), deliberately *not* `Thm51.collisionSum` (a `Fin Q` sum in `ℕ`).
+`Thm51.collisionSum_move` is unusable here: its hypothesis `c b + 2 ≤ c a` only
+covers balance-*improving* moves, whereas an arbitrary swap can go either way. -/
+
+/-- `indicatorQle Q i ≤ 1`. -/
+theorem indicatorQle_le_one (Q i : ℕ) : indicatorQle Q i ≤ 1 := by
+  unfold indicatorQle; split_ifs <;> omega
+
+/-- `nQr Q r I ≤ (N-1)/Q + 1`: each residue class mod `Q` meets `range N` in
+at most `(N-1)/Q + 1` points. -/
+theorem nQr_le {N Q : ℕ} (hQ : 0 < Q) (r : ℕ) (I : Finset (Fin N)) :
+    nQr Q r I ≤ (N - 1) / Q + 1 := by
+  classical
+  unfold nQr
+  -- map into `range N` filtered by the same residue condition
+  have hsub : (I.filter (fun i => i.val % Q = r % Q)).image (fun i : Fin N => i.val)
+      ⊆ (range N).filter (fun y => y % Q = r % Q) := by
+    intro y hy
+    simp only [mem_image, mem_filter] at hy
+    obtain ⟨i, ⟨_hiI, hmod⟩, rfl⟩ := hy
+    simp only [mem_filter, mem_range]
+    exact ⟨i.isLt, hmod⟩
+  have hcard : (I.filter (fun i => i.val % Q = r % Q)).card
+      ≤ ((range N).filter (fun y => y % Q = r % Q)).card := by
+    calc (I.filter (fun i => i.val % Q = r % Q)).card
+        = ((I.filter (fun i => i.val % Q = r % Q)).image (fun i : Fin N => i.val)).card := by
+          rw [Finset.card_image_of_injOn]
+          intro a _ b _ hab
+          exact Fin.ext hab
+      _ ≤ _ := Finset.card_le_card hsub
+  refine hcard.trans ?_
+  rw [card_range_filter_mod_eq hQ (Nat.mod_lt _ hQ) N]
+  -- `(N + Q - 1 - r%Q)/Q ≤ (N-1)/Q + 1`
+  rcases Nat.eq_zero_or_pos N with hN | hN
+  · subst hN
+    have hlt : 0 + Q - 1 - r % Q < Q := by omega
+    have h1 := Nat.div_eq_of_lt hlt
+    have h2 : (0 - 1) / Q = 0 := by norm_num
+    omega
+  have hle : N + Q - 1 - r % Q ≤ (N - 1) + Q := by omega
+  calc (N + Q - 1 - r % Q) / Q ≤ ((N - 1) + Q) / Q := Nat.div_le_div_right hle
+    _ = (N - 1) / Q + 1 := by rw [Nat.add_div_right _ hQ]
+
+/-- `FNQ N Q i = i/Q + (N-1-i)/Q ≤ (N-1)/Q + 1` for `i < N`. -/
+theorem FNQ_le {N Q i : ℕ} (hQ : 0 < Q) (hi : i < N) :
+    FNQ N Q i ≤ (N - 1) / Q + 1 := by
+  unfold FNQ
+  -- `⌊a/Q⌋ + ⌊b/Q⌋ ≤ ⌊(a+b)/Q⌋` with `a + b = N - 1`.
+  have hsum : i + (N - 1 - i) = N - 1 := by omega
+  have key : i / Q + (N - 1 - i) / Q ≤ (i + (N - 1 - i)) / Q + 1 := by
+    have h1 := Nat.div_add_mod i Q
+    have h2 := Nat.div_add_mod (N - 1 - i) Q
+    have h3 := Nat.div_add_mod (i + (N - 1 - i)) Q
+    have m1 : i % Q < Q := Nat.mod_lt _ hQ
+    have m2 : (N - 1 - i) % Q < Q := Nat.mod_lt _ hQ
+    have m3 : (i + (N - 1 - i)) % Q < Q := Nat.mod_lt _ hQ
+    -- Q*(a/Q) + Q*(b/Q) ≤ Q*((a+b)/Q) + Q
+    have hmul : Q * (i / Q) + Q * ((N - 1 - i) / Q)
+        ≤ Q * ((i + (N - 1 - i)) / Q) + Q := by omega
+    have := Nat.le_of_mul_le_mul_left
+      (by linarith [hmul] : Q * (i / Q + (N - 1 - i) / Q) ≤ Q * ((i + (N - 1 - i)) / Q + 1)) hQ
+    exact this
+  rw [hsum] at key
+  exact key
+
+/-! ## Stage B -/
+
+/-- `(3*B)/Q ≤ 3*(B/Q) + 4`. -/
+theorem three_mul_div_le {B Q : ℕ} (hQ : 0 < Q) : (3 * B) / Q ≤ 3 * (B / Q) + 4 := by
+  have hdm := Nat.div_add_mod B Q
+  have hmod : B % Q < Q := Nat.mod_lt _ hQ
+  have hbound : 3 * B < (3 * (B / Q) + 4) * Q := by nlinarith
+  have := (Nat.div_lt_iff_lt_mul hQ).mpr hbound
+  omega
+
+/-- The per-index additive term of `ellAQN`, named for reuse. -/
+def gTerm (B S Q N i : ℕ) : ℤ :=
+  (2 * NKQ B Q i : ℤ) - (NKQ S Q i : ℤ) - (2 * indicatorQle Q i : ℤ) - (FNQ N Q i : ℤ)
+
+/-- Every `g`-term is `O(1+B/Q)` in absolute value, given `N ≤ 3*B` and `S ≤ B`. -/
+theorem abs_gTerm_le {B S Q N i : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hN : N ≤ 3 * B) (hSB : S ≤ B) (hi : i < N) :
+    |gTerm B S Q N i| ≤ 7 * ((B / Q : ℕ) : ℤ) + 9 := by
+  have hb := NKQ_le hQ hodd B i
+  have hs := NKQ_le hQ hodd S i
+  have hind := indicatorQle_le_one Q i
+  have hf := FNQ_le (N := N) (Q := Q) (i := i) hQ hi
+  -- `(N-1)/Q ≤ (3B)/Q ≤ 3*(B/Q)+4`
+  have hN1 : (N - 1) / Q ≤ (3 * B) / Q := Nat.div_le_div_right (by omega)
+  have h3 := three_mul_div_le (B := B) (Q := Q) hQ
+  have hSQ : S / Q ≤ B / Q := Nat.div_le_div_right hSB
+  have hfN : FNQ N Q i ≤ 3 * (B / Q) + 5 := by omega
+  unfold gTerm
+  have cb : (NKQ B Q i : ℤ) ≤ ((B / Q : ℕ) : ℤ) + 1 := by exact_mod_cast hb
+  have cs : (NKQ S Q i : ℤ) ≤ ((B / Q : ℕ) : ℤ) + 1 := by
+    exact_mod_cast le_trans hs (by omega : S / Q + 1 ≤ B / Q + 1)
+  have ci : (indicatorQle Q i : ℤ) ≤ 1 := by exact_mod_cast hind
+  have cf : (FNQ N Q i : ℤ) ≤ 3 * ((B / Q : ℕ) : ℤ) + 5 := by exact_mod_cast hfN
+  have c0b : (0 : ℤ) ≤ (NKQ B Q i : ℤ) := by positivity
+  have c0s : (0 : ℤ) ≤ (NKQ S Q i : ℤ) := by positivity
+  have c0i : (0 : ℤ) ≤ (indicatorQle Q i : ℤ) := by positivity
+  have c0f : (0 : ℤ) ≤ (FNQ N Q i : ℤ) := by positivity
+  rw [abs_le]
+  constructor <;> linarith
+
+/-! ## Stage C: the collision term and its single-swap cost -/
+
+private theorem choose_two_succ' (n : ℕ) : (n + 1).choose 2 = n.choose 2 + n := by
+  simpa [Nat.choose_one_right, add_comm] using Nat.choose_succ_succ n 1
+
+/-- `ellAQN`'s collision term, isolated (a `range Q` sum in `ℤ`). -/
+def collTerm {N : ℕ} (Q : ℕ) (I : Finset (Fin N)) : ℤ :=
+  2 * ∑ r ∈ range Q, (((nQr Q r I).choose 2 : ℕ) : ℤ)
+
+/-- Inserting `b ∉ I` raises each `nQr` at `b`'s residue by one, others unchanged. -/
+theorem nQr_insert {N Q : ℕ} (I : Finset (Fin N)) {b : Fin N} (hb : b ∉ I) (r : ℕ) :
+    nQr Q r (insert b I) = nQr Q r I + (if b.val % Q = r % Q then 1 else 0) := by
+  classical
+  unfold nQr
+  rw [Finset.filter_insert]
+  by_cases h : b.val % Q = r % Q
+  · rw [if_pos h, if_pos h, Finset.card_insert_of_notMem (by
+      simp only [Finset.mem_filter]; tauto)]
+  · rw [if_neg h, if_neg h, Nat.add_zero]
+
+/-- Inserting one index raises the collision term by exactly `2 * nQr Q b.val I`. -/
+theorem collTerm_insert {N Q : ℕ} (hQ : 0 < Q) (I : Finset (Fin N)) {b : Fin N}
+    (hb : b ∉ I) :
+    collTerm Q (insert b I) = collTerm Q I + 2 * (nQr Q b.val I : ℤ) := by
+  classical
+  unfold collTerm
+  have hmem : b.val % Q ∈ range Q := mem_range.mpr (Nat.mod_lt _ hQ)
+  have hsplit : ∀ (g : ℕ → ℤ), ∑ r ∈ range Q, g r
+      = g (b.val % Q) + ∑ r ∈ (range Q).erase (b.val % Q), g r :=
+    fun g => (Finset.add_sum_erase _ g hmem).symm
+  rw [hsplit (fun r => (((nQr Q r (insert b I)).choose 2 : ℕ) : ℤ)),
+      hsplit (fun r => (((nQr Q r I).choose 2 : ℕ) : ℤ))]
+  have hrest : ∑ r ∈ (range Q).erase (b.val % Q),
+        (((nQr Q r (insert b I)).choose 2 : ℕ) : ℤ)
+      = ∑ r ∈ (range Q).erase (b.val % Q), (((nQr Q r I).choose 2 : ℕ) : ℤ) := by
+    refine Finset.sum_congr rfl fun r hr => ?_
+    have hrQ : r < Q := mem_range.mp (Finset.mem_of_mem_erase hr)
+    have hne : b.val % Q ≠ r := Ne.symm (Finset.mem_erase.mp hr).1
+    have : ¬ (b.val % Q = r % Q) := by rwa [Nat.mod_eq_of_lt hrQ]
+    rw [nQr_insert I hb r, if_neg this, Nat.add_zero]
+  rw [hrest]
+  have hat : nQr Q (b.val % Q) (insert b I) = nQr Q (b.val % Q) I + 1 := by
+    rw [nQr_insert I hb, if_pos (by rw [Nat.mod_mod])]
+  rw [hat, choose_two_succ']
+  have hnq : nQr Q (b.val % Q) I = nQr Q b.val I := by
+    unfold nQr; congr 1; ext x; simp
+  rw [hnq]
+  push_cast
+  ring
+
+/-- Removing one index drops the collision term by exactly `2*(nQr - 1)`. -/
+theorem collTerm_erase {N Q : ℕ} (hQ : 0 < Q) (I : Finset (Fin N)) {a : Fin N}
+    (ha : a ∈ I) :
+    collTerm Q I = collTerm Q (I.erase a) + 2 * ((nQr Q a.val I : ℤ) - 1) := by
+  classical
+  have hnotmem : a ∉ I.erase a := Finset.notMem_erase a I
+  have hins : insert a (I.erase a) = I := Finset.insert_erase ha
+  have h := collTerm_insert (Q := Q) hQ (I.erase a) hnotmem
+  rw [hins] at h
+  have hcount : nQr Q a.val I = nQr Q a.val (I.erase a) + 1 := by
+    conv_lhs => rw [← hins]
+    rw [nQr_insert (I.erase a) hnotmem, if_pos rfl]
+  rw [h, hcount]
+  push_cast
+  ring
+
+/-- The two-sided single-swap bound on the collision term. -/
+theorem abs_collTerm_swap_le {N Q : ℕ} (hQ : 0 < Q) (I : Finset (Fin N))
+    {a b : Fin N} (ha : a ∈ I) (hb : b ∉ I) :
+    |collTerm Q (insert b (I.erase a)) - collTerm Q I|
+      ≤ 2 * (((N - 1) / Q : ℕ) : ℤ) + 2 := by
+  classical
+  have hbe : b ∉ I.erase a := fun h => hb (Finset.mem_of_mem_erase h)
+  have h1 := collTerm_insert (Q := Q) hQ (I.erase a) hbe
+  have h2 := collTerm_erase (Q := Q) hQ I ha
+  -- bounds on the two `nQr` values
+  have hlo1 : (0 : ℤ) ≤ (nQr Q b.val (I.erase a) : ℤ) := by positivity
+  have hhi1 : (nQr Q b.val (I.erase a) : ℤ) ≤ ((N - 1) / Q : ℕ) + 1 := by
+    exact_mod_cast nQr_le hQ b.val (I.erase a)
+  have hlo2 : (1 : ℤ) ≤ (nQr Q a.val I : ℤ) := by
+    have : 1 ≤ nQr Q a.val I := by
+      unfold nQr
+      refine Finset.card_pos.mpr ⟨a, ?_⟩
+      simp only [Finset.mem_filter]
+      exact ⟨ha, by simp⟩
+    exact_mod_cast this
+  have hhi2 : (nQr Q a.val I : ℤ) ≤ ((N - 1) / Q : ℕ) + 1 := by
+    exact_mod_cast nQr_le hQ a.val I
+  rw [abs_le]
+  constructor <;> [linarith; linarith]
+
+/-! ## Stage D: the full single-swap `ellAQN` cost
+
+`CAQ` depends only on `B,S,Q,f`, so it cancels across a swap; the collision
+half is Stage C and the additive half is two applications of `abs_gTerm_le`.
+The constants are deliberately slack — only the *existence* of an absolute `C`
+matters for (5.2). -/
+
+theorem card_insert_erase_eq {N : ℕ} {I : Finset (Fin N)} {a b : Fin N}
+    (ha : a ∈ I) (hb : b ∉ I) : (insert b (I.erase a)).card = I.card := by
+  classical
+  have hbe : b ∉ I.erase a := fun h => hb (Finset.mem_of_mem_erase h)
+  rw [Finset.card_insert_of_notMem hbe, Finset.card_erase_of_mem ha]
+  have : 1 ≤ I.card := Finset.card_pos.mpr ⟨a, ha⟩
+  omega
+
+/-- `ellAQN` rewritten as `CAQ + collTerm + ∑ gTerm`. -/
+theorem ellAQN_eq_collTerm_add {B S Q N : ℕ} (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin N)) (hI : I.card = S) :
+    ellAQN B S Q f N I hI
+      = (CAQ B S Q f : ℤ) + collTerm Q I + ∑ i ∈ I, gTerm B S Q N i.val := by
+  unfold ellAQN collTerm gTerm
+  ring
+
+/-- A single row swap changes `ellAQN` by `O(1+B/Q)`. -/
+theorem abs_ellAQN_swap_le {B S Q N : ℕ} (hQ : 0 < Q) (hodd : Odd Q)
+    (hN : N ≤ 3 * B) (hSB : S ≤ B) (f : Fin S → Fin (S + 3))
+    (I : Finset (Fin N)) (hI : I.card = S) {a b : Fin N}
+    (ha : a ∈ I) (hb : b ∉ I) (hcard : (insert b (I.erase a)).card = S) :
+    |ellAQN B S Q f N (insert b (I.erase a)) hcard - ellAQN B S Q f N I hI|
+      ≤ 30 * ((B / Q : ℕ) : ℤ) + 30 := by
+  classical
+  have hbe : b ∉ I.erase a := fun h => hb (Finset.mem_of_mem_erase h)
+  rw [ellAQN_eq_collTerm_add f _ hcard, ellAQN_eq_collTerm_add f I hI]
+  -- the `g`-sum over the swapped set
+  have hgsum : ∑ i ∈ insert b (I.erase a), gTerm B S Q N i.val
+      = ∑ i ∈ I, gTerm B S Q N i.val + gTerm B S Q N b.val - gTerm B S Q N a.val := by
+    rw [Finset.sum_insert hbe]
+    have : ∑ i ∈ I.erase a, gTerm B S Q N i.val
+        = ∑ i ∈ I, gTerm B S Q N i.val - gTerm B S Q N a.val := by
+      have := Finset.sum_erase_add I (fun i : Fin N => gTerm B S Q N i.val) ha
+      linarith [this]
+    rw [this]; ring
+  rw [hgsum]
+  have hcoll := abs_collTerm_swap_le (Q := Q) hQ I ha hb
+  have hga := abs_gTerm_le (B := B) (S := S) (Q := Q) (N := N) (i := a.val) hQ hodd hN hSB a.isLt
+  have hgb := abs_gTerm_le (B := B) (S := S) (Q := Q) (N := N) (i := b.val) hQ hodd hN hSB b.isLt
+  -- `(N-1)/Q ≤ 3*(B/Q) + 4`
+  have hN1 : (N - 1) / Q ≤ (3 * B) / Q := Nat.div_le_div_right (by omega)
+  have h3 := three_mul_div_le (B := B) (Q := Q) hQ
+  have hNcast : (((N - 1) / Q : ℕ) : ℤ) ≤ 3 * ((B / Q : ℕ) : ℤ) + 4 := by
+    exact_mod_cast le_trans hN1 h3
+  rw [abs_le] at hcoll hga hgb ⊢
+  constructor <;> linarith [hcoll.1, hcoll.2, hga.1, hga.2, hgb.1, hgb.2]
+
+/-! ## Stage E: the `≤ 3`-step descent into the common range
+
+`mAQ`'s minimizer may use up to three indices of `topBlock B S` — the indices
+`{Ndim0, Ndim0+1, Ndim0+2}` of `Fin (Ndim B S)` with no counterpart in
+`Fin (Ndim0 B S)`. Each is swapped for an *arbitrary* free index of the common
+range; `abs_ellAQN_swap_le` pays `30*(B/Q)+30` per swap, and the top-block
+intersection strictly shrinks, so at most `card_topBlock = 3` swaps run. -/
+
+/-- Extract `mAQ`'s minimizing row set (mirror of `m0AQ_eq_ellAQN_min`). -/
+theorem mAQ_eq_ellAQ_min {B S Q : ℕ} (f : Fin S → Fin (S + 3))
+    (hne : ((univ : Finset (Fin (Ndim B S))).powersetCard S).Nonempty) :
+    ∃ (I : Finset (Fin (Ndim B S))) (hI : I.card = S),
+      mAQ B S Q f = ellAQ B S Q f I hI := by
+  classical
+  unfold mAQ
+  set s :=
+    ((univ : Finset (Fin (Ndim B S))).powersetCard S).image fun I =>
+      if hI : I.card = S then ellAQ B S Q f I hI else 0
+  have hsne : s.Nonempty := hne.image _
+  simp only [hsne, ↓reduceDIte]
+  obtain ⟨I, hImem, hIeq⟩ := mem_image.mp (Finset.min'_mem s hsne)
+  refine ⟨I, ?_, ?_⟩
+  · exact (mem_powersetCard.mp hImem).2
+  · rw [← hIeq]
+    simp [(mem_powersetCard.mp hImem).2]
+
+/-- The top block of `Fin (Ndim B S)`: the three indices with no counterpart in
+`Fin (Ndim0 B S)`. -/
+def topBlock (B S : ℕ) : Finset (Fin (Ndim B S)) :=
+  univ.filter (fun i => Ndim0 B S ≤ i.val)
+
+theorem mem_topBlock_iff {B S : ℕ} (i : Fin (Ndim B S)) :
+    i ∈ topBlock B S ↔ Ndim0 B S ≤ i.val := by
+  simp [topBlock]
+
+theorem card_topBlock {B S : ℕ} : (topBlock B S).card = 3 := by
+  classical
+  have : topBlock B S = {⟨Ndim0 B S, by unfold Ndim Ndim0; omega⟩,
+      ⟨Ndim0 B S + 1, by unfold Ndim Ndim0; omega⟩,
+      ⟨Ndim0 B S + 2, by unfold Ndim Ndim0; omega⟩} := by
+    ext i
+    rw [mem_topBlock_iff]
+    simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff]
+    have := i.isLt
+    unfold Ndim at this
+    unfold Ndim0
+    omega
+  rw [this]
+  rw [Finset.card_insert_of_notMem (by simp [Fin.ext_iff]),
+      Finset.card_insert_of_notMem (by simp [Fin.ext_iff]),
+      Finset.card_singleton]
+
+/-- A free index in the common range exists whenever `I` still meets the top
+block: `I` has card `S`, the common range has `Ndim0 B S = 2B+S` slots, and
+`S * 20 ≤ B` leaves plenty spare. -/
+theorem exists_free_common {B S : ℕ} (hS0 : 0 < S) (hSB : S * 20 ≤ B)
+    (I : Finset (Fin (Ndim B S))) (hI : I.card = S) :
+    ∃ b : Fin (Ndim B S), b ∉ I ∧ b.val < Ndim0 B S := by
+  classical
+  set C : Finset (Fin (Ndim B S)) := univ.filter (fun i => i.val < Ndim0 B S) with hC
+  have hCcard : C.card = Ndim0 B S := by
+    rw [hC]
+    have : (univ.filter (fun i : Fin (Ndim B S) => i.val < Ndim0 B S)).card
+        = ((range (Ndim B S)).filter (fun y => y < Ndim0 B S)).card := by
+      rw [← Finset.card_map ⟨Fin.val, Fin.val_injective⟩]
+      congr 1
+      ext y
+      simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and,
+        Function.Embedding.coeFn_mk, Finset.mem_range]
+      constructor
+      · rintro ⟨i, hi, rfl⟩; exact ⟨i.isLt, hi⟩
+      · rintro ⟨hy1, hy2⟩; exact ⟨⟨y, hy1⟩, hy2, rfl⟩
+    rw [this]
+    have hsub : (range (Ndim B S)).filter (fun y => y < Ndim0 B S) = range (Ndim0 B S) := by
+      ext y
+      simp only [Finset.mem_filter, Finset.mem_range]
+      constructor
+      · tauto
+      · intro hy; exact ⟨by unfold Ndim Ndim0 at *; omega, hy⟩
+    rw [hsub, Finset.card_range]
+  have hlt : I.card < C.card := by
+    rw [hI, hCcard]; unfold Ndim0; omega
+  obtain ⟨b, hbC, hbI⟩ := Finset.exists_mem_notMem_of_card_lt_card hlt
+  exact ⟨b, hbI, by rw [hC] at hbC; simpa using hbC⟩
+
+/-- Swapping a top-block index for a free common-range index strictly shrinks
+the top-block intersection. -/
+theorem card_inter_topBlock_swap {B S : ℕ} (I : Finset (Fin (Ndim B S)))
+    {a b : Fin (Ndim B S)} (ha : a ∈ I ∩ topBlock B S) (hb : b ∉ I)
+    (hblt : b.val < Ndim0 B S) :
+    ((insert b (I.erase a)) ∩ topBlock B S).card < (I ∩ topBlock B S).card := by
+  classical
+  have haI : a ∈ I := (Finset.mem_inter.mp ha).1
+  have haT : a ∈ topBlock B S := (Finset.mem_inter.mp ha).2
+  have hbT : b ∉ topBlock B S := by rw [mem_topBlock_iff]; omega
+  have hsub : (insert b (I.erase a)) ∩ topBlock B S ⊆ (I ∩ topBlock B S).erase a := by
+    intro x hx
+    rw [Finset.mem_inter] at hx
+    obtain ⟨hx1, hx2⟩ := hx
+    rcases Finset.mem_insert.mp hx1 with rfl | hx1'
+    · exact absurd hx2 hbT
+    · rw [Finset.mem_erase] at hx1' ⊢
+      exact ⟨hx1'.1, Finset.mem_inter.mpr ⟨hx1'.2, hx2⟩⟩
+  calc ((insert b (I.erase a)) ∩ topBlock B S).card
+      ≤ ((I ∩ topBlock B S).erase a).card := Finset.card_le_card hsub
+    _ < (I ∩ topBlock B S).card := Finset.card_erase_lt_of_mem ha
+
+/-- The `≤3`-step descent: any card-`S` row set can be moved into the common
+range at a cost of `k * (30*(B/Q)+30)`, where `k` bounds its top-block usage. -/
+theorem swap_descent_aux {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hS0 : 0 < S)
+    (hSB : S * 20 ≤ B) (f : Fin S → Fin (S + 3)) :
+    ∀ (k : ℕ) (I : Finset (Fin (Ndim B S))) (hI : I.card = S),
+      (I ∩ topBlock B S).card ≤ k →
+      ∃ (I' : Finset (Fin (Ndim B S))) (hI' : I'.card = S),
+        (I' ∩ topBlock B S) = ∅ ∧
+        ellAQN B S Q f (Ndim B S) I' hI'
+          ≤ ellAQN B S Q f (Ndim B S) I hI + (k : ℤ) * (30 * ((B / Q : ℕ) : ℤ) + 30) := by
+  classical
+  have hNle : Ndim B S ≤ 3 * B := by unfold Ndim; omega
+  have hSle : S ≤ B := by omega
+  intro k
+  induction k with
+  | zero =>
+    intro I hI hk
+    refine ⟨I, hI, ?_, by simp⟩
+    exact Finset.card_eq_zero.mp (Nat.le_zero.mp hk)
+  | succ k ih =>
+    intro I hI hk
+    rcases Finset.eq_empty_or_nonempty (I ∩ topBlock B S) with hempty | ⟨a, ha⟩
+    · refine ⟨I, hI, hempty, ?_⟩
+      have hk0 : (0 : ℤ) ≤ ((k + 1 : ℕ) : ℤ) * (30 * ((B / Q : ℕ) : ℤ) + 30) := by positivity
+      linarith
+    · obtain ⟨b, hbI, hblt⟩ := exists_free_common hS0 hSB I hI
+      have haI : a ∈ I := (Finset.mem_inter.mp ha).1
+      have hcard : (insert b (I.erase a)).card = S := by
+        rw [card_insert_erase_eq haI hbI, hI]
+      have hshrink := card_inter_topBlock_swap I ha hbI hblt
+      have hk' : ((insert b (I.erase a)) ∩ topBlock B S).card ≤ k := by omega
+      obtain ⟨I', hI', hI'empty, hI'le⟩ := ih (insert b (I.erase a)) hcard hk'
+      refine ⟨I', hI', hI'empty, ?_⟩
+      have hswap := abs_ellAQN_swap_le (B := B) (S := S) (Q := Q) (N := Ndim B S)
+        hQ hodd hNle hSle f I hI haI hbI hcard
+      rw [abs_le] at hswap
+      have hcast : ((k + 1 : ℕ) : ℤ) = (k : ℤ) + 1 := by push_cast; ring
+      rw [hcast]
+      linarith [hswap.2, hI'le]
+
+/-- A card-`S` set avoiding the top block is the `castLE`-image of a card-`S`
+set in `Fin (Ndim0 B S)`. -/
+theorem exists_preimage_of_disjoint_topBlock {B S : ℕ}
+    (I : Finset (Fin (Ndim B S))) (hdisj : I ∩ topBlock B S = ∅) :
+    ∃ J : Finset (Fin (Ndim0 B S)),
+      J.map ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩ = I ∧ J.card = I.card := by
+  classical
+  have hlt : ∀ i ∈ I, i.val < Ndim0 B S := by
+    intro i hi
+    by_contra h
+    have : i ∈ I ∩ topBlock B S :=
+      Finset.mem_inter.mpr ⟨hi, (mem_topBlock_iff i).mpr (by omega)⟩
+    rw [hdisj] at this
+    exact absurd this (Finset.notMem_empty i)
+  refine ⟨I.attach.image (fun i => ⟨i.val.val, hlt i.val i.property⟩), ?_, ?_⟩
+  · ext x
+    simp only [Finset.mem_map, Finset.mem_image, Finset.mem_attach, true_and,
+      Function.Embedding.coeFn_mk, Subtype.exists]
+    constructor
+    · rintro ⟨y, ⟨i, hi, rfl⟩, rfl⟩
+      simpa [Fin.ext_iff] using hi
+    · intro hx
+      exact ⟨⟨x.val, hlt x hx⟩, ⟨x, hx, rfl⟩, by simp⟩
+  · rw [Finset.card_image_of_injOn, Finset.card_attach]
+    intro p _ q _ hpq
+    simp only [Fin.ext_iff] at hpq
+    exact Subtype.ext (Fin.ext hpq)
+
 /-! ## Lemma 5.5, target statements -/
 
 /-- Paper (5.2): an absolute constant `C` bounding `|m^A - m^{(0)}|` by
@@ -815,5 +1262,103 @@ def lemma_5_5_ledger_little_o : Prop :=
         (|(((a0QB B (B / 20) pv.1 - m0AQ B (B / 20) pv.1 f) -
               (aQB B (B / 20) pv.1 - mAQ B (B / 20) pv.1 f) : ℤ) : ℝ)| : ℝ) *
           Real.log pv.1 ≤ ε * (B : ℝ) ^ 2
+
+/-! ## Stage F: assembly — (5.2) in full
+
+The hard direction chains `mAQ`'s minimizer through the `≤ 3`-step descent
+(Stage E) and the `castLE` transport, then pays the `FNQ` shift. Note the shift
+sum runs the *opposite* way from the easy direction, where `FNQ_shift_nonneg`
+made it automatically `≤ 0`; here it needs the genuine `O(1+B/Q)` counting
+bound `sum_FNQ_shift_le`, which was landed earlier for exactly this purpose. -/
+
+/-- The hard direction of (5.2): `m^{(0)}_{Q,B} ≤ m^A_{Q,B} + C*(1+B/Q)`. -/
+theorem m0AQ_le_mAQ_add {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hS0 : 0 < S)
+    (hSB : S * 20 ≤ B) (f : Fin S → Fin (S + 3)) :
+    m0AQ B S Q f ≤ mAQ B S Q f + 105 * (((B / Q : ℕ) : ℤ) + 1) := by
+  classical
+  -- `mAQ`'s minimizer exists
+  have hSN : S ≤ Ndim B S := by unfold Ndim; omega
+  have hne : ((univ : Finset (Fin (Ndim B S))).powersetCard S).Nonempty := by
+    refine ⟨consecutiveInitial S hSN, ?_⟩
+    rw [mem_powersetCard]
+    exact ⟨subset_univ _, consecutiveInitial_card hSN⟩
+  obtain ⟨I, hI, hIeq⟩ := mAQ_eq_ellAQ_min (Q := Q) f hne
+  -- descend into the common range
+  have hk : (I ∩ topBlock B S).card ≤ 3 := by
+    calc (I ∩ topBlock B S).card ≤ (topBlock B S).card :=
+          Finset.card_le_card Finset.inter_subset_right
+      _ = 3 := card_topBlock
+  obtain ⟨I', hI', hI'empty, hI'le⟩ :=
+    swap_descent_aux (Q := Q) hQ hodd hS0 hSB f 3 I hI hk
+  -- transport `I'` back to `Fin (Ndim0 B S)`
+  obtain ⟨J, hJmap, hJcard⟩ := exists_preimage_of_disjoint_topBlock I' hI'empty
+  have hJS : J.card = S := by rw [hJcard, hI']
+  -- the `FNQ` bridge: the shift is ≤ 0 in this direction
+  have hbridge := ellAQN_castLE_sub_eq_general (Q := Q) f J hJS
+  -- The shift sum runs the *other* way here, so `FNQ_shift_nonneg` is not
+  -- enough: we need the genuine `O(1+B/Q)` counting bound.
+  have hshift := sum_FNQ_shift_le (Q := Q) hQ hSB J hJS
+  have hnonpos : -(∑ i ∈ J, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)))
+      ≤ 15 * (((B / Q : ℕ) : ℤ) + 1) := by
+    have hneg : -(∑ i ∈ J, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)))
+        = ∑ i ∈ J, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) := by
+      rw [← Finset.sum_neg_distrib]
+      exact Finset.sum_congr rfl fun i _ => by ring
+    rw [hneg]
+    exact hshift
+  -- `m0AQ ≤ ellAQN at J`
+  have hm0 := m0AQ_le_ellAQN (Q := Q) f J hJS
+  -- chain: ellAQN(Ndim0, J) ≤ ellAQN(Ndim, J.map e) = ellAQN(Ndim, I')
+  have hmapeq : ellAQN B S Q f (Ndim B S)
+      (J.map ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩)
+      (by rw [Finset.card_map]; exact hJS) = ellAQN B S Q f (Ndim B S) I' hI' := by
+    congr 1
+  rw [hmapeq] at hbridge
+  rw [hIeq, ellAQ_eq_ellAQN]
+  have h3 : ((3 : ℕ) : ℤ) = 3 := by norm_num
+  rw [h3] at hI'le
+  have hexp : (3 : ℤ) * (30 * ((B / Q : ℕ) : ℤ) + 30) = 90 * (((B / Q : ℕ) : ℤ) + 1) := by ring
+  rw [hexp] at hI'le
+  set X := ellAQN B S Q f (Ndim0 B S) J hJS with hX
+  set Y := ellAQN B S Q f (Ndim B S) I' hI' with hY
+  set Z := ellAQN B S Q f (Ndim B S) I hI with hZ
+  linarith [hbridge, hnonpos, hm0, hI'le]
+
+/-- (5.2) with an explicit `ℕ`-division constant, both directions. -/
+theorem abs_mAQ_sub_m0AQ_le {B S Q : ℕ} (hQ : 0 < Q) (hodd : Odd Q) (hS0 : 0 < S)
+    (hSB : S * 20 ≤ B) (f : Fin S → Fin (S + 3)) :
+    |(mAQ B S Q f : ℤ) - m0AQ B S Q f| ≤ 105 * (((B / Q : ℕ) : ℤ) + 1) := by
+  have hS0' : S ≤ Ndim0 B S := S_le_Ndim0 B S
+  have heasy := mAQ_le_m0AQ_add_sharp (Q := Q) hQ hSB f hS0'
+  have hhard := m0AQ_le_mAQ_add (Q := Q) hQ hodd hS0 hSB f
+  have hpos : (0 : ℤ) ≤ ((B / Q : ℕ) : ℤ) := by positivity
+  rw [abs_le]
+  constructor <;> linarith
+
+/-- **Paper (5.2)**: `lemma_5_5_row_stability` holds, with `C = 210`. -/
+theorem lemma_5_5_row_stability_holds : lemma_5_5_row_stability := by
+  refine ⟨210, by norm_num, ?_⟩
+  intro B S Q hQpp hS0 hSB f
+  have hQ : 0 < Q := hQpp.pos
+  have hodd : Odd Q := hQpp.odd
+  have hint := abs_mAQ_sub_m0AQ_le (Q := Q) hQ hodd hS0 hSB f
+  -- move to `ℚ`
+  have hcast : |(mAQ B S Q f : ℚ) - (m0AQ B S Q f : ℚ)|
+      = (((|(mAQ B S Q f : ℤ) - m0AQ B S Q f| : ℤ)) : ℚ) := by
+    push_cast [abs_sub_comm]
+    rw [abs_sub_comm]
+  rw [hcast]
+  have h1 : (((|(mAQ B S Q f : ℤ) - m0AQ B S Q f| : ℤ)) : ℚ)
+      ≤ ((105 * (((B / Q : ℕ) : ℤ) + 1) : ℤ) : ℚ) := by exact_mod_cast hint
+  refine h1.trans ?_
+  -- `((B/Q : ℕ) : ℚ) ≤ (B:ℚ)/(Q:ℚ)`
+  have hdiv : (((B / Q : ℕ) : ℚ)) ≤ (B : ℚ) / (Q : ℚ) := Nat.cast_div_le
+  have hQpos : (0 : ℚ) < (Q : ℚ) := by exact_mod_cast hQ
+  have hrw : ((105 * (((B / Q : ℕ) : ℤ) + 1) : ℤ) : ℚ)
+      = 105 * ((((B / Q : ℕ)) : ℚ) + 1) := by
+    rw [Int.cast_mul, Int.cast_add, Int.cast_one, Int.cast_natCast]
+    norm_num
+  rw [hrw]
+  linarith [hdiv]
 
 end CatalanSun.Lemma55

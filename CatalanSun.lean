@@ -149,3 +149,11 @@ import CatalanSun.Lemma55
 #print axioms CatalanSun.Lemma55.abs_a0QB_sub_aQB_le
 #print axioms CatalanSun.Lemma55.m0AQ_le_ell0AQ
 #print axioms CatalanSun.Lemma55.mAQ_le_m0AQ_add
+#print axioms CatalanSun.Lemma55.mAQ_le_m0AQ_add_sharp
+#print axioms CatalanSun.Lemma55.nQr_le
+#print axioms CatalanSun.Lemma55.abs_collTerm_swap_le
+#print axioms CatalanSun.Lemma55.abs_ellAQN_swap_le
+#print axioms CatalanSun.Lemma55.swap_descent_aux
+#print axioms CatalanSun.Lemma55.m0AQ_le_mAQ_add
+#print axioms CatalanSun.Lemma55.abs_mAQ_sub_m0AQ_le
+#print axioms CatalanSun.Lemma55.lemma_5_5_row_stability_holds

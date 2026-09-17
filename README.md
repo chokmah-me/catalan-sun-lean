@@ -43,7 +43,9 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`, now **unconditional**: dispatches over `Q ≤ 2·B`, `Q ≥ 2·Ndim B S + 2·B`, and (splitting the middle gap in two) `sum_NKQ_tail_ge_of_gap` / `sum_NKQ_tail_ge_of_gap2` | `Thm51.lean` | **proved** |
 | **Thm 5.1** | `thm_5_1 : thm_5_1_statement`, assembled from PROOF-A–E via `linarith` | `Thm51.lean` | **proved** |
-| **Lemma 5.5, (5.2) partial** | `m0AQ` corrected to a **minimum** over card-`S` subsets at `Ndim0 B S` (not the fixed consecutive set — see divergence note below); `mAQ_le_m0AQ_add_sharp` (easy direction with a genuine `O(1+B/Q)` constant, `9*(1+B/Q)`, superseding `mAQ_le_m0AQ_add`'s too-weak `O(S)` constant); `m0AQ_le_ell0AQ` | `Lemma55.lean` | **proved** (easy direction only; hard direction and (5.3) open) |
+| **Lemma 5.5, (5.2) easy** | `m0AQ` corrected to a **minimum** over card-`S` subsets at `Ndim0 B S` (not the fixed consecutive set — see divergence note below); `mAQ_le_m0AQ_add_sharp` (easy direction with a genuine `O(1+B/Q)` constant, `9*(1+B/Q)`, superseding `mAQ_le_m0AQ_add`'s too-weak `O(S)` constant); `m0AQ_le_ell0AQ` | `Lemma55.lean` | **proved** |
+| **Lemma 5.5, (5.2) hard** | `m0AQ_le_mAQ_add`: `m0AQ ≤ mAQ + 105(1+B/Q)`, via termwise swap costs (`nQr_le`, `FNQ_le`, `abs_gTerm_le`), the single-swap collision bound `abs_collTerm_swap_le` (direct `Finset` splitting — **not** `collisionSum_move`, whose hypothesis only covers balance-improving moves), and the `≤3`-step descent `swap_descent_aux` out of `topBlock` | `Lemma55.lean` | **proved** |
+| **Lemma 5.5 (5.2)** | `lemma_5_5_row_stability_holds` — both directions, absolute `C = 210` | `Lemma55.lean` | **proved** |
 | **`a0QB`/`aQB` bound** | `abs_a0QB_sub_aQB_le`: `\|a0QB − aQB\| ≤ 6(1+B/Q)`, exact and unconditional (no minimization), via `NKQ_le` (arithmetic-progression count bound) | `Lemma55.lean` | **proved** |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
@@ -84,18 +86,16 @@ Lean work in this file.
 
 ### Deferred (later sessions)
 
-Theorem 5.1 is now fully proved. Remaining work: Lemma 5.5's hard direction
-of (5.2) (`m0AQ ≤ mAQ + C(1+B/Q)`, needing the paper's row-swap/replacement
-argument — not yet attempted against the corrected minimized `m0AQ`, though
-scoping suggests it needs only ~13 new lemmas, fewer than first estimated,
-since the additive per-index term is termwise `O(1+B/Q)` via the already-
-proved `NKQ_le` and only the collision-sum swap cost needs genuine new
-combinatorics) and (5.3) itself (`lemma_5_5_ledger_little_o`, to be derived
-via Chebyshev over `layerIndex`, not yet attempted — though its numerics now
-look favorable, see above); Corollary 5.2 uses a "Lemma 5.3" that is cited
-but never displayed in the arXiv v1 PDF — almost certainly the trivial
-`[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes); Props 6.3/7.4;
-Mertens/PNT; Theorem 1.1.
+Theorem 5.1 and **Lemma 5.5's (5.2) are now fully proved** (both directions,
+absolute constant, unconditional). Remaining work: **(5.3)** itself
+(`lemma_5_5_ledger_little_o`) — now the only open piece of Lemma 5.5, to be
+derived by summing the proved (5.2) bound over `layerIndex` via Chebyshev
+(`∑ log p ≈ 5B`) rather than reproducing the paper's undercounted
+`O(√B log B)` layer count; its numerics look favorable (`SUM/B²` decays
+0.32 → 0.06 for `B` from 100 to 800). Corollary 5.2 uses a "Lemma 5.3" that is
+cited but never displayed in the arXiv v1 PDF — almost certainly the trivial
+`[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes. Then Props
+6.3/7.4; Mertens/PNT; Theorem 1.1.
 
 ## Build
 
