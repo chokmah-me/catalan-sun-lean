@@ -1,15 +1,105 @@
 {
-  "ok": true,
-  "project": "C:\\Users\\Elke Shayna\\Documents\\00Dev\\catalan-sun-lean",
-  "lake": "C:\\Users\\Elke Shayna\\.elan\\bin\\lake.EXE",
-  "target": "CatalanSun.Thm51",
-  "build_exit": 0,
-  "build_ms": 5668,
-  "sorry_hits": [],
-  "native_decide_hits": [],
-  "axiom_entries": [],
-  "axiom_violations": [],
-  "errors": [],
-  "timestamp_utc": "2026-09-16T02:22:45.177078+00:00",
-  "status": "pass"
+  "project": "C:\\Users\\danie\\Projects\\catalan-sun-lean",
+  "target": "CatalanSun",
+  "timestamp": "2026-09-17T22:19:46+00:00",
+  "verdict": "CAPABILITY_LIMITED",
+  "findings": [
+    {
+      "check": "project_shape",
+      "status": "PASS",
+      "detail": "lakefile.toml, toolchain leanprover/lean4:v4.32.2",
+      "hits": []
+    },
+    {
+      "check": "no_sorry_admit",
+      "status": "PASS",
+      "detail": "no sorry/admit/sorryAx in sources",
+      "hits": []
+    },
+    {
+      "check": "native_decide",
+      "status": "PASS",
+      "detail": "no native_decide",
+      "hits": []
+    },
+    {
+      "check": "local_axiom_declarations",
+      "status": "PASS",
+      "detail": "no locally declared axioms",
+      "hits": []
+    },
+    {
+      "check": "lake_build",
+      "status": "PASS",
+      "detail": "`lake build CatalanSun` exited 0",
+      "hits": []
+    },
+    {
+      "check": "build_sorry_warnings",
+      "status": "PASS",
+      "detail": "no sorry warnings in build output",
+      "hits": []
+    },
+    {
+      "check": "axiom_audit",
+      "status": "UNKNOWN",
+      "detail": "audited 506/544; 38 name(s) did not resolve (namespace/section parsing or elaboration failure) \u2014 treat those as unchecked, not as clean",
+      "hits": [
+        {
+          "violations": {},
+          "unresolved": [
+            "CatalanSun.FunctionalEq.clearedEq_eval_root'",
+            "CatalanSun.FunctionalEq.no_rational_solution_complex'",
+            "CatalanSun.FunctionalEq.two_mul_three_div_two",
+            "CatalanSun.Lemma55.choose_two_succ'",
+            "CatalanSun.Lemma55.lt_div_add_one_mul",
+            "CatalanSun.NewtonCompletion.fwdDiff_iter_choose_cast",
+            "CatalanSun.NewtonDiff.fwdDiff_iter_sum_cast",
+            "CatalanSun.NewtonDiff.neg_one_pow_n_mul_sub",
+            "CatalanSun.Structure.Icc_union_split",
+            "CatalanSun.Structure.disjoint_Icc_split",
+            "CatalanSun.Structure.image_succ_range_eq_Icc",
+            "CatalanSun.Structure.natDegree_eq_of_degree_eq_nat",
+            "CatalanSun.Structure.natDegree_prod_g0Lin",
+            "CatalanSun.Structure.natDegree_prod_g0Lin_sq",
+            "CatalanSun.Structure.prod_Icc_one_eq_prod_range",
+            "CatalanSun.Structure.sum_natDegree_oddLin",
+            "CatalanSun.Tail.neg_neg_one_pow_sub",
+            "CatalanSun.Tail.neg_neg_one_pow_succ",
+            "CatalanSun.Thm51.block_div",
+            "CatalanSun.Thm51.card_range_filter_mod_lt",
+            "CatalanSun.Thm51.card_range_mul_filter_mod",
+            "CatalanSun.Thm51.choose_two_succ",
+            "CatalanSun.Thm51.collisionMove_sum",
+            "CatalanSun.Thm51.collisionMove_sum_sq_lt",
+            "CatalanSun.Thm51.collisionMove_val_a",
+            "CatalanSun.Thm51.collisionMove_val_b",
+            "CatalanSun.Thm51.collisionMove_val_other",
+            "CatalanSun.Thm51.collisionSum_pair",
+            "CatalanSun.Thm51.consecutiveInitial_succ",
+            "CatalanSun.Thm51.le_add_one_of_int_sub_le",
+            "CatalanSun.Thm51.nat_choose_move",
+            "CatalanSun.Thm51.nat_mul_move_lt",
+            "CatalanSun.Thm51.not_mem_consecutiveInitial_boundary",
+            "CatalanSun.Thm51.phiQ_succ",
+            "CatalanSun.Thm51.sum_const_nat_range",
+            "CatalanSun.Thm51.triangular_succ",
+            "CatalanSun.Thm51.two_mul_choose_two",
+            "CatalanSun.TwoAdic.isTwoIntegral_mul'"
+          ],
+          "audited": 506,
+          "expected": 544
+        }
+      ]
+    }
+  ],
+  "files_scanned": 20,
+  "declarations_found": 544,
+  "allowlist": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "toolchain": "leanprover/lean4:v4.32.2",
+  "build_exit_code": 0
 }

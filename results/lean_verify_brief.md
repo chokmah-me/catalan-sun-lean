@@ -12,10 +12,18 @@ All 150 `#print axioms` lines in `CatalanSun.lean` report axioms within
 (two of the new `Cor52` lemmas need strictly less). No `axiom` declarations
 anywhere under `CatalanSun/`.
 
-Note: `lean-proof-forge/scripts/verify_lean_project.py` is not present on this
-machine; the checks above were run directly (build exit status, a
-`sorry`/`admit`/`native_decide` scan, an `^axiom ` scan, and an audit of every
-`#print axioms` report).
+`lean-proof-forge` run (2026-09-17, synced skill at
+`~/.claude/skills/synced/221a11f0-…/lean-proof-forge/scripts/verify_lean_project.py`,
+`--target CatalanSun`): verdict **CAPABILITY_LIMITED**. `project_shape`,
+`no_sorry_admit`, `native_decide`, `local_axiom_declarations`, `lake_build`
+and `build_sorry_warnings` all PASS; `axiom_audit` is UNKNOWN because 38 of
+544 declarations (34 `private`, 4 with a trailing prime) cannot be addressed
+by the script's name resolver. Those are helpers used only by public
+theorems, whose `#print axioms` output is transitive, so they are covered by
+the 150 curated lines in `CatalanSun.lean`. The run must be made with the
+gitignored `_tmp/` (vendored lean4export) moved aside, or the scanner flags a
+`sorryAx` string inside its test file. `results/lean_verify_meta.json` holds
+the report.
 
 ## Headline results verified
 

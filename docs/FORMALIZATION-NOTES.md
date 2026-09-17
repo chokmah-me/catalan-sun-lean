@@ -35,6 +35,9 @@ Companion documents:
   was not needed.
 - [Cor 5.2: `layerIndex`'s `5B` cutoff is too small](#cor-52-cutoff) — the
   third transcription-class finding; a `Θ(B²)` truncation.
+- [The tail band above `(2+ρ)B`](#tail-band) — §8 integrates only to
+  `2+ρ`; the exact `m`-layers carry `(39/200)·B²` beyond it; decisive next
+  computation named.
 
 ---
 
@@ -170,6 +173,8 @@ The band is 7.0% of the large-prime range, not a fourth uncovered range.
 Decisively, `Δ_{>B} = (2/3)ρ + (1/2)ρ²` (eq. 8.4) is a **closed form in `ρ`
 alone with no cutoff parameter** — an integral over the whole `p > B` tail,
 which by construction runs past `5B`. So the paper's §8 does cover it.
+**[Withdrawn the same day: this was inferred, not read. §8 integrates
+`∫_1^{2+ρ}` with an explicit cutoff; see `#tail-band` below.]**
 
 **What this means.** The `5B` cutoff is a real inconsistency *within the paper*
 — (5.3)'s summation range truncates at `5B` while §8's `Δ_{>B}` integrates the
@@ -195,6 +200,70 @@ ledgers agree to `o(B²)`. Sign trap confirmed exactly as predicted — (5.3)'s
 summand is `|(a0−m0) − (a−m)|`, the termwise Lipschitz bound comes out as
 `|(a−m) − (a0−m0)|`, and one `abs_sub_comm` at the `ℤ` level (before the cast,
 so `rw` cannot grab the wrong `|·−·|`) bridges them.
+
+<a id="tail-band"></a>
+**Note (the tail band above `(2+ρ)B` — found 2026-09-17, reading §8 directly
+and running the exact ledger against it). This reopens the paragraph above.**
+The "§8 covers it" conclusion was inferred from `Δ_{>B}` being a closed form
+in `ρ`. Reading §8 itself: the large-prime density `ℰ_ρ(t)` (8.1) is stated
+"for `1 < t < 2+ρ`", its last branch is `−2ρ` on `2+2ρ/3 < t < 2+ρ`, and
+(8.2) integrates `∫_1^{2+ρ} ℰ_ρ(t) dt = −(4/3)ρ − (5/4)ρ²`. **The large-prime
+range is integrated with an explicit upper cutoff `t = 2+ρ`, i.e. `p <
+2.05B`.** Not the full tail, and not `5B` either. So §5.1's `5B`, §8's
+`(2+ρ)B`, and (5.24)'s "all odd `p`" are three different ranges.
+
+What the exact layers do there (`scripts/gates/gate_ledger_vs_paper.py`,
+data in `scripts/gates/data/`, `B = 200…1200`, `S = B/20`):
+
+| `B` | `∫_ρ^1 m/B` vs `Λ_mid = 0.17636` | `∫_1^{2+ρ} m/B` vs (8.2) `= −0.06979` | `∫_{2+ρ}^{thr} m/B` |
+|---|---|---|---|
+| 200 | 0.16420 | −0.06640 | −0.19875 |
+| 400 | 0.16478 | −0.06765 | −0.20182 |
+| 800 | 0.17245 | −0.06936 | −0.19889 |
+| 1200 | 0.17427 | −0.06986 | −0.20000 |
+
+(Trapezoid in `t = p/B` over primes, which removes prime-discreteness noise;
+the plain `∑ log p`-weighted sums agree to within a few percent.) Two
+conclusions and one open question:
+
+1. **Where the paper integrates, the repo's `mAQ` reproduces the paper's
+   densities.** `∫_1^{2+ρ} m/B` matches (8.2) to 0.1% at `B = 1200`, and the
+   (8.1) branch values (`−2ρ` on `(1+ρ, 4/3)`, `−ρ` on `(4/3+…, 2)`, `−2ρ`
+   near `2+ρ`) are visible prime by prime. `∫_ρ^1 m/B` is 1.2% under `Λ_mid`
+   and rising with `B`. So `ℰ_ρ` **is** the min-layer density `m^A_{p,B}/B`,
+   and the (5.7)/(5.8) transcription is faithful at the level §§7–8 use.
+2. **Above `(2+ρ)B` the exact layers are not zero.** For every prime in
+   `((2+ρ)B, 4B)`, `m^A_{p,B} = −2S` exactly and `a_{p,B} = 2B` exactly (at
+   `B = 1200`: 282 primes, all `(2400, −120)`). The mechanism is the term
+   `−2·1_{Q ≤ 2i+1}` of (5.7): for `p < 2N ≈ 4.1B` it fires on the top rows,
+   and the minimiser takes `S` of them. So `−∑_{p > (2+ρ)B} m_p log p =
+   2ρ(2−ρ)·B² + o(B²) = (39/200)·B²` — **numerically identical to the raw
+   quadratic (9.4), `4ρ − 2ρ² = 2ρ(2−ρ)`**. The earlier `[5B, 6.1B]` band
+   (`≈ 0.627·B²` of raw `(a−m) log p` mass) is a sub-band of this; its `a`
+   part cancels exactly against `log ∏Π_i − log F_B` by (3.5)/(3.7), and its
+   `m` part is `0` there (the indicator stops firing at `4B`), so the earlier
+   "65× δ₀" figure was the wrong quantity to worry about. The right one is
+   the `m`-mass on `((2+ρ)B, 4B)`, which is `0.195·B²`, about **20× δ₀**.
+3. **Open: is that `0.195·B²` inside the raw quadratic or missing?** The
+   identity `2ρ(2−ρ) = 39/200` is exact and suggests the paper's "raw
+   Cauchy–tail contribution" *is* this tail mass under different bookkeeping.
+   But the paper's own text assigns `39/200` to Stirling on (4.5) and then
+   subtracts a separate baseline `−2ρ − (7/4)ρ²` (8.3) on `(1, 2+ρ)` to get
+   `Δ_{>B}`, which is not obviously consistent with `39/200` also being the
+   `(2+ρ, 4)` tail. **This cannot be settled from §§5–9 alone.** It needs the
+   fixed scalar: by (3.5) and (3.7), everything except `m` and `det R[A,J]`
+   cancels exactly, so the paper's whole `B²` claim reduces to
+   `log|Ξ_I| − ∑_p m_p log p ≤ −δ₀ B² + o(B²)` with `Ξ_I` the (4.5) closed
+   form. `PascalCauchy.Xi_closed_form` states (4.5) in Lean, ℝ-valued. **The
+   decisive next computation is to mirror it in Python (log-gamma plus
+   `mpmath` for the weighted tails) and evaluate `log|Ξ_I| − ∑ m log p` at
+   `B = 200…1200` against `−δ₀B²`.** That is a direct numerical verdict on
+   §9 and needs no new Lean.
+
+Corrections this forces elsewhere: the "settled" §4 of the handoff brief
+and the "not a fourth paper error" verdict above are withdrawn as stated;
+what survives is that the `[5B, 6.1B]` band's *raw* mass is dominated by
+the `a` part, which does cancel.
 
 Third finding of the same class as the `m0AQ` and `p`-vs-`p^ν` bugs, and again
 caught by gating numerically before writing Lean. Scripts and the full tables:

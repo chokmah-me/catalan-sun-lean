@@ -36,7 +36,22 @@ Both tasks the handoff brief set out are done, in `Cor52.lean`, with
 - Everything built first try; the only fixes were three style-linter
   warnings. Ten new `#print axioms` lines in `CatalanSun.lean` (140 → 150).
 
-**Next (unchanged from the brief, §5):** the §4→§5 odd-`p` valuation lemma
+**Later the same day — the tail band, and a withdrawn conclusion.** Read
+§8 directly: `ℰ_ρ` is stated for `1 < t < 2+ρ` and (8.2) integrates
+`∫_1^{2+ρ}`; the earlier "§8 covers the `[5B, 6.1B]` band" verdict was
+inferred from the closed form and is withdrawn. Ran the exact ledger at
+`S = B/20`, `B = 200…1200` (`scripts/gates/gate_ledger_vs_paper.py`, data
+committed): where the paper integrates, `mAQ/B` reproduces `Λ_mid` (1.2%)
+and (8.2) (0.1%); above `(2+ρ)B` every prime up to `4B` has `m = −2S`
+exactly, a mass of `2ρ(2−ρ)B² = (39/200)B²`, identical to the raw quadratic
+(9.4) and 20× `δ₀`. Whether that is bookkeeping or an omission reduces, via
+(3.5)/(3.7), to `log|Ξ_I| − ∑ m log p ≤ −δ₀B²` with `Ξ_I` = (4.5) =
+`PascalCauchy.Xi_closed_form`. Full note: `FORMALIZATION-NOTES.md#tail-band`.
+**The (4.5) mirror is now the top priority**, ahead of the valuation lemma.
+Also: `lean-proof-forge` is installed after all; its verifier passes every
+check and reports the axiom audit UNKNOWN only for private/primed helpers.
+
+**Next after that (unchanged from the brief, §5):** the §4→§5 odd-`p` valuation lemma
 `v_p(Ξ_I) ≥ ℓ^A_Q(I) − …` is the real missing piece before anything about
 `H_B^min` can be stated. Scope it before committing; if staged, state it as an
 explicit `LayerValuationInput` hypothesis and prove Cor 5.2's deductive step

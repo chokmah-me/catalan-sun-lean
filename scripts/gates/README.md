@@ -41,6 +41,7 @@ Re-run it after any change to `Thm51.lean`'s `NKQ` / `phiQ` / `nQr` / `CAQ` /
 | `gate_threshold.py` | Confirms the threshold is exact: every odd prime power in `[5B, thr]` is nonzero, everything above is zero. |
 | `gate_mass.py` | How much ledger mass the `Q < 5B` truncation drops (S=1, so it reaches larger B). |
 | `gate_ratio2.py` | The same at the paper's regime `S = B/20`, via `fast2`. This produced the `drop/B² ≈ 0.627` figure. |
+| `gate_ledger_vs_paper.py` | `compute` writes one row per nonzero layer at `S = B/20` (`data/ledger_S_B20_B200-1200.csv`, ~1 min at B=1200); `analyze` compares the exact `m/B` profile with the paper's `Λ_mid` (7.14), (8.2), and the tail above `(2+ρ)B` that §8 does not integrate. See `FORMALIZATION-NOTES.md#tail-band`. |
 | `gate_full53.py` | Sanity gate for the widened (5.3) bound used in `Cor52.ledgerFull_little_o`: checks `layerBound B (B/20) ≤ 12B` and that `111·B·log(12B)·(13+log 12B)/B²` decays to 0. A gate on the *bound*, not on the layer defs. |
 
 ## What these established

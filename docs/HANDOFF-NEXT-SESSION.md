@@ -31,9 +31,13 @@ this. Details and the four instances: `docs/FORMALIZATION-NOTES.md`.
   comment in `Thm21.lean:7` — the phrase "are sorry-free", not a hole.)
 - **150** `#print axioms` lines, all within `[propext, Classical.choice,
   Quot.sound]`.
-- `lean-proof-forge` is **not installed on this machine**. Its checks were run
-  manually; `results/lean_verify_brief.md` says so. Do not claim a forge pass
-  without the forge.
+- `lean-proof-forge` **is installed** (synced skill; path in
+  `results/lean_verify_brief.md`). Its verifier reports CAPABILITY_LIMITED:
+  every check passes, and the axiom audit is UNKNOWN only for 38 `private` or
+  primed helper names its resolver cannot address; those are covered
+  transitively by the 150 curated `#print axioms` lines in `CatalanSun.lean`.
+  Run it with `_tmp/` (gitignored vendored tooling) moved aside, or it flags a
+  `sorryAx` string inside lean4export's tests.
 - Toolchain: Lean 4.32.2 / Mathlib v4.32.2.
 
 Proved through §5: Thm 2.1, Cor 2.1, Prop 3.1, Cauchy–Binet, PC0–PC3, det-level
@@ -65,38 +69,36 @@ Why it was mechanical: `layer_int_bound` (the (5.2) input) has no upper cutoff
 on `Q`. Nothing here needed new mathematics. Everything built on the first
 try.
 
-## 4. The `5B` question — settled, do not redo it
+## 4. The `5B` question — reopened, and now the most important thing here
 
-I spent real effort on this; the answer is recorded so you do not repeat it.
+An earlier version of this section said the `[5B, 6.1B]` band was "covered by
+§8" because `Δ_{>B}` is a closed form in `ρ`. **That was inferred, not read,
+and it is wrong.** §8 states `ℰ_ρ(t)` for `1 < t < 2+ρ` and integrates
+`∫_1^{2+ρ}` (eq. 8.2): an explicit cutoff at `p = (2+ρ)B = 2.05B`.
 
-**The `5B` is the paper's own number**, not a scaffold invention. Three
-confirmations: `da77779`'s docstring transcribes it "(per the proof)"; an
-earlier session fetched the arXiv v1 §5.1 HTML and found "the separate
-`p^ν < 5B` restriction used later in (5.3)'s summation range"; and
-`docs/robustness-check-catalan.md` independently attributes it to the paper.
+The exact ledger (`scripts/gates/gate_ledger_vs_paper.py analyze
+scripts/gates/data/ledger_S_B20_B200-1200.csv`) then shows three things,
+recorded in full at `docs/FORMALIZATION-NOTES.md#tail-band`:
 
-**But the band `[5B, 6.1B]` is already covered by §8, so `δ₀` is safe.**
-Partitioning the ledger by the paper's own three ranges puts the band wholly
-inside *Large primes (`p > B`)*, which is unbounded above. Measured mass split:
+- Where the paper integrates, `mAQ/B` **is** the paper's density: `Λ_mid`
+  matched to 1.2% and rising, (8.2) matched to 0.1%, (8.1)'s branches
+  visible per prime. The §5 transcription is faithful.
+- Above `(2+ρ)B`, `m^A_{p,B} = −2S` exactly for every prime up to `4B`
+  (the `−2·1_{Q ≤ 2i+1}` term of (5.7)). That `m`-mass is `2ρ(2−ρ)B² =
+  (39/200)B²`, **numerically identical to the raw quadratic (9.4)** and 20×
+  `δ₀`. The `a` part of the tail cancels exactly via (3.5)/(3.7), so the old
+  "65× δ₀" figure was the wrong quantity.
+- Whether that `0.195·B²` is already inside `39/200` or is missing cannot be
+  decided from §§5–9. By (3.5)/(3.7) the whole `B²` claim reduces to
+  `log|Ξ_I| − ∑_p m_p log p ≤ −δ₀B² + o(B²)`, with `Ξ_I` the (4.5) closed
+  form that `PascalCauchy.Xi_closed_form` already states.
 
-| B | small `Q≤S` | mid `S<p<B` | large `p>B, Q<5B` | large `p>B, Q≥5B` |
-|---|---|---|---|---|
-| 200 | 12.2% | 40.3% | 43.9% | 3.6% |
-| 400 | 19.0% | 35.8% | 42.1% | 3.2% |
-| 800 | 23.1% | 34.5% | 39.4% | 3.0% |
-
-Decisive: `Δ_{>B} = (2/3)ρ + (1/2)ρ²` (eq. 8.4) is a **closed form in `ρ` alone
-with no cutoff parameter** — the integral over the whole `p>B` tail.
-
-So: a **bookkeeping inconsistency between §5.1 and §8 inside the paper**, not a
-missing contribution. Note the band is `≈65×δ₀` in raw magnitude, so it would
-have been fatal had it genuinely been dropped. It is not dropped.
-
-**Residual uncertainty, stated honestly:** this partition used the plain-language
-range description in `docs/catalan-constant-irrational.md`, **not** §§6–9 of the
-paper directly. The `Δ_{>B}` closed form is strong evidence the tail is
-unbounded, but if you want it airtight, read §8's derivation for an explicit
-upper cutoff. That is the one loose end here.
+**Start here: mirror `Xi_closed_form` in Python** (log-gamma for the
+factorials and Vandermondes, `mpmath` for the weighted tails `T_i`, which
+depend on `G`), evaluate `log|Ξ_I| − ∑_p m_p log p` at `B = 200…1200` using
+the committed `m` data, and compare with `−δ₀B²`. The `B² log B` terms must
+cancel; the `B²` coefficient is the verdict. No Lean needed. Gate it against
+the paper's own worked numbers if any are given in §9.
 
 ## 5. The bigger missing piece — start here (scope before starting)
 
@@ -119,6 +121,9 @@ the pattern `thm_5_1_statement` followed for several sessions.
 ## 6. Tooling notes that will save you time
 
 - **The numeric gates are committed at `scripts/gates/`** — see its README.
+  `gate_ledger_vs_paper.py` plus `data/ledger_S_B20_B200-1200.csv` hold the
+  exact per-layer `(a, m)` values at `S = B/20` up to `B = 1200`; recomputing
+  them costs about a minute at `B = 1200` and scales badly past that.
   **Run `python scripts/gates/check.py` first** (exit 0 = the Python mirror
   still agrees with the Lean definitions), and re-run it after any change to a
   layer definition in `Thm51.lean` or `Lemma55.lean`.
@@ -143,6 +148,8 @@ the pattern `thm_5_1_statement` followed for several sessions.
 
 ## 7. Suggested order
 
+0. **The (4.5) mirror and the `−δ₀B²` check (§4).** Decides whether the
+   paper's ledger closes before anything else is worth formalizing.
 1. Scope the §4→§5 odd-`p` valuation lemma (§5) before committing to it. If
    staged, land `LayerValuationInput` as an explicit hypothesis and Cor 5.2's
    deductive step against it; keep `logHmin` out of the namespace until the

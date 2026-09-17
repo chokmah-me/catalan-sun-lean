@@ -69,8 +69,11 @@ exact-model and `(0)`-model ledgers are proved to agree to `o(B²)`
 integerizers — that bridge needs the §4→§5 odd-`p` valuation lemma, which does
 not exist here. While scoping it, a third transcription-class finding surfaced:
 `layerIndex`'s `5B` cutoff is too small for (5.24) and truncates a `Θ(B²)`
-band; (5.3) was therefore re-proved over the corrected index set. Details in
-`FORMALIZATION-NOTES.md`.
+band; (5.3) was therefore re-proved over the corrected index set. Reading §8
+directly then showed the paper's large-prime integral stops at `(2+ρ)B`,
+while the exact `m`-layers carry `(39/200)·B²` beyond it — numerically the
+paper's own raw quadratic. Whether that is bookkeeping or an omission is the
+repo's current top question; see `FORMALIZATION-NOTES.md#tail-band`.
 
 **Picking this up fresh? Start with
 [`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)** — current
