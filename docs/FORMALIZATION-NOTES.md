@@ -146,6 +146,40 @@ is to sum over all odd prime powers and prove the vanishing above
 This does **not** invalidate `lemma_5_5_ledger_little_o_holds`, which is a true
 statement about the sum over `layerIndex B` as defined — but it does mean that
 theorem cannot be consumed directly for a ledger indexed over the larger set.
+**Provenance, and why this is NOT a fourth paper error (resolved
+2026-09-17).** The `5B` is the *paper's* number, not a scaffold invention:
+`da77779`'s docstring transcribes it as "restricted (per the proof) to
+`p^ν < 5·B`"; an earlier session fetched the arXiv v1 §5.1 HTML directly and
+recorded "the separate `p^ν < 5B` restriction used later in (5.3)'s summation
+range"; and `robustness-check-catalan.md` independently attributes to the
+paper "prime powers below `5B`".
+
+But partitioning the ledger by the paper's own three ranges shows the band is
+**already accounted for**. §§6–9 evaluate *Small* (`Q ≤ S`), *Middle*
+(`S < p < B`) and *Large* (`p > B`) — and `[5B, 6B+2S+5]` lies wholly inside
+*Large*, which is bounded below by `B` and **unbounded above**. Measured split
+of the ledger mass:
+
+| B | small `Q≤S` | mid `S<p<B` | large `p>B`, `Q<5B` | large `p>B`, `Q≥5B` |
+|---|---|---|---|---|
+| 200 | 12.2% | 40.3% | 43.9% | 3.6% |
+| 400 | 19.0% | 35.8% | 42.1% | 3.2% |
+| 800 | 23.1% | 34.5% | 39.4% | 3.0% |
+
+The band is 7.0% of the large-prime range, not a fourth uncovered range.
+Decisively, `Δ_{>B} = (2/3)ρ + (1/2)ρ²` (eq. 8.4) is a **closed form in `ρ`
+alone with no cutoff parameter** — an integral over the whole `p > B` tail,
+which by construction runs past `5B`. So the paper's §8 does cover it.
+
+**What this means.** The `5B` cutoff is a real inconsistency *within the paper*
+— (5.3)'s summation range truncates at `5B` while §8's `Δ_{>B}` integrates the
+full tail — but it is a **bookkeeping mismatch between two sections, not a
+missing contribution**, and `δ₀` is not under threat from it. The band is
+`≈ 65×δ₀` in raw magnitude, so had it genuinely been dropped the proof would
+fail; it is not dropped. For *this repo* the consequence is unchanged and
+purely technical: `layerIndex`'s cutoff is wrong for (5.24)'s ledger, so
+`Cor52` must index over `layerIndexFull`, and (5.3) needs re-proving there.
+
 Third finding of the same class as the `m0AQ` and `p`-vs-`p^ν` bugs, and again
 caught by gating numerically before writing Lean. Scripts and the full tables:
 `.scratchpad/cor52/` (`layers.py` brute-force mirror, `fast2.py` accelerated

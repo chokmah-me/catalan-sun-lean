@@ -27,6 +27,20 @@ The truncated band is **`Θ(B²)`, not `o(B²)`**: measured `drop/B²` = 0.599,
 `S = B/20` — stable, not decaying, and about **65× the paper's `δ₀ ≈ 0.00966`
 margin**. So this is not a cosmetic index quibble.
 
+**Provenance resolved: the `5B` is the PAPER's, and the band IS covered by
+§8.** `da77779`'s docstring transcribes it "(per the proof)"; an earlier
+session fetched the arXiv §5.1 HTML and found "the separate `p^ν < 5B`
+restriction used later in (5.3)'s summation range"; the robustness check
+independently attributes it to the paper. **But** partitioning the ledger by
+the paper's own three ranges (Small `Q≤S` / Middle `S<p<B` / Large `p>B`)
+puts `[5B, 6B+2S+5]` wholly inside *Large*, which is unbounded above — and
+`Δ_{>B} = (2/3)ρ + (1/2)ρ²` (eq. 8.4) is a closed form in `ρ` with no cutoff,
+i.e. the integral over the entire `p>B` tail. Measured, the band is 7.0% of
+the large-prime range and ~3% of the ledger. So this is a **bookkeeping
+inconsistency between §5.1 and §8 within the paper, not a missing
+contribution**, and `δ₀ ≈ 0.00966` is **not** threatened — though the band is
+`≈65×δ₀` raw, so it would have been fatal had it actually been dropped.
+
 **Consequence: Lemma 5.5's (5.3) cannot be consumed as-is by Cor 5.2.**
 `lemma_5_5_ledger_little_o_holds` remains true — it is a correct statement
 about its own index set — but it is indexed over `layerIndex B`, whereas
