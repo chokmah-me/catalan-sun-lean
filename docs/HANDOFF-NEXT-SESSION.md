@@ -1,6 +1,7 @@
 # Handoff: catalan-sun-lean, next session
 
-**Written 2026-09-17, at commit `e58dfb8`.** For an agent picking this up cold.
+**Written 2026-09-17 at commit `e58dfb8`; updated the same day after Stage D
+closed.** For an agent picking this up cold.
 Read this file, then `docs/FORMALIZATION-NOTES.md`. Everything below was
 verified in-session; where something is inferred rather than checked, it says so.
 
@@ -17,7 +18,8 @@ what is assumed, cited, or externally computed. Several files carry explicit
 "what this does NOT establish" docstrings. Preserve that discipline; it is the
 product, not a formality.
 
-**The standing rule, which has now paid off four times:** before proving a
+**The standing rule, which has now paid off four times (and cost nothing the
+fifth time, when it confirmed a widened bound in seconds):** before proving a
 scaffolded statement, (a) check it against the paper, and (b) gate it
 numerically in Python, keeping the scripts. Sessions have been lost to skipping
 this. Details and the four instances: `docs/FORMALIZATION-NOTES.md`.
@@ -27,7 +29,7 @@ this. Details and the four instances: `docs/FORMALIZATION-NOTES.md`.
 - `lake build` clean: **2957 jobs**, exit 0.
 - **0** `sorry` / `admit` / `native_decide`. (A `grep` for `sorry` hits one
   comment in `Thm21.lean:7` — the phrase "are sorry-free", not a hole.)
-- **140** `#print axioms` lines, all within `[propext, Classical.choice,
+- **150** `#print axioms` lines, all within `[propext, Classical.choice,
   Quot.sound]`.
 - `lean-proof-forge` is **not installed on this machine**. Its checks were run
   manually; `results/lean_verify_brief.md` says so. Do not claim a forge pass
@@ -35,53 +37,33 @@ this. Details and the four instances: `docs/FORMALIZATION-NOTES.md`.
 - Toolchain: Lean 4.32.2 / Mathlib v4.32.2.
 
 Proved through §5: Thm 2.1, Cor 2.1, Prop 3.1, Cauchy–Binet, PC0–PC3, det-level
-Lemma 5.4, **Thm 5.1**, **Lemma 5.5 (both (5.2) and (5.3))**, and now
-**Corollary 5.2's positive-part collapse** (`CatalanSun/Cor52.lean`).
+Lemma 5.4, **Thm 5.1**, **Lemma 5.5 (both (5.2) and (5.3))**, **Corollary
+5.2's positive-part collapse**, **(5.3) over the full index set**
+(`Cor52.ledgerFull_little_o`), and **the model comparison**
+`Cor52.posPartLedger_sub_little_o`: the exact and `(0)` ledgers of (5.24)
+agree to `o(B²)`. §5 is now self-contained at the ledger level.
 
-## 3. The one open gap I created — start here
+## 3. The index-set gap — closed (do not reopen)
 
 `Cor52.posPartLedger` indexes over `layerIndexFull B S`, cutoff
-`layerBound B S = 6B + 2S + 5`. But `Lemma55.lemma_5_5_ledger_little_o_holds`
-((5.3)) is proved over `layerIndex B`, cutoff `5B`. **The two index sets differ,
-so (5.3) cannot currently be consumed by Cor 5.2.** Stage D is therefore a
-deliberate stub: I proved the index-set-independent termwise piece
-(`abs_layer_diff_le`) and the containment
-(`layerIndex_subset_layerIndexFull`), and did **not** claim the summed `o(B²)`
-comparison.
+`layerBound B S = 6B + 2S + 5`, while `Lemma55.lemma_5_5_ledger_little_o_holds`
+((5.3)) is over `layerIndex B`, cutoff `5B`. This was the one gap the previous
+session left. **Both tasks it set are done**, in `Cor52.lean` Stage F and the
+closing Stage D, with `Lemma55.lean` untouched:
 
-**Task 1 (highest value): re-prove (5.3) over `layerIndexFull`.**
+- `ledgerFull_little_o` — (5.3) verbatim over `layerIndexFull B (B/20)`. The
+  `5B` only ever entered as a numeric cap; every cap is now `12B`
+  (`layerBound B (B/20) ≤ 12B` for `B ≥ 1`), giving
+  `SUM ≤ 111·B·log(12B)·(13 + log 12B)`. Gate: `scripts/gates/gate_full53.py`.
+- `posPartLedger_sub_little_o` — `|posPartLedger − posPartLedger0| ≤ εB²`
+  eventually, for every `f`. Via `Finset.abs_sum_le_sum_abs`, the termwise
+  `abs_layer_diff_le`, and one `abs_sub_comm` applied at the `ℤ` level before
+  casting (the predicted sign trap; doing it after the cast lets `rw` grab the
+  wrong `|·−·|`).
 
-Why the cutoff had to widen: `[aQB − mAQ]₊` is *nonzero* for odd prime powers
-`Q ≥ 5B`. Exact support is `Q ≤ 2(N−1)+2B+1 = 6B+2S+5` (`N = Ndim B S`),
-because `aQB` counts solutions of `Q ∣ 2i+2h+1` over `i < N`, `1 ≤ h ≤ B`, and
-that is the largest value the modulus argument attains. Above it `NKQ`, `aQB`
-and `mAQ` all vanish. The truncated band carries `≈ 0.627·B²` — `Θ(B²)`, not
-`o(B²)`.
-
-**This is mechanical, not research.** `5*B` enters (5.3)'s proof only as a
-numeric bound — never structurally. The four places to change:
-
-| lemma | line | change |
-|---|---|---|
-| `card_layerIndex_le` | `Lemma55.lean:1428` | `≤ 5*B` → `≤ layerBound B S` |
-| `sum_inv_layer_le` | `Lemma55.lean:1497` | `harmonic (5*B)` → `harmonic (layerBound B S)` |
-| `layer_term_le` | `Lemma55.lean:1451` | `log (5*B)` bound → `log (layerBound B S)` |
-| `eventually_log_sq_le` | `Lemma55.lean:1534` | same substitution; still `log²x/x → 0` |
-
-`layer_pow_injOn` (unique factorization) is cutoff-independent and needs nothing.
-
-**Checked numerically before writing this:** the crude bound
-`111·B·log(L)·(6+log L)` at `L = 6B+2S+5` versus `L = 5B` gives `RHS/B²` of
-88.5 vs 84.3 (B=10²), 2.08 vs 2.02 (10⁴), 0.286 vs 0.279 (10⁵), 0.0048 vs
-0.0047 (10⁷). **~2% degradation; `o(B²)` survives comfortably.** Consider
-proving it directly over `layerIndexFull` rather than generalizing `layerIndex`,
-to avoid disturbing the existing green (5.3).
-
-**Task 2: close Stage D.** With Task 1 done:
-`Finset.abs_sum_le_sum_abs` → termwise `abs_layer_diff_le` →
-`mul_le_mul_of_nonneg_right` → re-proved (5.3). **Sign trap:** (5.3)'s summand
-is written `|((a0−m0) − (a−m))|` — the opposite order from what you will have.
-One `abs_sub_comm`; it presents as a failed `exact`.
+Why it was mechanical: `layer_int_bound` (the (5.2) input) has no upper cutoff
+on `Q`. Nothing here needed new mathematics. Everything built on the first
+try.
 
 ## 4. The `5B` question — settled, do not redo it
 
@@ -116,7 +98,7 @@ paper directly. The `Δ_{>B}` closed form is strong evidence the tail is
 unbounded, but if you want it airtight, read §8's derivation for an explicit
 upper cutoff. That is the one loose end here.
 
-## 5. The bigger missing piece (scope before starting)
+## 5. The bigger missing piece — start here (scope before starting)
 
 Nothing in §5 currently constrains a *height*. `aQB` / `mAQ` are pure ℕ/ℤ
 floor-and-collision combinatorics: `grep -c padicVal` returns **0** for both
@@ -161,9 +143,10 @@ the pattern `thm_5_1_statement` followed for several sessions.
 
 ## 7. Suggested order
 
-1. Re-prove (5.3) over `layerIndexFull` (§3, Task 1) — mechanical, unblocks all.
-2. Close Stage D (§3, Task 2) — then §5 is genuinely self-contained.
-3. Optionally settle §4's residual uncertainty by reading §8 directly.
-4. Scope the §4→§5 valuation lemma (§5) before committing to it.
-5. Props 6.3/7.4 remain **certified-numerics** work (Arb / interval arithmetic),
+1. Scope the §4→§5 odd-`p` valuation lemma (§5) before committing to it. If
+   staged, land `LayerValuationInput` as an explicit hypothesis and Cor 5.2's
+   deductive step against it; keep `logHmin` out of the namespace until the
+   input is proved.
+2. Optionally settle §4's residual uncertainty by reading §8 directly.
+3. Props 6.3/7.4 remain **certified-numerics** work (Arb / interval arithmetic),
    not Lean work. `mpmath` and `sympy` are installed; `python-flint` is not.

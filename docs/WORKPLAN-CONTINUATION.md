@@ -12,7 +12,39 @@ lemmas the paper's proof depends on.
 **→ Start with [`HANDOFF-NEXT-SESSION.md`](HANDOFF-NEXT-SESSION.md)**, which
 condenses everything below into an actionable brief for a cold start.
 
-**2026-09-17 (newest of all): COROLLARY 5.2 PARTLY LANDED — and the numeric
+**2026-09-17 (newest of all): STAGE D CLOSED — (5.3) re-proved over
+`layerIndexFull`, and the two (5.24) ledgers agree to `o(B²)`. `lake build`
+clean (2957 jobs), 0 sorry, 150 audited declarations, axioms ⊆ classical
+three.**
+
+Both tasks the handoff brief set out are done, in `Cor52.lean`, with
+`Lemma55.lean` untouched:
+
+- **Stage F** — `layerFull_pow_injOn`, `card_layerIndexFull_le`,
+  `layerBound_le_twelve` (`6B + 2(B/20) + 5 ≤ 12B`), `sum_inv_layerFull_le`,
+  `layerFull_term_le`, `eventually_log_sq_le_twelve`, `ledgerFull_sum_le`,
+  and **`ledgerFull_little_o`** — (5.3) verbatim with `layerIndex B` replaced
+  by `layerIndexFull B (B/20)`. Mechanical, as predicted: `5B` was only ever a
+  numeric cap, and `layer_int_bound` has no upper cutoff on `Q`. Bound:
+  `111·B·log(12B)·(13 + log 12B)`. Gated first: `scripts/gates/gate_full53.py`
+  (≤ 1.9× the old bound, decays to 0).
+- **Stage D closed** — `abs_posPartLedger_sub_le`
+  (`Finset.abs_sum_le_sum_abs` + `abs_layer_diff_le`, sign flipped by one
+  `abs_sub_comm` *at the `ℤ` level before casting*, so `rw` cannot pick the
+  wrong `|·−·|`) and **`posPartLedger_sub_little_o`**:
+  `|posPartLedger − posPartLedger0| ≤ ε B²` eventually, for every `f`.
+- Everything built first try; the only fixes were three style-linter
+  warnings. Ten new `#print axioms` lines in `CatalanSun.lean` (140 → 150).
+
+**Next (unchanged from the brief, §5):** the §4→§5 odd-`p` valuation lemma
+`v_p(Ξ_I) ≥ ℓ^A_Q(I) − …` is the real missing piece before anything about
+`H_B^min` can be stated. Scope it before committing; if staged, state it as an
+explicit `LayerValuationInput` hypothesis and prove Cor 5.2's deductive step
+against it. Do not name anything `logHmin` until it lands.
+
+---
+
+**2026-09-17 (superseded above): COROLLARY 5.2 PARTLY LANDED — and the numeric
 gate found a third transcription-class bug, this time in the layer cutoff.
 `lake build` clean (2957 jobs), 0 sorry, axioms ⊆ classical three.**
 

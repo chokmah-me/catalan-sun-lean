@@ -180,6 +180,22 @@ fail; it is not dropped. For *this repo* the consequence is unchanged and
 purely technical: `layerIndex`'s cutoff is wrong for (5.24)'s ledger, so
 `Cor52` must index over `layerIndexFull`, and (5.3) needs re-proving there.
 
+**Closed 2026-09-17.** (5.3) is re-proved over `layerIndexFull B (B/20)` as
+`Cor52.ledgerFull_little_o`, by the same crude route with every cap widened
+from `5B` to `12B` (`layerBound B (B/20) = 6B + 2(B/20) + 5 ≤ 12B`): at most
+`12B` layers, `∑ 1/Q ≤ harmonic(layerBound) ≤ 1 + log 12B`, `log p ≤ log 12B`,
+giving `SUM ≤ 111·B·log(12B)·(13 + log 12B)`. The `5B` never entered the
+original proof structurally, which is why this was mechanical: the (5.2)
+input `layer_int_bound` carries no upper cutoff on `Q`. `Lemma55.lean` is
+untouched; `lemma_5_5_ledger_little_o_holds` stands as the paper-literal
+statement. Gated first in `scripts/gates/gate_full53.py` (the widened bound is
+at most 1.9× the old one and still decays to `0`). With it,
+`Cor52.posPartLedger_sub_little_o` closes the model comparison: the two (5.24)
+ledgers agree to `o(B²)`. Sign trap confirmed exactly as predicted — (5.3)'s
+summand is `|(a0−m0) − (a−m)|`, the termwise Lipschitz bound comes out as
+`|(a−m) − (a0−m0)|`, and one `abs_sub_comm` at the `ℤ` level (before the cast,
+so `rw` cannot grab the wrong `|·−·|`) bridges them.
+
 Third finding of the same class as the `m0AQ` and `p`-vs-`p^ν` bugs, and again
 caught by gating numerically before writing Lean. Scripts and the full tables:
 **`scripts/gates/`** (committed; `layers.py` brute-force mirror, `fast2.py`

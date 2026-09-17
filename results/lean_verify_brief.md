@@ -7,7 +7,7 @@
 - native_decide hits: 0
 - axiom violations: 0
 
-All 140 `#print axioms` lines in `CatalanSun.lean` report axioms within
+All 150 `#print axioms` lines in `CatalanSun.lean` report axioms within
 `[propext, Classical.choice, Quot.sound]` — the classical three, nothing else
 (two of the new `Cor52` lemmas need strictly less). No `axiom` declarations
 anywhere under `CatalanSun/`.
@@ -34,6 +34,12 @@ machine; the checks above were run directly (build exit status, a
 - `CatalanSun.Cor52.layerIndex_subset_layerIndexFull` — records that Lemma
   5.5's `5B` cutoff is strictly inside Cor 5.2's correct threshold
   `layerBound B S = 6B+2S+5`.
+- `CatalanSun.Cor52.ledgerFull_little_o` — **paper (5.3) over the full index
+  set** `layerIndexFull B (B/20)`, unconditional, same elementary route with
+  caps at `12B`.
+- `CatalanSun.Cor52.posPartLedger_sub_little_o` — **Cor 5.2's model
+  comparison**: the exact-model and `(0)`-model (5.24) ledgers agree to
+  `o(B²)` at `S = B/20`, for every `f`.
 
 ## Explicitly not established
 
@@ -43,10 +49,10 @@ the §4→§5 odd-`p` valuation lemma, which does not exist here (neither
 `Thm51.lean` nor `Lemma55.lean` contains any `padicVal`). Nothing is named
 `logHmin`.
 
-Also open: (5.3) is proved over `layerIndex B` (cutoff `5B`), but Cor 5.2's
-ledger needs the larger `layerIndexFull B S` (cutoff `6B+2S+5`). The band
-between them carries a measured `≈ 0.627·B²` — `Θ(B²)`, not `o(B²)` — so
-Lemma 5.5's (5.3) cannot yet be consumed for the corrected-model comparison.
-See `docs/FORMALIZATION-NOTES.md#cor-52-cutoff`.
+The index-set gap noted previously ((5.3) over `layerIndex B` vs the ledger
+over `layerIndexFull B S`) is closed: (5.3) is now also proved over the larger
+set (`ledgerFull_little_o`), and the model comparison
+(`posPartLedger_sub_little_o`) is proved against it. See
+`docs/FORMALIZATION-NOTES.md#cor-52-cutoff`.
 
 Still open (not attempted): Props 6.3/7.4, Mertens/PNT, Theorem 1.1.

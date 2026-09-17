@@ -55,21 +55,27 @@ Props 6.3/7.4.
 | **Cor 5.2 index set** | `layerBound B S = 6B+2S+5` (the exact cutoff, `= 2(N−1)+2B+1`) and `layerIndexFull`; `layerIndex_subset_layerIndexFull`. **Diverges from `layerIndex`'s `5B`** — see notes | `Cor52.lean` | proved |
 | **Cor 5.2 ledger** | `posPartLedger` = (5.24) RHS; `posPartLedger_nonneg` | `Cor52.lean` | defs + proved |
 | **Cor 5.2 core** | `posPart_layer_eq` / `posPartLedger_eq_raw` — Thm 5.1 ⇒ `[a−m]₊ = a−m`, the ledger loses nothing to the positive part | `Cor52.lean` | **proved** |
+| **(5.3) over the full index set** | `ledgerFull_little_o` — Lemma 5.5's (5.3) re-proved over `layerIndexFull B (B/20)` (cutoff `6B+2S+5 ≤ 12B`), same crude route: `≤ 12B` layers, `harmonic ≤ 1 + log 12B`, `log²x/x → 0` | `Cor52.lean` | **proved** |
+| **Cor 5.2 model comparison** | `posPartLedger_sub_little_o` — the exact-model and `(0)`-model (5.24) ledgers agree to `o(B²)` at `S = B/20`, for every `f` | `Cor52.lean` | **proved** |
 
 Verification: **pass** (0 sorry, 0 native_decide, axioms ⊆ classical three,
-2957 jobs). See `results/lean_verify_brief.md`.
+2957 jobs, 150 audited declarations). See `results/lean_verify_brief.md`.
 
-**Corollary 5.2 is partly landed** (`Cor52.lean`): (5.24)'s right-hand side is
-defined and its positive parts are discharged via Theorem 5.1. It establishes
-**nothing** about `H_B^min` or integerizers — that bridge needs the §4→§5 odd-`p`
-valuation lemma, which does not exist here. While scoping it, a third
-transcription-class finding surfaced: `layerIndex`'s `5B` cutoff is too small
-for (5.24) and truncates a `Θ(B²)` band. Details in `FORMALIZATION-NOTES.md`.
+**Corollary 5.2's §5 content is landed** (`Cor52.lean`): (5.24)'s right-hand
+side is defined, its positive parts are discharged via Theorem 5.1, and the
+exact-model and `(0)`-model ledgers are proved to agree to `o(B²)`
+(`posPartLedger_sub_little_o`) — the statement §§6–9 need in order to evaluate
+(5.24) in the `(0)` model. It establishes **nothing** about `H_B^min` or
+integerizers — that bridge needs the §4→§5 odd-`p` valuation lemma, which does
+not exist here. While scoping it, a third transcription-class finding surfaced:
+`layerIndex`'s `5B` cutoff is too small for (5.24) and truncates a `Θ(B²)`
+band; (5.3) was therefore re-proved over the corrected index set. Details in
+`FORMALIZATION-NOTES.md`.
 
 **Picking this up fresh? Start with
 [`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)** — current
-verified state, the one open gap and exactly how to close it, the settled
-questions not worth redoing, and the tooling notes.
+verified state, what is next and how to scope it, the settled questions not
+worth redoing, and the tooling notes.
 
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5_1`
 (now complete) is in `docs/THM51-REDUCTION-NOTES.md`.

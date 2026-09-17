@@ -175,3 +175,13 @@ import CatalanSun.Cor52
 #print axioms CatalanSun.Cor52.two_not_mem_layerIndexFull
 #print axioms CatalanSun.Cor52.layerIndex_subset_layerIndexFull
 #print axioms CatalanSun.Cor52.abs_layer_diff_le
+#print axioms CatalanSun.Cor52.layerFull_pow_injOn
+#print axioms CatalanSun.Cor52.card_layerIndexFull_le
+#print axioms CatalanSun.Cor52.layerBound_le_twelve
+#print axioms CatalanSun.Cor52.sum_inv_layerFull_le
+#print axioms CatalanSun.Cor52.layerFull_term_le
+#print axioms CatalanSun.Cor52.eventually_log_sq_le_twelve
+#print axioms CatalanSun.Cor52.ledgerFull_sum_le
+#print axioms CatalanSun.Cor52.ledgerFull_little_o
+#print axioms CatalanSun.Cor52.abs_posPartLedger_sub_le
+#print axioms CatalanSun.Cor52.posPartLedger_sub_little_o
