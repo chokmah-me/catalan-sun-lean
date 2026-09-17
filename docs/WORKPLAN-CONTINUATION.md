@@ -9,6 +9,9 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**→ Start with [`HANDOFF-NEXT-SESSION.md`](HANDOFF-NEXT-SESSION.md)**, which
+condenses everything below into an actionable brief for a cold start.
+
 **2026-09-17 (newest of all): COROLLARY 5.2 PARTLY LANDED — and the numeric
 gate found a third transcription-class bug, this time in the layer cutoff.
 `lake build` clean (2957 jobs), 0 sorry, axioms ⊆ classical three.**

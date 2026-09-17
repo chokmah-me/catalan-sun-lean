@@ -66,6 +66,11 @@ valuation lemma, which does not exist here. While scoping it, a third
 transcription-class finding surfaced: `layerIndex`'s `5B` cutoff is too small
 for (5.24) and truncates a `Θ(B²)` band. Details in `FORMALIZATION-NOTES.md`.
 
+**Picking this up fresh? Start with
+[`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)** — current
+verified state, the one open gap and exactly how to close it, the settled
+questions not worth redoing, and the tooling notes.
+
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5_1`
 (now complete) is in `docs/THM51-REDUCTION-NOTES.md`.
 
