@@ -319,9 +319,17 @@ logarithmic drift that `o(B²)` could absorb.
 1.3863`. `F_B = ∏_{r<2B} r!` sits in the **numerator** of (3.5), and
 `v₂(F_B) ~ 2B²`. That 2-adic mass is real-place mass in `log|q̂_B|` that the
 odd-prime ledger (5.24) never removes, because (5.24) sums over odd `p` only.
-The paper's only discussion of the prime 2 is Lemma 5.4 (`[A_{2,B} −
-R_{2,B}]₊ = 0`, about `H_B^min`'s 2-part) and Remark 6.2, which considers a
-`(19/200)log 2` constant. Neither addresses the `2 log 2 · B²` above. The
+The paper does address this, and the numbers do not work. **Remark 9.3**
+states that "the residual real power of 2 from `F_D`, the Cauchy factor
+`2^{S(S-1)}`, and the missing 2-power in the odd von Mangoldt sum are
+included in the derivation of the odd-prime small-scale expression (6.21)",
+concluding that the applicable cost is therefore `c_odd`. But
+`c_odd = 0.00628`, and the residual real power of 2 alone is
+`v₂(F_B) log 2 / B² → 2 log 2 = 1.386` — **221× larger**. Remark 6.2's
+alternative `(19/200) log 2 = 0.0658` is still 21× too small. Lemma 5.4 is
+about `H_B^min`'s 2-part (`[A_{2,B} − R_{2,B}]₊ = 0`) and does not bear on
+the real place. So the term is named but absorbed into a constant two orders
+of magnitude too small to hold it. The
 remaining `+0.47…+0.61` is `log|det R|/B²`, which is still rising.
 
 *How far this was checked.* Three independent routes agree:
@@ -348,9 +356,10 @@ grouping of factors there is not reproduced here term by term. What it
 establishes is that **the inequality Theorem 9.1 states, in the form its own
 §§3 and 5 reduce it to, fails numerically by about `1.87` in the `B²`
 coefficient, with the prime 2's contribution to `F_B` the largest identified
-component.** Anyone continuing should either locate where `2 log 2 · B²` is
-cancelled — nothing in §§3–9 appears to do so — or treat Theorem 9.1 as
-unsupported at this level of bookkeeping.
+component — a term Remark 9.3 names and assigns to `c_odd`, which is 221×
+too small to carry it.** Anyone continuing should either show that the
+grouping in §9 cancels `2 log 2 · B²` some other way, or treat Theorem 9.1
+as unsupported at this level of bookkeeping.
 
 **This supersedes the tail-band note's open question.** The `(39/200)B²`
 coincidence noted there is not the binding issue; `SCALAR` is computed

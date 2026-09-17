@@ -81,7 +81,8 @@ with `δ₀ > 0.0097`. Every term is computable; at `B = 200, 400, 800` the left
 side is `+1.826, +1.846, +1.851`, converging upward to about `+1.86`. The
 dominant piece is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the
 numerator of (3.5), `v₂(F_B) ~ 2B²`, and the odd-prime ledger (5.24) never
-removes it. Three independent routes agree and `det R` is validated against
+removes it. Remark 9.3 does claim this residual real power of 2 is folded
+into `c_odd` — but `c_odd = 0.0063` is **221× too small** to hold it. Three independent routes agree and `det R` is validated against
 brute force. This says nothing about the Lean, which claims no part of §9.
 Full note and caveats: `FORMALIZATION-NOTES.md#scalar-verdict`; gate:
 `scripts/gates/gate_scalar.py`.

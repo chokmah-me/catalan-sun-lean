@@ -115,9 +115,11 @@ Theorem 9.1 asserts this is `≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measur
 Converging upward to `≈ +1.86`, not drifting logarithmically (increments fall
 ~4× per doubling). **The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`.**
 `F_B` is in the numerator of (3.5) and `v₂(F_B) ~ 2B²`; (5.24) sums over odd
-`p` only, so that mass is never removed. The paper's only treatment of the
-prime 2 is Lemma 5.4 and Remark 6.2's `(19/200)log 2`, neither of which
-touches it.
+`p` only, so that mass is never removed. **Remark 9.3 names this exact term**
+("the residual real power of 2 from `F_D` ... included in ... (6.21)") and
+assigns it to `c_odd = 0.00628` — which is **221× too small**. Remark 6.2's
+`(19/200)log 2 = 0.0658` is still 21× too small. Lemma 5.4 concerns
+`H_B^min`'s 2-part, not the real place.
 
 Validated three ways (algebraic, direct-from-(3.5), and the (5.13) identity
 to `1.6e-16`); `det R` checked against brute-force `polygamma` at
