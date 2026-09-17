@@ -43,7 +43,7 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, and now **Theorem
 | **Thm 5.1 PROOF-D** | Exact `NKQ`/`sumT` reduction to `phiQ` shifted evaluations (`NKQ_eq_PsiQ_sub`, `sum_NKQ_tail_eq`) | `Thm51.lean` | proved |
 | **Thm 5.1 PROOF-E** | (KI) target `sum_NKQ_tail_ge`, now **unconditional**: dispatches over `Q ≤ 2·B`, `Q ≥ 2·Ndim B S + 2·B`, and (splitting the middle gap in two) `sum_NKQ_tail_ge_of_gap` / `sum_NKQ_tail_ge_of_gap2` | `Thm51.lean` | **proved** |
 | **Thm 5.1** | `thm_5_1 : thm_5_1_statement`, assembled from PROOF-A–E via `linarith` | `Thm51.lean` | **proved** |
-| **Lemma 5.5, (5.2) partial** | `m0AQ` corrected to a **minimum** over card-`S` subsets at `Ndim0 B S` (not the fixed consecutive set — see divergence note below); `mAQ_le_m0AQ_add` (easy direction, unconditional); `m0AQ_le_ell0AQ` | `Lemma55.lean` | **proved** (easy direction only; hard direction and (5.3) open) |
+| **Lemma 5.5, (5.2) partial** | `m0AQ` corrected to a **minimum** over card-`S` subsets at `Ndim0 B S` (not the fixed consecutive set — see divergence note below); `mAQ_le_m0AQ_add_sharp` (easy direction with a genuine `O(1+B/Q)` constant, `9*(1+B/Q)`, superseding `mAQ_le_m0AQ_add`'s too-weak `O(S)` constant); `m0AQ_le_ell0AQ` | `Lemma55.lean` | **proved** (easy direction only; hard direction and (5.3) open) |
 | **`a0QB`/`aQB` bound** | `abs_a0QB_sub_aQB_le`: `\|a0QB − aQB\| ≤ 6(1+B/Q)`, exact and unconditional (no minimization), via `NKQ_le` (arithmetic-progression count bound) | `Lemma55.lean` | **proved** |
 
 `lean-proof-forge` verify: **pass** (0 sorry, axioms ⊆ classical three). See `results/lean_verify_brief.md`.
@@ -64,16 +64,36 @@ independently supports the minimized version. Separately, the paper's claim
 of `O(√B log B)` odd prime powers below `5B` undercounts — it omits the
 primes themselves (`~5B/log 5B` of them); the `o(B²)` conclusion of (5.3)
 still appears to survive via Chebyshev (`∑ log p ≈ 5B`), but Lean should
-derive it that way rather than reproduce the paper's count.
+derive it that way rather than reproduce the paper's count. **Re-verified
+2026-09-17:** re-ran the (5.3) ledger sum with `m0` minimized on both sides
+(the prior numerics used the since-refuted fixed-set `m0`) and `SUM/B²`
+decays monotonically (0.32 → 0.06 for `B` from 100 to 800), consistent with
+`o(B²)`.
+
+**Note (Lemma 5.5, easy-direction constant):** the first easy-direction proof
+landed (`mAQ_le_m0AQ_add`, `S*(3/Q+1)`) was too weak to establish (5.2) as
+stated — for `Q > 3` its constant is `S ≈ B/20`, not `O(1+B/Q)`. The
+per-index `FNQ` shift between `Ndim` and `Ndim0` is actually always `0` or
+`1` (never the `2` that bound allowed) and nonzero on only 3 residue classes
+mod `Q`, giving a genuine `O(1+B/Q)` bound (`mAQ_le_m0AQ_add_sharp`,
+`sum_FNQ_shift_le`) — see `docs/WORKPLAN-CONTINUATION.md` for the full
+derivation and a list of `ℕ`-division arithmetic pitfalls hit while proving
+it (`Nat.div_lt_iff_lt_mul`'s argument order, `omega`'s inability to unify
+differently-ordered products, etc.), worth reading before further div-heavy
+Lean work in this file.
 
 ### Deferred (later sessions)
 
 Theorem 5.1 is now fully proved. Remaining work: Lemma 5.5's hard direction
 of (5.2) (`m0AQ ≤ mAQ + C(1+B/Q)`, needing the paper's row-swap/replacement
-argument — not yet attempted against the corrected minimized `m0AQ`) and
-(5.3) itself (`lemma_5_5_ledger_little_o`, to be derived via Chebyshev over
-`layerIndex`, not yet attempted); Corollary 5.2 uses a "Lemma 5.3" that is
-cited but never displayed in the arXiv v1 PDF — almost certainly the trivial
+argument — not yet attempted against the corrected minimized `m0AQ`, though
+scoping suggests it needs only ~13 new lemmas, fewer than first estimated,
+since the additive per-index term is termwise `O(1+B/Q)` via the already-
+proved `NKQ_le` and only the collision-sum swap cost needs genuine new
+combinatorics) and (5.3) itself (`lemma_5_5_ledger_little_o`, to be derived
+via Chebyshev over `layerIndex`, not yet attempted — though its numerics now
+look favorable, see above); Corollary 5.2 uses a "Lemma 5.3" that is cited
+but never displayed in the arXiv v1 PDF — almost certainly the trivial
 `[x]_+ = x` fact for `x ≥ 0`, content-free for Lean purposes); Props 6.3/7.4;
 Mertens/PNT; Theorem 1.1.
 

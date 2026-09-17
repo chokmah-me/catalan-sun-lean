@@ -7,6 +7,139 @@ lemmas the paper's proof depends on.
 
 ## Next session pointer
 
+**2026-09-17 (newest of all): sharpened (5.2)'s easy direction from an
+`O(S)` constant to a genuine `O(1+B/Q)` constant — the previously-committed
+`mAQ_le_m0AQ_add` could never establish `lemma_5_5_row_stability` as stated.
+Also re-ran the (5.3) ledger sum against the corrected minimized `m0AQ`:
+`SUM/B²` now decays monotonically, resolving the open worry from the prior
+entry.**
+
+**The bug found this session:** `mAQ_le_m0AQ_add` (landed 2026-09-16) proves
+`mAQ ≤ m0AQ + S*(3/Q+1)`. Since `3/Q = 0` in ℕ-division for `Q > 3`, this
+constant is `S ≈ B/20` — but `lemma_5_5_row_stability` demands `≤ C*(1+B/Q)`,
+which at `Q ≈ B` is `≈ 2C`. The proved bound is too weak by a factor `~S` and
+no hard-direction work fixes it; this was missed because prior numerics
+probed the *value* `|mAQ-m0AQ|` (ratio 0.34, fine) rather than the *proved
+constant*.
+
+**The fix:** the per-index `FNQ` difference `FNQ(Ndim,Q,i) - FNQ(Ndim0,Q,i)`
+is **always 0 or 1** for `Q > 3` (never the `3/Q+1 = 2` the old bound
+allowed), and is nonzero only when `(Ndim0-1-i) % Q` lands in the top three
+residues `{Q-1,Q-2,Q-3}` — at most 3 residue classes. So the sum over any
+card-`S` set is `≤ min(S, 3*(Ndim0/Q)+3) ≤ 15*(1+B/Q)`, genuinely `O(1+B/Q)`.
+Verified independently in Python (fresh script re-deriving `Ndim`/`Ndim0`/
+`FNQ` from the Lean defs): max per-index difference `= 1` across
+`B ∈ [200,10^5]`; worst adversarial `sum/(1+B/Q) = 6.14`, saturating rather
+than growing.
+
+**Landed in Lean** (`Lemma55.lean`, unconditional, `lake build` clean, 0
+sorry, axioms ⊆ classical three):
+- `FNQ_shift_nonneg`: `FNQ(Ndim0) ≤ FNQ(Ndim)` pointwise, for any `Q > 0`.
+- `FNQ_shift_le_one`: the difference is `≤ 1`, but **only for `Q > 3`** —
+  false at `Q ∈ {1,2,3}` (e.g. `Q=1` gives `FNQ(N,1,i)=N-1`, so the
+  difference is exactly `3`). This split into `FNQ_shift_nonneg` (always
+  true) vs `FNQ_shift_le_one` (needs `Q>3`) is itself worth remembering —
+  the natural single combined lemma is simply false as stated.
+- `card_filter_FNQ_shift_ne`: the counting lemma — at most `3*(Ndim0/Q)+3`
+  indices have a nonzero difference, via injecting into 3 residue classes
+  and reusing `card_range_filter_mod_eq` (de-privatized in `Thm51.lean`,
+  the only other file touched this session — a one-word change, no logic
+  change, safe since the lemma was only used within `Thm51.lean` itself).
+- `sum_FNQ_shift_le`: assembles the above into `∑(FNQ(Ndim)-FNQ(Ndim0)) ≤
+  15*(1+B/Q)` over any card-`S` subset, splitting `Q>3` (sharp count) from
+  `Q≤3` (crude `≤4S ≤4*(B/Q)` route, using `S*20≤B` — the only place that
+  hypothesis is needed in this session's work).
+- `mAQ_le_m0AQ_add_sharp`: `mAQ ≤ m0AQ + 9*(1+B/Q)` — the corrected easy
+  direction. Doesn't even need `sum_FNQ_shift_le`'s counting argument: since
+  `FNQ_shift_nonneg` makes the whole `FNQ`-difference sum (over `m0AQ`'s
+  *arbitrary* minimizing set `I₀`, not just the consecutive block) already
+  `≤ 0`, the bound `≤ 9*(1+B/Q)` holds trivially. `sum_FNQ_shift_le` is kept
+  as a standalone lemma since it's the piece the *hard* direction will need
+  (there, the sum runs the other way and isn't automatically `≤ 0`).
+
+**Debugging notes for next time (Lean arithmetic pitfalls hit this
+session):** all in `ℕ`-division lemmas, none in the underlying combinatorics:
+- `rw [Nat.div_eq_of_lt h]` on a goal that is an *inequality* (e.g.
+  `3/Q ≤ 1`) doesn't close it — `rw` rewrites `3/Q` to `0` leaving `0 ≤ 1`
+  unclosed; follow with `omega`, or better, state `Nat.div_eq_of_lt` as an
+  equation (`3/Q = 0`) via `have` and let `omega` use it directly.
+  `Nat.mul_add_div` is **not** a real Mathlib/core lemma name (used it twice
+  under the wrong assumption it existed, both times it silently failed to
+  even parse/resolve until the actual error surfaced downstream) — the
+  robust pattern that always worked: `have hdm := (Nat.div_add_mod x
+  Q).symm`, `nlinarith` to get a strict `<` bound in `a < b*Q` shape
+  (`Q` on the **right**), then `(Nat.div_lt_iff_lt_mul hQ).mpr`.
+- `Nat.div_lt_iff_lt_mul hQ : a/Q < n ↔ a < n*Q` — `Q` must be the **second**
+  factor on the RHS; `Q*n` silently fails to unify via `.mpr` with a type
+  mismatch error, not a tactic failure, so it's easy to miss which side
+  needs fixing.
+- `omega` cannot relate `Q*(y/Q)` and `(y/Q)*Q` (or any two syntactically
+  different-order products of the same two terms) even though they're
+  trivially equal by `mul_comm` — it treats each as an opaque atom. Keep a
+  single multiplication order throughout a proof; don't introduce a second
+  `have` restating the same fact with factors swapped.
+- A leftover doc-comment (`/-- ... -/`) directly above a *replacement*
+  doc-comment, left behind by a partial `Edit` that only swapped the body
+  and not the header, produces a confusing "unexpected token `/--`" parse
+  error pointing at the *next* declaration, not the actual duplicate —
+  worth double-checking doc-comment boundaries after any edit that touches
+  them.
+
+**Numerics — the (5.3) ledger sum, m0 minimized on both sides** (workplan's
+stated "recommended first step" from the prior entry, finally done): fixed
+the broken `exec` path in `.scratchpad/lemma55/l55g.py`/`l55h.py`/`l55j.py`
+(pointed at a deleted `C:\Users\danie\.claude\jobs\...\tmp\` session
+directory; now `.scratchpad/lemma55/l55b.py`), and wrote a fresh script
+(`.scratchpad/lemma55/l53min.py`) re-running the full (5.3) sum:
+
+| B | S | layers | nonzero | maxterm | SUM | SUM/B² |
+|---|---|---|---|---|---|---|
+| 100 | 5 | 106 | 66 | 205 | 3193.1 | 0.3193 |
+| 200 | 10 | 184 | 119 | 410 | 7281.4 | 0.1820 |
+| 400 | 20 | 323 | 202 | 820 | 16157.9 | 0.1010 |
+| 600 | 30 | 455 | 283 | 1230 | 25775.1 | 0.0716 |
+| 800 | 40 | 578 | 363 | 1640 | 35632.6 | 0.0557 |
+
+`SUM/B²` **decays monotonically** — under the old fixed-set `m0AQ`, the
+`|m0-mA|` half of this sum sat flat at `≈B²/2` instead. Minimizing `m0AQ`
+rescues (5.3), not just (5.2). Shape is consistent with `Θ(B log²B)`, i.e.
+the Chebyshev route flagged in the prior entry, though this has not been
+checked more precisely (e.g. against `B*log(B)^2` directly) nor started in
+Lean.
+
+**Corrections to the prior entry's proof-route sketch** (found while
+scoping the hard direction, not yet acted on in Lean):
+1. `collisionSum_move` (`Thm51.lean:578`) is the **wrong tool** for bounding
+   a single row-swap's effect on the collision-sum term: its hypothesis
+   `c b + 2 ≤ c a` only covers balance-*improving* moves, but the hard
+   direction needs an unconditional two-sided bound (a swap could go either
+   way). Prove that bound directly via `Finset.sum` splitting instead.
+   `collisionSum_move` remains correct and useful for its original purpose
+   (bounding the *minimum*, not an arbitrary swap).
+2. `mAQ_eq_ellAQN_min` — the `mAQ` analogue of the already-proved
+   `m0AQ_eq_ellAQN_min` (`Lemma55.lean:334`, extracting a minimizing witness
+   set) — **does not exist yet** and must be added (mechanical copy) before
+   the hard direction can extract `mAQ`'s minimizer.
+3. Every term of the per-index additive part `g(i) := 2*NKQ(B,Q,i) -
+   NKQ(S,Q,i) - 2*indicatorQle(Q,i) - FNQ(N,Q,i)` is *individually*
+   `O(1+B/Q)` (`NKQ_le`, already proved, handles the `NKQ` terms;
+   `indicatorQle ≤ 1`; `FNQ(N,Q,i) ≤ (N-1)/Q+1 ≤ 3B/Q+1` since `N≤3B`), so
+   the hard direction's single-swap cost bound does **not** need a
+   residue-occupancy argument for this half — only the collision-sum term
+   (point 1 above) needs genuine combinatorics. This substantially
+   undercuts the "15-25 new lemmas" estimate in the prior entry; a fuller
+   scoping pass put it closer to ~13 lemmas, with only two stages
+   (the residue-counting lemma here, already landed as
+   `card_filter_FNQ_shift_ne`, and a `≤3`-fold descent induction for the
+   row-replacement argument) being genuinely new combinatorics.
+
+**Not attempted this session:** the hard direction itself
+(`m0AQ ≤ mAQ + O(1+B/Q)`), and (5.3) in Lean. See "Next target: Lemma 5.5"
+below for the fuller staged plan (still applies; the corrections above
+refine stages B/C of it).
+
+---
+
 **2026-09-16 (newest of all): found and fixed the actual bug — `m0AQ` was
 scaffolded as a fixed set, not a minimum. (5.2)'s easy direction and the
 `a0QB`/`aQB` bound are now proved; unblocked.**

@@ -1099,7 +1099,7 @@ private theorem card_range_filter_mod_lt {Q r ρ : ℕ} (hr : r < Q) (hρ : ρ <
   split_ifs <;> simp
 
 /-- Exact closed form: number of `j < n` with `j % Q = r` equals `(n + Q - 1 - r) / Q`. -/
-private theorem card_range_filter_mod_eq {Q r : ℕ} (hQ : 0 < Q) (hr : r < Q) (n : ℕ) :
+theorem card_range_filter_mod_eq {Q r : ℕ} (hQ : 0 < Q) (hr : r < Q) (n : ℕ) :
     ((range n).filter (fun j => j % Q = r)).card = (n + Q - 1 - r) / Q := by
   classical
   set q := n / Q with hqdef

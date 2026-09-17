@@ -329,6 +329,147 @@ theorem abs_ellAQ_consecutive_sub_ell0AQ_le {B S Q : ℕ} (hQ : 0 < Q)
         push_cast
         ring
 
+/-! ## Sharpened `FNQ`-shift bound: the difference is `O(1+B/Q)`, not `O(S)`
+
+`abs_FNQ_shift_le` above bounds each *individual* `FNQ` difference by
+`3/Q + 1` (which is `0` or `1` for `Q > 3`, but the sum over a card-`S` set
+is then bounded by `S`, not `1 + B/Q` — too weak for (5.2), which demands a
+bound uniform in `S`/`B`). This section shows the difference is **nonzero on
+at most 3 residue classes mod `Q`**, so the *sum* over any card-`S` subset is
+bounded by `min(S, 3 * (Ndim0 B S / Q) + 3)`, which genuinely is `O(1+B/Q)`. -/
+
+/-- The `FNQ` difference vanishes unless `(Ndim0 B S - 1 - i) % Q` lands in
+the top three residues `{Q-1, Q-2, Q-3}` (i.e. adding `3` doesn't cross a
+multiple of `Q`). -/
+theorem FNQ_shift_eq_of_mod {B S Q i : ℕ} (hQ3 : 3 < Q) (hiN0 : i < Ndim0 B S)
+    (hmod : (Ndim0 B S - 1 - i) % Q + 3 < Q) :
+    FNQ (Ndim B S) Q i = FNQ (Ndim0 B S) Q i := by
+  have heq1 : Ndim0 B S - 1 - i + 3 = Ndim B S - 1 - i := by
+    unfold Ndim0 at hiN0
+    unfold Ndim0 CatalanSun.NewtonCompletion.Ndim
+    omega
+  have hFNQ : FNQ (Ndim B S) Q i = i / Q + (Ndim B S - 1 - i) / Q := rfl
+  have hFNQ0 : FNQ (Ndim0 B S) Q i = i / Q + (Ndim0 B S - 1 - i) / Q := rfl
+  rw [hFNQ, hFNQ0, ← heq1]
+  congr 1
+  set y := Ndim0 B S - 1 - i with hy
+  have hdm : y = Q * (y / Q) + y % Q := (Nat.div_add_mod y Q).symm
+  have hdiv : (y + 3) / Q = y / Q := by
+    have hlt : y + 3 < (y / Q + 1) * Q := by nlinarith
+    have h1 : (y + 3) / Q < y / Q + 1 := (Nat.div_lt_iff_lt_mul (by omega)).mpr hlt
+    have h2 : y / Q ≤ (y + 3) / Q := Nat.div_le_div_right (by omega)
+    omega
+  omega
+
+/-- The `FNQ` difference is nonnegative: `Ndim > Ndim0` makes the right
+summand of `FNQ` only bigger, for **any** `Q > 0` (no lower bound on `Q`
+needed — this direction is plain monotonicity of `/Q`). -/
+theorem FNQ_shift_nonneg {B S Q i : ℕ} (_hQ : 0 < Q) (hiN0 : i < Ndim0 B S) :
+    FNQ (Ndim0 B S) Q i ≤ FNQ (Ndim B S) Q i := by
+  have heq1 : Ndim0 B S - 1 - i + 3 = Ndim B S - 1 - i := by
+    unfold Ndim0 at hiN0
+    unfold Ndim0 CatalanSun.NewtonCompletion.Ndim
+    omega
+  have hFNQ : FNQ (Ndim B S) Q i = i / Q + (Ndim B S - 1 - i) / Q := rfl
+  have hFNQ0 : FNQ (Ndim0 B S) Q i = i / Q + (Ndim0 B S - 1 - i) / Q := rfl
+  rw [hFNQ, hFNQ0, ← heq1]
+  have h1 : (Ndim0 B S - 1 - i) / Q ≤ (Ndim0 B S - 1 - i + 3) / Q :=
+    Nat.div_le_div_right (by omega)
+  omega
+
+/-- The `FNQ` difference is at most `1`, **for `Q > 3`** (false for
+`Q ∈ {1,2,3}`: e.g. at `Q = 1`, `FNQ(N,1,i) = N-1`, so the difference is
+exactly `3`, matching `abs_FNQ_shift_le`'s looser `3/Q+1` bound instead). -/
+theorem FNQ_shift_le_one {B S Q i : ℕ} (hQ3 : 3 < Q) (hiN0 : i < Ndim0 B S) :
+    FNQ (Ndim0 B S) Q i ≤ FNQ (Ndim B S) Q i ∧
+      FNQ (Ndim B S) Q i ≤ FNQ (Ndim0 B S) Q i + 1 := by
+  have hQ : 0 < Q := by omega
+  have heq1 : Ndim0 B S - 1 - i + 3 = Ndim B S - 1 - i := by
+    unfold Ndim0 at hiN0
+    unfold Ndim0 CatalanSun.NewtonCompletion.Ndim
+    omega
+  have hFNQ : FNQ (Ndim B S) Q i = i / Q + (Ndim B S - 1 - i) / Q := rfl
+  have hFNQ0 : FNQ (Ndim0 B S) Q i = i / Q + (Ndim0 B S - 1 - i) / Q := rfl
+  rw [hFNQ, hFNQ0, ← heq1]
+  set y := Ndim0 B S - 1 - i with hy
+  constructor
+  · have h1 : y / Q ≤ (y + 3) / Q := Nat.div_le_div_right (by omega)
+    omega
+  · have h2 : (y + 3) / Q ≤ y / Q + 3 / Q + 1 := div_add_le_div_add y 3 Q hQ
+    have h3 : 3 / Q = 0 := Nat.div_eq_of_lt (by omega)
+    omega
+
+/-- The set of indices where the `FNQ` difference is nonzero injects (via
+`i ↦ Ndim0 B S - 1 - i.val`) into the union of the three residue classes
+`{Q-1, Q-2, Q-3}` mod `Q` inside `range (Ndim0 B S)`; each class has size
+`≤ Ndim0 B S / Q + 1`, giving the crude bound `3 * (Ndim0 B S / Q) + 3`. -/
+theorem card_filter_FNQ_shift_ne {B S Q : ℕ} (hQ3 : 3 < Q)
+    (I : Finset (Fin (Ndim0 B S))) :
+    (I.filter fun i => FNQ (Ndim B S) Q i.val ≠ FNQ (Ndim0 B S) Q i.val).card
+      ≤ 3 * (Ndim0 B S / Q) + 3 := by
+  classical
+  set T := I.filter fun i => FNQ (Ndim B S) Q i.val ≠ FNQ (Ndim0 B S) Q i.val with hT
+  have hsub : T.image (fun i => Ndim0 B S - 1 - i.val) ⊆
+      (range (Ndim0 B S)).filter (fun y => y % Q = Q - 1) ∪
+        ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 2) ∪
+          (range (Ndim0 B S)).filter (fun y => y % Q = Q - 3)) := by
+    intro y hy
+    simp only [mem_image, hT, mem_filter] at hy
+    obtain ⟨i, ⟨_hiI, hine⟩, rfl⟩ := hy
+    have hcontra : ¬ ((Ndim0 B S - 1 - i.val) % Q + 3 < Q) :=
+      fun h => hine (FNQ_shift_eq_of_mod hQ3 i.isLt h)
+    have hcontra' : Q ≤ (Ndim0 B S - 1 - i.val) % Q + 3 := by omega
+    have hlt : Ndim0 B S - 1 - i.val < Ndim0 B S := by omega
+    have hrange : (Ndim0 B S - 1 - i.val) % Q < Q := Nat.mod_lt _ (by omega)
+    simp only [mem_union, mem_filter, mem_range]
+    omega
+  have hcard_img : T.card ≤
+      ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 1) ∪
+        ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 2) ∪
+          (range (Ndim0 B S)).filter (fun y => y % Q = Q - 3))).card := by
+    calc T.card = (T.image (fun i => Ndim0 B S - 1 - i.val)).card := by
+          rw [Finset.card_image_of_injOn]
+          intro a _ b _ hab
+          simp only at hab
+          have ha : a.val < Ndim0 B S := a.isLt
+          have hb : b.val < Ndim0 B S := b.isLt
+          have : a.val = b.val := by omega
+          exact Fin.ext this
+      _ ≤ _ := Finset.card_le_card hsub
+  refine hcard_img.trans ?_
+  calc ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 1) ∪
+        ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 2) ∪
+          (range (Ndim0 B S)).filter (fun y => y % Q = Q - 3))).card
+      ≤ ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 1)).card +
+          (((range (Ndim0 B S)).filter (fun y => y % Q = Q - 2)).card +
+            ((range (Ndim0 B S)).filter (fun y => y % Q = Q - 3)).card) :=
+        (Finset.card_union_le _ _).trans (by gcongr; exact Finset.card_union_le _ _)
+    _ ≤ 3 * (Ndim0 B S / Q) + 3 := by
+        rw [card_range_filter_mod_eq (by omega) (by omega) (Ndim0 B S),
+          card_range_filter_mod_eq (by omega) (by omega) (Ndim0 B S),
+          card_range_filter_mod_eq (by omega) (by omega) (Ndim0 B S)]
+        have e1 : Ndim0 B S + Q - 1 - (Q - 1) = Ndim0 B S := by omega
+        have e2 : Ndim0 B S + Q - 1 - (Q - 2) ≤ Ndim0 B S + 1 := by omega
+        have e3 : Ndim0 B S + Q - 1 - (Q - 3) ≤ Ndim0 B S + 2 := by omega
+        have b1 : (Ndim0 B S + Q - 1 - (Q - 1)) / Q = Ndim0 B S / Q := by rw [e1]
+        have b2 : (Ndim0 B S + Q - 1 - (Q - 2)) / Q ≤ (Ndim0 B S + 1) / Q :=
+          Nat.div_le_div_right e2
+        have b3 : (Ndim0 B S + Q - 1 - (Q - 3)) / Q ≤ (Ndim0 B S + 2) / Q :=
+          Nat.div_le_div_right e3
+        have hdm : Ndim0 B S = Q * (Ndim0 B S / Q) + Ndim0 B S % Q :=
+          (Nat.div_add_mod (Ndim0 B S) Q).symm
+        have hmodlt : Ndim0 B S % Q < Q := Nat.mod_lt _ (by omega)
+        have c2 : (Ndim0 B S + 1) / Q ≤ Ndim0 B S / Q + 1 := by
+          have hbound2 : Ndim0 B S + 1 < (Ndim0 B S / Q + 1 + 1) * Q := by nlinarith
+          have := (Nat.div_lt_iff_lt_mul (by omega)).mpr hbound2
+          omega
+        have c3 : (Ndim0 B S + 2) / Q ≤ Ndim0 B S / Q + 1 := by
+          have hbound3 : Ndim0 B S + 2 < (Ndim0 B S / Q + 1 + 1) * Q := by nlinarith
+          have := (Nat.div_lt_iff_lt_mul (by omega)).mpr hbound3
+          omega
+        rw [b1]
+        omega
+
 /-- Extract `m0AQ`'s minimizing row set: `m0AQ` equals `ellAQN` at `Ndim0 B S`
 for some particular card-`S` subset `I₀`. -/
 theorem m0AQ_eq_ellAQN_min {B S Q : ℕ} (f : Fin S → Fin (S + 3))
@@ -406,6 +547,135 @@ theorem mAQ_le_m0AQ_add {B S Q : ℕ} (hQ : 0 < Q) (f : Fin S → Fin (S + 3))
   have h2 := (abs_le.mp hbound).2
   rw [hI₀eq]
   linarith [hbridge]
+
+
+/-- The sharpened `FNQ`-shift sum bound: `O(1+B/Q)`, not `O(S)`. Splits `I`
+into the (small) set where the difference is nonzero, bounded via
+`card_filter_FNQ_shift_ne`, and its complement, which contributes `0`. -/
+theorem sum_FNQ_shift_le {B S Q : ℕ} (hQ : 0 < Q) (hSB : S * 20 ≤ B)
+    (I : Finset (Fin (Ndim0 B S))) (hI : I.card = S) :
+    ∑ i ∈ I, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) ≤
+      15 * (((B / Q : ℕ) : ℤ) + 1) := by
+  classical
+  rcases lt_or_ge 3 Q with hQ3 | hQ3
+  · -- Q > 3: use the sharp counting bound.
+    set T := I.filter fun i => FNQ (Ndim B S) Q i.val ≠ FNQ (Ndim0 B S) Q i.val with hTdef
+    have hsplit :
+        ∑ i ∈ I, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) =
+          ∑ i ∈ T, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) +
+            ∑ i ∈ I.filter fun i => ¬ (FNQ (Ndim B S) Q i.val ≠ FNQ (Ndim0 B S) Q i.val),
+              ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) :=
+      (Finset.sum_filter_add_sum_filter_not I _ _).symm
+    have hzero :
+        ∑ i ∈ I.filter fun i => ¬ (FNQ (Ndim B S) Q i.val ≠ FNQ (Ndim0 B S) Q i.val),
+          ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) = 0 := by
+      apply Finset.sum_eq_zero
+      intro i hi
+      simp only [mem_filter, not_not] at hi
+      rw [hi.2]; ring
+    have htop : ∑ i ∈ T, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) ≤
+        (T.card : ℤ) := by
+      calc ∑ i ∈ T, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ))
+          ≤ ∑ _i ∈ T, (1 : ℤ) := by
+            refine Finset.sum_le_sum fun i _hi => ?_
+            have h := FNQ_shift_le_one (B := B) (S := S) (Q := Q) hQ3 i.isLt
+            have : (FNQ (Ndim B S) Q i.val : ℤ) ≤ (FNQ (Ndim0 B S) Q i.val : ℤ) + 1 := by
+              exact_mod_cast h.2
+            linarith
+        _ = (T.card : ℤ) := by rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+    have hcardT : (T.card : ℤ) ≤ 3 * ((Ndim0 B S / Q : ℕ) : ℤ) + 3 := by
+      have := card_filter_FNQ_shift_ne (B := B) (S := S) (Q := Q) hQ3 I
+      exact_mod_cast this
+    have hNdim0 : (Ndim0 B S : ℤ) ≤ 3 * (B : ℤ) := by
+      have : Ndim0 B S ≤ 3 * B := by
+        unfold Ndim0
+        omega
+      exact_mod_cast this
+    have hdivbound : ((Ndim0 B S / Q : ℕ) : ℤ) ≤ 3 * ((B / Q : ℕ) : ℤ) + 4 := by
+      have hle : Ndim0 B S / Q ≤ (3 * B) / Q := by
+        apply Nat.div_le_div_right
+        unfold Ndim0; omega
+      have hmul : (3 * B) / Q ≤ 3 * (B / Q) + 4 := by
+        rcases Nat.eq_zero_or_pos Q with hQ0 | hQpos
+        · omega
+        -- `B = Q*(B/Q) + B%Q` with `B%Q < Q` gives `3*B < Q*(3*(B/Q)+3) + Q`,
+        -- i.e. `3*B < Q*(3*(B/Q)+4)`, hence `(3*B)/Q < 3*(B/Q)+4` via
+        -- `Nat.div_lt_iff_lt_mul`.
+        have hdm : B = Q * (B / Q) + B % Q := (Nat.div_add_mod B Q).symm
+        have hmodlt : B % Q < Q := Nat.mod_lt _ hQpos
+        have hbound : 3 * B < (3 * (B / Q) + 4) * Q := by nlinarith
+        have := (Nat.div_lt_iff_lt_mul hQpos).mpr hbound
+        omega
+      calc (Ndim0 B S / Q : ℤ) ≤ ((3 * B) / Q : ℕ) := by exact_mod_cast hle
+        _ ≤ 3 * (B / Q) + 4 := by exact_mod_cast hmul
+    rw [hsplit, hzero, add_zero]
+    calc ∑ i ∈ T, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ))
+        ≤ (T.card : ℤ) := htop
+      _ ≤ 3 * ((Ndim0 B S / Q : ℕ) : ℤ) + 3 := hcardT
+      _ ≤ 3 * (3 * ((B / Q : ℕ) : ℤ) + 4) + 3 := by linarith
+      _ ≤ 15 * (((B / Q : ℕ) : ℤ) + 1) := by linarith
+  · -- Q ≤ 3: crude bound `≤ S ≤ B/20 ≤ B/Q` beats `15*(B/Q+1)`.
+    have hSQ : (S : ℤ) ≤ ((B / Q : ℕ) : ℤ) := by
+      have h1 : S ≤ B / Q := by
+        have hBQ : B / 3 ≤ B / Q := Nat.div_le_div_left hQ3 hQ
+        have hS3 : S ≤ B / 3 := by omega
+        omega
+      exact_mod_cast h1
+    -- `FNQ_shift_le_one` needs `Q > 3` (false at `Q ≤ 3`); use the looser but
+    -- unconditional `abs_FNQ_shift_le` (`≤ 3/Q+1 ≤ 4` here) instead.
+    have htop : ∑ i ∈ I, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ)) ≤
+        4 * (I.card : ℤ) := by
+      calc ∑ i ∈ I, ((FNQ (Ndim B S) Q i.val : ℤ) - (FNQ (Ndim0 B S) Q i.val : ℤ))
+          ≤ ∑ _i ∈ I, (4 : ℤ) := by
+            refine Finset.sum_le_sum fun i _hi => ?_
+            have h := abs_FNQ_shift_le (B := B) (S := S) (Q := Q) hQ i.isLt
+            have h4 : ((3 / Q : ℕ) : ℤ) + 1 ≤ 4 := by
+              have : 3 / Q ≤ 3 := Nat.div_le_self 3 Q
+              have : ((3 / Q : ℕ) : ℤ) ≤ 3 := by exact_mod_cast this
+              linarith
+            have := (abs_le.mp h).2
+            linarith
+        _ = 4 * (I.card : ℤ) := by rw [Finset.sum_const, nsmul_eq_mul]; ring
+    rw [hI] at htop
+    linarith
+
+/-- One direction of (5.2), sharpened: `m^A_{Q,B} ≤ m^{(0)}_{Q,B} + 9*(1+B/Q)`
+— an `O(1+B/Q)` constant, unlike `mAQ_le_m0AQ_add`'s `O(S)` constant, which is
+too weak to establish `lemma_5_5_row_stability`. Same proof spine as
+`mAQ_le_m0AQ_add`, but using `FNQ_shift_nonneg` (`FNQ(Ndim0) ≤ FNQ(Ndim)`
+pointwise, for **any** `Q > 0`) to see the `FNQ`-difference sum in
+`ellAQN_castLE_sub_eq_general` is `≤ 0`, hence trivially `≤ 9*(1+B/Q)`; the
+crude per-index bound summed over `I₀` (`sum_FNQ_shift_le`, which needs the
+`Q > 3` vs `Q ≤ 3` split) is not even needed for *this* direction, only for
+the hard direction later. (`hSB` is unused by this particular proof — kept in
+the signature to match the paper's stated hypotheses and for parity with
+`mAQ_le_m0AQ_add`.) -/
+theorem mAQ_le_m0AQ_add_sharp {B S Q : ℕ} (hQ : 0 < Q) (_hSB : S * 20 ≤ B)
+    (f : Fin S → Fin (S + 3)) (hS0 : S ≤ Ndim0 B S) :
+    (mAQ B S Q f : ℤ) ≤ m0AQ B S Q f + 9 * (((B / Q : ℕ) : ℤ) + 1) := by
+  have hne : ((univ : Finset (Fin (Ndim0 B S))).powersetCard S).Nonempty := by
+    refine ⟨consecutiveInitial (N := Ndim0 B S) S hS0, ?_⟩
+    rw [mem_powersetCard]
+    exact ⟨subset_univ _, consecutiveInitial_card hS0⟩
+  obtain ⟨I₀, hI₀, hI₀eq⟩ := m0AQ_eq_ellAQN_min (B := B) (S := S) (Q := Q) f hne
+  set e : Fin (Ndim0 B S) ↪ Fin (Ndim B S) :=
+    ⟨Fin.castLE (Ndim0_le_Ndim B S), Fin.castLE_injective _⟩
+  have hI₀mapcard : (I₀.map e).card = S := by rw [Finset.card_map]; exact hI₀
+  have h1 : (mAQ B S Q f : ℤ) ≤ ellAQN B S Q f (Ndim B S) (I₀.map e) hI₀mapcard :=
+    mAQ_le_ellAQ f (I₀.map e) hI₀mapcard
+  have hbridge := ellAQN_castLE_sub_eq_general (B := B) (S := S) (Q := Q) f I₀ hI₀
+  have hnonpos : ∑ i ∈ I₀, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) ≤ 0 := by
+    have : ∑ i ∈ I₀, ((FNQ (Ndim0 B S) Q i.val : ℤ) - (FNQ (Ndim B S) Q i.val : ℤ)) ≤
+        ∑ _i ∈ I₀, (0 : ℤ) := by
+      refine Finset.sum_le_sum fun i _hi => ?_
+      have h := FNQ_shift_nonneg (B := B) (S := S) (Q := Q) hQ i.isLt
+      have : (FNQ (Ndim0 B S) Q i.val : ℤ) ≤ (FNQ (Ndim B S) Q i.val : ℤ) := by
+        exact_mod_cast h
+      linarith
+    simpa using this
+  have hnonneg : (0 : ℤ) ≤ 9 * (((B / Q : ℕ) : ℤ) + 1) := by positivity
+  rw [hI₀eq]
+  linarith [hbridge, hnonpos, hnonneg]
 
 /-! ## `a0QB` vs `aQB`: an exact, self-contained bound
 
