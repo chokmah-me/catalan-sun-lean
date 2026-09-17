@@ -48,25 +48,32 @@ mathematical content (no new lemma about *G*).
 
 ## What the runs show for this formalization
 
-Measured on GitHub `ubuntu-latest`, commit `8663999`,
-[Actions run 2](https://github.com/chokmah-me/catalan-sun-lean/actions/runs/35216050384):
+Measured on GitHub `ubuntu-latest`, commit `c412014` (the commit that proved
+Lemma 5.5's (5.3)),
+[Actions run](https://github.com/chokmah-me/catalan-sun-lean/actions/runs/35256463769):
 
-- export: **39 068 387** NDJSON lines (CatalanSun **plus** the Mathlib /
+- export: **39 696 770** NDJSON lines (CatalanSun **plus** the Mathlib /
   Batteries / … cone `lean4export` walks from the default target);
-- `con-leche: accepted 362547 declarations (--verified)` in ~9.5 min
-  (job ~13.5 min).
+- `con-leche: accepted 365651 declarations (--verified)` in ~9 min
+  (job ~14 min).
+
+Previous run for comparison, commit `8663999`
+([run](https://github.com/chokmah-me/catalan-sun-lean/actions/runs/35216050384)):
+39 068 387 lines, **362 547** declarations accepted — so (5.3) and its
+supporting lemmas added **+3 104** accepted declarations.
 
 So the **currently proved** default-target material — Theorem 2.1, absolute
-Corollary 2.1, det-level Lemma 5.4, Theorem 5.1, Lemma 5.5’s (5.2), and the
-supporting lemmas — is, after export, a kernel environment this checker
-accepts. If the set-theory hypothesis holds, those statements are true in the
-model (they are not a proof of `False`).
+Corollary 2.1, det-level Lemma 5.4, Theorem 5.1, **Lemma 5.5 in full (both
+(5.2) and (5.3))**, and the supporting lemmas — is, after export, a kernel
+environment this checker accepts. If the set-theory hypothesis holds, those
+statements are true in the model (they are not a proof of `False`).
 
 **Not shown:**
 
 - Theorem 1.1 (*G* irrational) — still open here;
-- Lemma 5.5 (5.3), Corollary 5.2, Props 6.3/7.4, Mertens/PNT — not on the
-  accepted stream as proved claims if they are not in the library yet;
+- Corollary 5.2, Props 6.3/7.4, Mertens/PNT — not on the accepted stream as
+  proved claims if they are not in the library yet. (Lemma 5.5's (5.3) **was**
+  on this list; as of `c412014` it is proved and accepted.);
 - “ZFC proved Catalan's constant is irrational”;
 - a full Mathlib audit (only this library’s dependency cone);
 - independence from the Lean compiler that *built* the con-leche binary.

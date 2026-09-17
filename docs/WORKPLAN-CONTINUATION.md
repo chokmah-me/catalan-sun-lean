@@ -2,6 +2,8 @@
 
 **Repo:** https://github.com/chokmah-me/catalan-sun-lean (public)
 **Paper:** Z.-W. Sun, *Catalan's constant is irrational*, arXiv:2609.04176v1.
+**Divergences from the paper and known traps:**
+[`FORMALIZATION-NOTES.md`](FORMALIZATION-NOTES.md) (split out of the README).
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 
