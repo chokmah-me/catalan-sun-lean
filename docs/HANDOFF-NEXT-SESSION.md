@@ -108,9 +108,9 @@ log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q}
 
 Theorem 9.1 asserts this is `≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measured:
 
-| `B` | 200 | 400 | 800 | 1000 |
-|---|---|---|---|---|
-| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 | **+1.854020** |
+| `B` | 200 | 400 | 800 | 1000 | 1200 |
+|---|---|---|---|---|---|
+| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 | +1.854020 | **+1.854615** |
 
 Converging upward to `≈ +1.86`, not drifting logarithmically (increments fall
 ~4× per doubling). **`B = 1000` was run as a blind prediction test**: the
@@ -122,13 +122,16 @@ assigns it to `c_odd = 0.00628` — which is **221× too small**. Remark 6.2's
 `(19/200)log 2 = 0.0658` is still 21× too small. Lemma 5.4 concerns
 `H_B^min`'s 2-part, not the real place.
 
-**Outstanding when this brief was written:** a `B = 1200` run was still in
-flight (`python gate_scalar.py scalar 1200`, ~90 min on this machine; its
-layer data is already committed). It is confirmatory only — at `B = 1200`
-the two *exactly computed* components alone (`v₂(F_B) log 2` and
-`−∑ m log p`) already sum to about `+1.22`, and `log|det R|` is positive and
-rising, so no value it can return changes the sign. Add it to the tables if
-you want the fifth point; nothing depends on it.
+**The `B = 1200` run is done** (2026-09-17, later; `SCALAR/B² = +1.854615`,
+in the tables above). It came in as predicted and changed nothing: the sign
+was already determined, since its two *exactly computed* components alone
+sum to `+1.200` with `log|det R|` positive and rising. Two things it did
+confirm out of sample: the `c+k/B` fit predicted `+1.855875` against
+`+1.854615` measured (`1.3e-3`), and the Prop 9.5 residue landed at
+`+0.475174`, inside the `[0.4722, 0.4775]` band established before that
+point existed. **`scalar_S_B20.csv` now holds all five points**; the
+B = 1000 row, which the prose had carried since `a3eaac6` without the data
+backing it, was also re-run and reproduced to six decimals.
 
 Validated three ways (algebraic, direct-from-(3.5), and the (5.13) identity
 to `1.6e-16`); `det R` checked against brute-force `polygamma` at

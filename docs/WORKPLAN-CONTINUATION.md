@@ -39,9 +39,9 @@ log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q}
 with every term directly computable. Theorem 9.1 asserts this is
 `≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measured (`scripts/gates/gate_scalar.py`):
 
-| `B` | 200 | 400 | 800 | 1000 |
-|---|---|---|---|---|
-| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 | **+1.854020** |
+| `B` | 200 | 400 | 800 | 1000 | 1200 |
+|---|---|---|---|---|---|
+| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 | +1.854020 | **+1.854615** |
 
 Converging upward to `≈ +1.86`. The dominant term is
 `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the numerator of (3.5) with

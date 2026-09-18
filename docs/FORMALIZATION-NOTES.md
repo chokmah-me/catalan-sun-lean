@@ -316,6 +316,7 @@ Legendre, and `det R[A,J]` from (2.1).
 | 400 | +0.544358 | +1.368411 | −0.066843 | **+1.845926** |
 | 800 | +0.613610 | +1.376486 | −0.138860 | **+1.851237** |
 | 1000 | +0.635912 | +1.378071 | −0.159963 | **+1.854020** |
+| 1200 | +0.654135 | +1.379440 | −0.178961 | **+1.854615** |
 
 The paper needs `≤ −0.009662`. The increments fall by ~4× per doubling and an
 `a·log B` fit collapses, so this converges to a finite positive constant near
@@ -409,6 +410,7 @@ what happens if the 2-adic term is repaired and nothing else:
 | 400 | +1.845926 | +0.459632 |
 | 800 | +1.851237 | +0.464943 |
 | 1000 | +1.854020 | +0.467726 |
+| 1200 | +1.854615 | +0.468321 |
 
 If `2 log 2` were the only error this residual would have to reach `−δ₀ =
 −0.0097`. It converges to **`+0.479`**: still **~50× `δ₀`, and the wrong

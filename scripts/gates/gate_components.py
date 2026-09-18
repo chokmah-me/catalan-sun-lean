@@ -6,7 +6,7 @@ mispriced 2-adic constant?"  It is not.  Writing the measured coefficient as
     SCALAR/B^2  =  [ v2(F_B) log2 / B^2 ]  +  [ log|det R|/B^2 - sum m log p/B^2 ]
 
 the first bracket -> 2 log 2 = 1.3863 (Remark 9.3's term, mispriced 221x) and
-the second is FLAT at about +0.475 across B = 200..1000 -- a second, wholly
+the second is FLAT at about +0.475 across B = 200..1200 -- a second, wholly
 separate gap of ~50x delta_0 living in Proposition 9.5's cancellation, which
 fires (the two halves track to ~5% per doubling) but does not close.
 
@@ -26,6 +26,7 @@ TABLE = [
     (400,  0.544358, 1.368411, -0.066843, 1.845926),
     (800,  0.613610, 1.376486, -0.138860, 1.851237),
     (1000, 0.635912, 1.378071, -0.159963, 1.854020),
+    (1200, 0.654135, 1.379440, -0.178961, 1.854615),
 ]
 
 
