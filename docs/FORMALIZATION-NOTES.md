@@ -47,6 +47,9 @@ Companion documents:
 - [**Two independent components, not one**](#two-components) — repairing
   Remark 9.3's `2 log 2` still leaves `+0.479`, ~50× `δ₀`, in Prop 9.5's
   incomplete cancellation.
+- [**§9's factor grouping, reproduced term by term**](#grouping) — the caveat
+  in the two notes above is now discharged. §9's proof is one prose paragraph;
+  the grouping is supplied here and independently confirms `+0.475`.
 
 ---
 
@@ -446,7 +449,74 @@ constant would still leave Theorem 9.1 failing by ~50×.
 
 **Consequence for anyone continuing.** The exit condition stated above ("show
 that the grouping in §9 cancels `2 log 2 · B²` some other way") is necessary
-but **not sufficient**. A repair must close both components. Caveat, same as
-above: this locates the second gap in the det-R/ledger cancellation; it does
-not identify which line of §9 is wrong, and §9's factor grouping is still not
-reproduced here term by term.
+but **not sufficient**. A repair must close both components. Caveat: this
+locates the second gap in the det-R/ledger cancellation and does not identify
+which line of §9 is wrong. **The "factor grouping not reproduced term by term"
+half of this caveat is now discharged** — see [`#grouping`](#grouping), which
+reproduces it and confirms `+0.475` from an independent script.
+
+
+<a id="grouping"></a>
+**Note (§9's factor grouping, reproduced term by term — 2026-09-18).** Both
+notes above carry the same caveat: the measurement "locates the gaps but does
+not reproduce §9's factor grouping term by term." That caveat is now
+discharged. Gate: `scripts/gates/gate_grouping.py`.
+
+*Why it had to be done by hand.* Proposition 9.5's proof, read from the arXiv
+LaTeX source (`P99g.tex`, §`sec:final`), contains no displayed derivation of
+the grouping. It is one paragraph:
+
+> "The factorial, odd-linear, Cauchy, Vandermonde, and tail factors are then
+> grouped by prime-power scale. The `B²log B` terms cancel because the
+> denominator baseline `a_{Q,B}` and the real normalization come from the same
+> fixed scalar. The remaining raw quadratic coefficient is `4ρ−2ρ² = 39/200`."
+
+Every step that the `+1.86` verdict might have been accused of mis-transcribing
+lives in that sentence. So the five named groups were evaluated separately,
+from the exact `(4.5)` = `eq:summand` identity:
+
+```
+|Xi_I| = 2^{S(S-1)} V(J) V(I)^2 |Psi_A(I)|
+         * prod_{a in A}(a+2B)! / prod_{i in I} i!(N-1-i)!
+         * prod_{i in I} |q T_{i+1}| Pi_i / prod_{j=1..S} (2(i+j)+1)
+```
+
+| group | `/B²` at `B=1200` |
+|---|---|
+| factorial | `+0.060360` |
+| cauchy (`2^{S(S-1)}V(J)`) | `+0.004985` |
+| vandermonde (`V(I)²`) | `+0.006562` |
+| odd-linear (`∏Π_i / ∏(2(i+j)+1)`) | `+0.799167` |
+| tail (`∏T_{i+1}`) | `−0.000680` |
+
+*Three things this establishes.*
+
+1. **The `B²log B` term is real and the paper's cancellation claim is
+   structurally right.** `log|Ξ_I|/B²` fits `c₂ + c_L log B` with `c_L ≈
+   +0.1013` (stable across `B = 200…1200`), so the grouped summand genuinely
+   carries `B²log B`. The `a`-ledger removes it: the `(5.13)` identity
+   `∑_{odd} a_Q log p = log ∏Π_i − log F_B + v₂(F_B) log 2` reproduces to
+   `8e-16`. This is the one part of §9 that works exactly as advertised.
+2. **The grouped route is an upper bound on the direct route, as Prop 9.5
+   needs.** Dropping `|Ψ_A(I)| ≥ 1` (the paper never bounds it below by more
+   than 1 either) and taking `max_I` rather than `∑_I` overestimates
+   `log|det R|` by a stable `+0.2107 → +0.2163 B²`. Both routes are therefore
+   measuring the same object, and the grouped one is the conservative one.
+3. **It confirms `+0.475` independently.** `log|det R|/B² − ∑m log p/B²` =
+   `+0.472152, +0.477515, +0.474750, +0.475949, +0.475175` at
+   `B = 200…1200`, reproducing the `#two-components` figure `+0.4722` at
+   `B = 200` to six decimals from a separately written script.
+
+*The verdict is unchanged and now rests on a reproduced grouping.* Running
+the paper's own grouped route end to end gives `GROUPED-SCALAR/B² = +2.037,
++2.060, +2.067, +2.070, +2.071` — i.e. the paper's own factor grouping, taken
+at face value, is **worse** for the paper than the direct `det R` route
+(`+1.826 … +1.855`), because it discards `Ψ_A`. Either way the quantity
+Theorem 9.1 needs `≤ −0.0097` is positive and `~200×` the margin.
+
+*Caveats, stated precisely.* (a) `Ψ_A(I)` is dropped, so the grouped column is
+an upper bound, not an equality — it cannot by itself prove the claim false,
+which is why the direct `det R` route remains the primary evidence. (b) `max_I`
+is taken over four candidate row sets (consecutive, top, centered, spread), not
+all `C(N,S)`; `centered` wins at every `B` tested. (c) `q` is dropped from the
+tail group (`O(S log q) = o(B²)`). None of these affects the sign.
