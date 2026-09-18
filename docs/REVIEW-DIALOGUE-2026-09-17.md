@@ -14,7 +14,9 @@ is the interrogation that produced it.
 
 Questions are quoted as asked, including typos. Answers are condensed from the
 session transcript, with the hedges and caveats preserved — several of them are
-load-bearing.
+load-bearing. Where a later measurement bore on an answer, it is added as a
+**postscript** rather than folded into the answer, so that what was claimed
+and what was later confirmed stay distinguishable (see Q3).
 
 ---
 
@@ -114,6 +116,34 @@ alone would leave Theorem 9.1 failing by ~50×.
 
 Gate: `scripts/gates/gate_components.py`.
 
+**Postscript, later the same day: confirmed out of sample.** The answer above
+was given with four data points, `B = 200…1000`. A `B = 1200` run was
+suspended at the time and finished afterwards. It had no say in the
+decomposition, which makes it a genuine test of it rather than a fifth point
+fitted to it:
+
+| | claimed before `B = 1200` existed | measured at `B = 1200` |
+|---|---|---|
+| `SCALAR/B²` | `+1.855875` (`c+k/B` fit) | `+1.854615` |
+| Prop 9.5 residue | inside `[0.4722, 0.4775]` | **`+0.475174`** |
+
+The second row is the one that matters. The residue band was read off the
+first four points *as part of answering Q3*; the fifth landed inside it. So
+the second component is **predictive, not merely descriptive**: the flatness
+of `log|det R|/B² − ∑m log p/B²` at `+0.475` now holds across a 6× range in
+`B`, and was stated in advance of the widest point.
+
+Run detail: both precision passes (`P = 20000`, `P = 40000`) returned
+identical `log|det R|`, the `(5.13)` identity matched to all printed digits,
+and `detR + v₂log2 − ∑m log p` reproduced the stored `SCALAR` to `1e-9`.
+
+(A smaller loose end closed at the same time: the `B = 1000` row had been
+quoted in the prose since `a3eaac6` but never reached `scalar_S_B20.csv`,
+because `gate_scalar.py` appends only after `det_R_verified` returns and that
+run did not survive to the append. Re-run on a different day, it reproduced
+all four components to six decimals — so the prior session's headline point
+is now independently reproduced, not just transcribed.)
+
 ---
 
 ## Q4. "What would formalizing §6–9 actually cost? Is it worth pinning down exactly which theorem the error lives in, or should you just report the numerical symptom?"
@@ -167,3 +197,10 @@ The generalizable point: the prior session's numbers were right and thoroughly
 validated; its *framing* was what needed interrogating. Validation effort had
 gone into the quantity that was already believed, none into asking whether it
 was the whole story.
+
+And the finding then survived the test it set itself. The `B = 1200` run,
+suspended while Q3 was being answered and finished afterwards, had no say in
+the decomposition; the residue band stated during Q3 predicted where it would
+land, and it landed there. A framing correction that makes a falsifiable
+prediction and then passes it is worth more than one that merely re-describes
+the same four points.
