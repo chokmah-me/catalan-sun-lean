@@ -6,18 +6,18 @@ Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 **This project does not claim Theorem 1.1 (G irrational).** It locks arithmetic
 and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
 column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
-**Lemma 5.5 in full** — both the row-stability bound (5.2) and the ledger
-bound (5.3) — are proved, together with Corollary 5.2's §5 content.
+**Lemma 5.5 in full** (both the row-stability bound (5.2) and the ledger
+bound (5.3)) are proved, together with Corollary 5.2's §5 content.
 
 > ### The paper's §9 conclusion does not survive measurement
 >
 > Independently of the Lean, the paper's own §§3 and 5 reduce Theorem 9.1 to
 > an inequality in three directly computable quantities. Evaluated at
 > `B = 200, 400, 800, 1000`, it comes out **`+1.83, +1.85, +1.85, +1.85`**
-> where it must be
-> **`≤ −0.0097`** — wrong by `≈ 1.86` in the `B²` coefficient and converging,
-> not drifting. The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`, which
-> Remark 9.3 names and assigns to a constant 221× too small to hold it.
+> where it must be **`≤ −0.0097`**: wrong by `≈ 1.86` in the `B²` coefficient,
+> and converging, not drifting. The dominant term is
+> `v₂(F_B) log 2 → 2 log 2 = 1.386`, which Remark 9.3 names and assigns to a
+> constant 221× too small to hold it.
 > Checked three independent ways; `det R` validated against brute force.
 > **This changes nothing about the Lean below**, which claims no part of §9.
 > Details, caveats and the gate: [`docs/FORMALIZATION-NOTES.md#scalar-verdict`](docs/FORMALIZATION-NOTES.md#scalar-verdict).
@@ -79,41 +79,41 @@ Verification: **pass** (0 sorry, 0 native_decide, axioms ⊆ classical three,
 **Corollary 5.2's §5 content is landed** (`Cor52.lean`): (5.24)'s right-hand
 side is defined, its positive parts are discharged via Theorem 5.1, and the
 exact-model and `(0)`-model ledgers are proved to agree to `o(B²)`
-(`posPartLedger_sub_little_o`) — the statement §§6–9 need in order to evaluate
-(5.24) in the `(0)` model. It establishes **nothing** about `H_B^min` or
-integerizers — that bridge needs the §4→§5 odd-`p` valuation lemma, which does
-not exist here. While scoping it, a third transcription-class finding surfaced:
-`layerIndex`'s `5B` cutoff is too small for (5.24) and truncates a `Θ(B²)`
-band; (5.3) was therefore re-proved over the corrected index set. Reading §8
-directly then showed the paper's large-prime integral stops at `(2+ρ)B`,
-while the exact `m`-layers carry `(39/200)·B²` beyond it — numerically the
-paper's own raw quadratic. See `FORMALIZATION-NOTES.md#tail-band`.
+(`posPartLedger_sub_little_o`), the statement §§6–9 need to evaluate (5.24)
+in the `(0)` model. It establishes **nothing** about `H_B^min` or
+integerizers; that bridge needs the §4→§5 odd-`p` valuation lemma, which does
+not exist here. While scoping it, a third transcription-class finding
+surfaced: `layerIndex`'s `5B` cutoff is too small for (5.24) and truncates a
+`Θ(B²)` band, so (5.3) was re-proved over the corrected index set. Reading §8
+directly then showed the paper's large-prime integral stops at `(2+ρ)B`, while
+the exact `m`-layers carry `(39/200)·B²` beyond it, numerically the paper's
+own raw quadratic. See `FORMALIZATION-NOTES.md#tail-band`.
 
 **The paper's `B²` claim has now been measured directly, and it does not
 hold at this level of bookkeeping.** Its own §§3 and 5 reduce Theorem 9.1 to
 `log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p ≤ −δ₀B² + o(B²)`
 with `δ₀ > 0.0097`. Every term is computable; at `B = 200, 400, 800, 1000`
 the left side is `+1.826, +1.846, +1.851, +1.854`, converging upward to about
-`+1.86` (increments fall ~4× per doubling). **`B = 1000` was run as a blind
-prediction test:** the earlier three points predicted `+1.854003` and it
-measured `+1.854020`, so the trend is out-of-sample predictive, not a
-post-hoc fit. The dominant piece is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B`
-is in the numerator of (3.5), `v₂(F_B) ~ 2B²`, and the odd-prime ledger
-(5.24) never removes it. Remark 9.3 does claim this residual real power of 2 is folded
-into `c_odd` — but `c_odd = 0.0063` is **221× too small** to hold it. Three independent routes agree and `det R` is validated against
-brute force. This says nothing about the Lean, which claims no part of §9.
-Full note and caveats: `FORMALIZATION-NOTES.md#scalar-verdict`; gate:
-`scripts/gates/gate_scalar.py`.
+`+1.86`, with increments falling ~4× per doubling. **`B = 1000` was a blind
+prediction test:** the earlier three points predicted `+1.854003`, and it
+measured `+1.854020`, so the trend predicts out of sample. The dominant piece
+is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the numerator of (3.5),
+`v₂(F_B) ~ 2B²`, and the odd-prime ledger (5.24) never removes it. Remark 9.3
+does fold this residual real power of 2 into `c_odd`, but `c_odd = 0.0063` is
+**221× too small** to hold it. Three independent routes agree, and `det R` is
+validated against brute force. This says nothing about the Lean, which claims
+no part of §9. Full note and caveats:
+`FORMALIZATION-NOTES.md#scalar-verdict`; gate: `scripts/gates/gate_scalar.py`.
 
 **Picking this up fresh? Start with
-[`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)** — current
+[`docs/HANDOFF-NEXT-SESSION.md`](docs/HANDOFF-NEXT-SESSION.md)**: current
 verified state, what is next and how to scope it, the settled questions not
 worth redoing, and the tooling notes.
 
 Continuation plan: `docs/WORKPLAN-CONTINUATION.md`. Derivation history of `thm_5_1`
 (now complete) is in `docs/THM51-REDUCTION-NOTES.md`.
 
-**Formalization notes — divergences from the paper, and traps:**
+**Formalization notes (divergences from the paper, and traps):**
 [`docs/FORMALIZATION-NOTES.md`](docs/FORMALIZATION-NOTES.md). Worth reading
 before touching `Lemma55.lean` or `Thm51.lean`: it records two scaffolded
 statements that were **false as written** (`m0AQ` as a fixed set; (5.3)'s layer
@@ -121,21 +121,21 @@ index), the `T_{i+1}` divergence, and the `ℕ`-division cast traps.
 
 ### Deferred (later sessions)
 
-Theorem 5.1 and **Lemma 5.5 are now fully proved** — (5.2) in both directions
-with an absolute constant, and (5.3) as an unconditional `o(B²)` bound. Neither
-needed Chebyshev: (5.3) follows from layer injectivity (at most `5B` layers,
-`∑ 1/Q ≤ harmonic(5B)`) plus `log²x/x → 0`, using no prime number theory, so
-the paper's undercounted `O(√B log B)` layer claim never has to be reproduced
-or repaired. Corollary 5.2 uses a "Lemma 5.3" that is cited but never displayed
-in the arXiv v1 PDF — almost certainly the trivial `[x]_+ = x` fact for
-`x ≥ 0`, content-free for Lean purposes. Remaining: Props 6.3/7.4;
-Mertens/PNT; Theorem 1.1. (`Mathlib.NumberTheory.Chebyshev` **is** available at
-this toolchain pin — `theta_le_log4_mul_x`, `pi_le_log4_mul_div`,
-`psi_le_const_mul_self` — which should help those later targets.)
+Theorem 5.1 and **Lemma 5.5 are now fully proved**: (5.2) in both directions
+with an absolute constant, and (5.3) as an unconditional `o(B²)` bound.
+Neither needed Chebyshev. (5.3) follows from layer injectivity (at most `5B`
+layers, `∑ 1/Q ≤ harmonic(5B)`) plus `log²x/x → 0`, using no prime number
+theory, so the paper's undercounted `O(√B log B)` layer claim never has to be
+reproduced or repaired. Corollary 5.2 uses a "Lemma 5.3" that is cited but
+never displayed in the arXiv v1 PDF, almost certainly the trivial `[x]_+ = x`
+fact for `x ≥ 0`, content-free for Lean purposes. Remaining: Props 6.3/7.4;
+Mertens/PNT; Theorem 1.1. (`Mathlib.NumberTheory.Chebyshev` **is** available
+at this toolchain pin (`theta_le_log4_mul_x`, `pi_le_log4_mul_div`,
+`psi_le_const_mul_self`), which should help those later targets.)
 
 ## Numeric gates
 
-Before proving a scaffolded statement, this repo gates it numerically — four
+Before proving a scaffolded statement, this repo gates it numerically. Four
 statement-level bugs have been found that way. The Python mirrors of the Lean
 layer definitions live in [`scripts/gates/`](scripts/gates/):
 
