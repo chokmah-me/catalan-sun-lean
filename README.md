@@ -1,6 +1,7 @@
 # CatalanSun (Lean slice of arXiv:2609.04176v1)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22830201.svg)](https://doi.org/10.5281/zenodo.22830201)
+[![Paper DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22830610.svg)](https://doi.org/10.5281/zenodo.22830610)
+[![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22830201.svg)](https://doi.org/10.5281/zenodo.22830201)
 [![GitHub release](https://img.shields.io/github/v/release/chokmah-me/catalan-sun-lean)](https://github.com/chokmah-me/catalan-sun-lean/releases/tag/v0.1.0)
 
 Lean 4 / Mathlib formalization of **high-ROI structural lemmas** from
@@ -12,9 +13,11 @@ column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
 **Lemma 5.5 in full** (both the row-stability bound (5.2) and the ledger
 bound (5.3)) are proved, together with Corollary 5.2's §5 content.
 
-- **Software concept DOI** (prefer for citation): [10.5281/zenodo.22830201](https://doi.org/10.5281/zenodo.22830201) — always latest zip
-- **Software version DOI** (this release): [10.5281/zenodo.22830202](https://doi.org/10.5281/zenodo.22830202) (`v0.1.0`)
-- DOI map: [`ZENODO.md`](ZENODO.md) · citation file: [`CITATION.cff`](CITATION.cff)
+- **Paper concept DOI** (prefer for the numerical note): [10.5281/zenodo.22830610](https://doi.org/10.5281/zenodo.22830610) — always latest PDF
+- **Paper version DOI** (v1.4.0): [10.5281/zenodo.22830611](https://doi.org/10.5281/zenodo.22830611) — `PAPER1-v1.4.0.pdf`
+- **Software concept DOI**: [10.5281/zenodo.22830201](https://doi.org/10.5281/zenodo.22830201) — always latest zip
+- **Software version DOI** (`v0.1.0`): [10.5281/zenodo.22830202](https://doi.org/10.5281/zenodo.22830202)
+- DOI map: [`ZENODO.md`](ZENODO.md) · citation file: [`CITATION.cff`](CITATION.cff) · changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
 > ### The paper's §9 conclusion does not survive measurement
 >
@@ -184,6 +187,21 @@ Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catal
 
 ## Citation
 
+**Paper** (preferred for the numerical note; concept DOI for always-latest PDF):
+
+```bibtex
+@article{bilar_catalan_sun_paper1_2026,
+  author       = {Bilar, Daniyel Yaacov},
+  title        = {A Numerical Test of the Quadratic Estimate in arXiv:2609.04176v1},
+  version      = {1.4.0},
+  year         = {2026},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.22830610},
+  url          = {https://doi.org/10.5281/zenodo.22830610},
+  note         = {Concept DOI (always latest). Pinned PDF: 10.5281/zenodo.22830611 (v1.4.0).}
+}
+```
+
 **Software** (prefer the concept DOI; pin the version DOI for a specific zip):
 
 ```bibtex
@@ -200,6 +218,6 @@ Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catal
 ```
 
 Sun’s preprint claims belong to arXiv:2609.04176v1; cite that separately from
-this Lean software archive. See also `CITATION.cff` and `ZENODO.md`.
+this paper and Lean archive. See also `CITATION.cff` and `ZENODO.md`.
 
 Repo: https://github.com/chokmah-me/catalan-sun-lean (public).

@@ -1,12 +1,19 @@
 # Zenodo deposits
 
-Software-only concept for this repo (do **not** merge with any future PAPER1
-paper deposit or with Sun’s arXiv preprint):
+Two separate Zenodo **concepts** (do **not** merge paper and software):
 
 | Role | DOI | Status |
 |---|---|---|
-| **Software concept** | [10.5281/zenodo.22830201](https://doi.org/10.5281/zenodo.22830201) | **Stable.** Always resolves to the latest software zip. |
+| **Paper concept** | [10.5281/zenodo.22830610](https://doi.org/10.5281/zenodo.22830610) | **Stable.** Always resolves to the latest PAPER1 PDF. |
+| **Paper (current version)** | [10.5281/zenodo.22830611](https://doi.org/10.5281/zenodo.22830611) | v1.4.0; numerical test of Sun §9 quadratic estimate; PDF only. |
+| **Software concept** | [10.5281/zenodo.22830201](https://doi.org/10.5281/zenodo.22830201) | Always latest software zip. |
 | **Software (current version)** | [10.5281/zenodo.22830202](https://doi.org/10.5281/zenodo.22830202) | From GitHub Release `v0.1.0` (Thm 5.1 + Lemma 5.5 + Cor 5.2 Lean slice). |
+
+## Paper version history
+
+| Version DOI | Status | Notes |
+|---|---|---|
+| [10.5281/zenodo.22830611](https://doi.org/10.5281/zenodo.22830611) | **Current** | `v1.4.0`; first PAPER1 mint. File `PAPER1-v1.4.0.pdf`. |
 
 ## Software version history
 
@@ -17,20 +24,24 @@ paper deposit or with Sun’s arXiv preprint):
 ## External links
 
 - **GitHub:** https://github.com/chokmah-me/catalan-sun-lean
-- **Release:** https://github.com/chokmah-me/catalan-sun-lean/releases/tag/v0.1.0
-- **Source paper (not this deposit):** arXiv:2609.04176v1 (Zhi-Wei Sun)
+- **Software release:** https://github.com/chokmah-me/catalan-sun-lean/releases/tag/v0.1.0
+- **Source preprint under test:** arXiv:2609.04176v1 (Zhi-Wei Sun)
+- **OSF (legacy mirror):** https://osf.io/yhf8t/ (DOI [10.17605/OSF.IO/YHF8T](https://doi.org/10.17605/OSF.IO/YHF8T))
 
 ## Citation
 
-**Software (prefer concept DOI; version DOI for a pinned zip):**
+**Paper (prefer concept DOI; version DOI for a pinned PDF):**
+
+Bilar, D. Y. (2026). *A Numerical Test of the Quadratic Estimate in arXiv:2609.04176v1* (v1.4.0). Zenodo.
+https://doi.org/10.5281/zenodo.22830610 (concept); https://doi.org/10.5281/zenodo.22830611 (this PDF)
+
+**Software:**
 
 Bilar, D. Y. (2026). *catalan-sun-lean: Lean formalization slice of Sun’s Catalan preprint* (v0.1.0). Zenodo.
 https://doi.org/10.5281/zenodo.22830201 (concept); https://doi.org/10.5281/zenodo.22830202 (this zip)
 
-This deposit does **not** claim Theorem 1.1 (Catalan's constant irrational).
+Neither deposit claims Theorem 1.1 (Catalan's constant irrational). The paper deposit refutes Sun’s **proof route** to Theorem 9.1 as written; it does not settle rationality of G.
 
-## Post-mint note
+## Direct PDF
 
-Zenodo auto-creators from GitHub were recorded as `dyb` / `Claude`. Correct the
-Zenodo metadata authors to Daniyel Yaacov Bilar (ORCID 0000-0002-9040-6914)
-when convenient; local `CITATION.cff` already uses the correct author.
+https://zenodo.org/records/22830611/files/PAPER1-v1.4.0.pdf

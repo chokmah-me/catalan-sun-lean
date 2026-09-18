@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it using these metadata. For Sun's preprint claims, cite arXiv:2609.04176v1 separately."
+message: "If you use this work, please cite the paper (preferred) and/or the software. For Sun's preprint claims, cite arXiv:2609.04176v1 separately."
 type: software
 title: "catalan-sun-lean: Lean formalization slice of Sun's Catalan preprint"
 authors:
@@ -20,5 +20,22 @@ keywords:
   - formalization
   - number theory
   - irrationality
-# Prefer concept DOI 10.5281/zenodo.22830201 when a reader wants "always latest".
+# Prefer software concept DOI 10.5281/zenodo.22830201 when a reader wants "always latest" zip.
 # doi: above pins this software version (.22830202 / GitHub v0.1.0).
+preferred-citation:
+  type: article
+  title: "A Numerical Test of the Quadratic Estimate in arXiv:2609.04176v1"
+  authors:
+    - family-names: Bilar
+      given-names: Daniyel Yaacov
+      orcid: "https://orcid.org/0000-0002-9040-6914"
+      affiliation: "Chokmah LLC"
+  year: 2026
+  month: 9
+  version: "1.4.0"
+  doi: "10.5281/zenodo.22830611"
+  url: "https://doi.org/10.5281/zenodo.22830611"
+  publisher:
+    name: Zenodo
+  # Prefer paper concept DOI 10.5281/zenodo.22830610 when a reader wants "always latest" PDF.
+  # preferred-citation.doi pins this PDF version (.22830611 / v1.4.0).
