@@ -26,7 +26,10 @@ Two separate Zenodo **concepts** (do **not** merge paper and software):
 - **GitHub:** https://github.com/chokmah-me/catalan-sun-lean
 - **Software release:** https://github.com/chokmah-me/catalan-sun-lean/releases/tag/v0.1.0
 - **Source preprint under test:** arXiv:2609.04176v1 (Zhi-Wei Sun)
+- **Catalog (paper):** https://chokmah.me/research/a-numerical-test-of-the-quadratic-estimate-in-arxiv-2609-22830611/
+- **Catalog (software):** https://chokmah.me/research/catalan-sun-lean-lean-formalization-slice-of-sun-catalan-22830202/
 - **OSF (legacy mirror):** https://osf.io/yhf8t/ (DOI [10.17605/OSF.IO/YHF8T](https://doi.org/10.17605/OSF.IO/YHF8T))
+- **ORCID:** https://orcid.org/0000-0002-9040-6914 _(manual add still pending for this work)_
 
 ## Citation
 
