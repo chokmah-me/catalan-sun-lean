@@ -92,11 +92,14 @@ paper's own raw quadratic. See `FORMALIZATION-NOTES.md#tail-band`.
 **The paper's `B²` claim has now been measured directly, and it does not
 hold at this level of bookkeeping.** Its own §§3 and 5 reduce Theorem 9.1 to
 `log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q} m_Q log p ≤ −δ₀B² + o(B²)`
-with `δ₀ > 0.0097`. Every term is computable; at `B = 200, 400, 800` the left
-side is `+1.826, +1.846, +1.851`, converging upward to about `+1.86`. The
-dominant piece is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B` is in the
-numerator of (3.5), `v₂(F_B) ~ 2B²`, and the odd-prime ledger (5.24) never
-removes it. Remark 9.3 does claim this residual real power of 2 is folded
+with `δ₀ > 0.0097`. Every term is computable; at `B = 200, 400, 800, 1000`
+the left side is `+1.826, +1.846, +1.851, +1.854`, converging upward to about
+`+1.86` (increments fall ~4× per doubling). **`B = 1000` was run as a blind
+prediction test:** the earlier three points predicted `+1.854003` and it
+measured `+1.854020`, so the trend is out-of-sample predictive, not a
+post-hoc fit. The dominant piece is `v₂(F_B) log 2 → 2 log 2 = 1.386`: `F_B`
+is in the numerator of (3.5), `v₂(F_B) ~ 2B²`, and the odd-prime ledger
+(5.24) never removes it. Remark 9.3 does claim this residual real power of 2 is folded
 into `c_odd` — but `c_odd = 0.0063` is **221× too small** to hold it. Three independent routes agree and `det R` is validated against
 brute force. This says nothing about the Lean, which claims no part of §9.
 Full note and caveats: `FORMALIZATION-NOTES.md#scalar-verdict`; gate:
