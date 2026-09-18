@@ -4,6 +4,8 @@
 **Paper:** Z.-W. Sun, *Catalan's constant is irrational*, arXiv:2609.04176v1.
 **Divergences from the paper and known traps:**
 [`FORMALIZATION-NOTES.md`](FORMALIZATION-NOTES.md) (split out of the README).
+**How the §9 verdict was interrogated:**
+[`REVIEW-DIALOGUE-2026-09-17.md`](REVIEW-DIALOGUE-2026-09-17.md).
 This repo does **not** claim Theorem 1.1 (G irrational); it locks structural/arithmetic
 lemmas the paper's proof depends on.
 

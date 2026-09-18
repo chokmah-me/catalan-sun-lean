@@ -16,6 +16,9 @@ Companion documents:
 - [`THM51-REDUCTION-NOTES.md`](THM51-REDUCTION-NOTES.md) — Theorem 5.1's
   (now closed) derivation history.
 - [`con-leche.md`](con-leche.md) — the external kernel check.
+- [`REVIEW-DIALOGUE-2026-09-17.md`](REVIEW-DIALOGUE-2026-09-17.md) — the
+  four review questions that produced `#two-components`, and the answers.
+  How the verdict was interrogated, not just what it concluded.
 
 ## Contents
 
