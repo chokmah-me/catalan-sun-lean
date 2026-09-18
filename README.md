@@ -13,7 +13,8 @@ bound (5.3) — are proved, together with Corollary 5.2's §5 content.
 >
 > Independently of the Lean, the paper's own §§3 and 5 reduce Theorem 9.1 to
 > an inequality in three directly computable quantities. Evaluated at
-> `B = 200, 400, 800`, it comes out **`+1.83, +1.85, +1.85`** where it must be
+> `B = 200, 400, 800, 1000`, it comes out **`+1.83, +1.85, +1.85, +1.85`**
+> where it must be
 > **`≤ −0.0097`** — wrong by `≈ 1.86` in the `B²` coefficient and converging,
 > not drifting. The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`, which
 > Remark 9.3 names and assigns to a constant 221× too small to hold it.

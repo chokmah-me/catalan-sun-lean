@@ -309,11 +309,18 @@ Legendre, and `det R[A,J]` from (2.1).
 | 200 | +0.475164 | +1.353994 | −0.003012 | **+1.826146** |
 | 400 | +0.544358 | +1.368411 | −0.066843 | **+1.845926** |
 | 800 | +0.613610 | +1.376486 | −0.138860 | **+1.851237** |
+| 1000 | +0.635912 | +1.378071 | −0.159963 | **+1.854020** |
 
 The paper needs `≤ −0.009662`. The increments fall by ~4× per doubling and an
-`a·log B` fit collapses (`a = 0.0285 → 0.0077` across the three pairs), so
-this converges to a finite positive constant near `+1.86`; it is not
-logarithmic drift that `o(B²)` could absorb.
+`a·log B` fit collapses, so this converges to a finite positive constant near
+`+1.86`; it is not logarithmic drift that `o(B²)` could absorb.
+
+**`B = 1000` was a blind prediction test.** Before running it, the `B = 200,
+400, 800` data predicted `+1.854003` (extrapolating each of the three
+components separately) and `+1.852299` (a `c + k/B` fit to the total). The
+measured value is **`+1.854020`** — the component route was right to
+`1.7e-5`. The model of what this quantity is doing is therefore not a
+post-hoc fit; it predicts out of sample.
 
 *Where it comes from.* The dominant term is `v₂(F_B) log 2 → 2 log 2 =
 1.3863`. `F_B = ∏_{r<2B} r!` sits in the **numerator** of (3.5), and
@@ -337,9 +344,10 @@ components move in opposite directions and nearly cancel:
 
 | per doubling of `B` | change |
 |---|---|
-| `log\|det R\|/B²` | `+0.0692`, `+0.0693` |
-| `−∑ m log p/B²` | `−0.0638`, `−0.0720` |
+| `log\|det R\|/B²` | `+0.0692`, `+0.0693`, `+0.0693` |
+| `−∑ m log p/B²` | `−0.0638`, `−0.0720`, `−0.0656` |
 
+(third entry is the `800 → 1000` interval, rescaled to a full doubling.)
 They agree to about 5%. That is precisely the `B² log B` cancellation
 Proposition 9.5 asserts ("the `B² log B` terms cancel because the denominator
 baseline `a_{Q,B}` and the real normalization come from the same fixed

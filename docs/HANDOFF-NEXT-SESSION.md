@@ -108,12 +108,13 @@ log H_B^min + log|q̂_B|  ≤  log|det R[A,J]| + v₂(F_B) log 2 − ∑_{odd Q}
 
 Theorem 9.1 asserts this is `≤ −δ₀B² + o(B²)`, `δ₀ > 0.0097`. Measured:
 
-| `B` | 200 | 400 | 800 |
-|---|---|---|---|
-| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 |
+| `B` | 200 | 400 | 800 | 1000 |
+|---|---|---|---|---|
+| `SCALAR/B²` | +1.826146 | +1.845926 | +1.851237 | **+1.854020** |
 
 Converging upward to `≈ +1.86`, not drifting logarithmically (increments fall
-~4× per doubling). **The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`.**
+~4× per doubling). **`B = 1000` was run as a blind prediction test**: the
+earlier three points predicted `+1.854003`, measured `+1.854020`. **The dominant term is `v₂(F_B) log 2 → 2 log 2 = 1.386`.**
 `F_B` is in the numerator of (3.5) and `v₂(F_B) ~ 2B²`; (5.24) sums over odd
 `p` only, so that mass is never removed. **Remark 9.3 names this exact term**
 ("the residual real power of 2 from `F_D` ... included in ... (6.21)") and
