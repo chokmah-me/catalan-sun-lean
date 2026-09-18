@@ -1,5 +1,8 @@
 # CatalanSun (Lean slice of arXiv:2609.04176v1)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22830201.svg)](https://doi.org/10.5281/zenodo.22830201)
+[![GitHub release](https://img.shields.io/github/v/release/chokmah-me/catalan-sun-lean)](https://github.com/chokmah-me/catalan-sun-lean/releases/tag/v0.1.0)
+
 Lean 4 / Mathlib formalization of **high-ROI structural lemmas** from
 Zhi-Wei Sun, *Catalan's constant is irrational* (arXiv:2609.04176v1).
 
@@ -8,6 +11,10 @@ and linear-algebra facts that the paper's proof depends on. Theorem 2.1 (full
 column rank), absolute Corollary 2.1, det-level Lemma 5.4, **Theorem 5.1**, and
 **Lemma 5.5 in full** (both the row-stability bound (5.2) and the ledger
 bound (5.3)) are proved, together with Corollary 5.2's §5 content.
+
+- **Software concept DOI** (prefer for citation): [10.5281/zenodo.22830201](https://doi.org/10.5281/zenodo.22830201) — always latest zip
+- **Software version DOI** (this release): [10.5281/zenodo.22830202](https://doi.org/10.5281/zenodo.22830202) (`v0.1.0`)
+- DOI map: [`ZENODO.md`](ZENODO.md) · citation file: [`CITATION.cff`](CITATION.cff)
 
 > ### The paper's §9 conclusion does not survive measurement
 >
@@ -174,5 +181,25 @@ Sun eq. 1.4 (Catalan tail recurrence) lives in `CatalanSun/Tail.lean` (sorry-fre
 The original Downloads draft is archived as a stub under `incoming/`.
 
 Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catalan.md`.
+
+## Citation
+
+**Software** (prefer the concept DOI; pin the version DOI for a specific zip):
+
+```bibtex
+@software{bilar_catalan_sun_lean_2026,
+  author       = {Bilar, Daniyel Yaacov},
+  title        = {catalan-sun-lean: Lean formalization slice of Sun's Catalan preprint},
+  version      = {0.1.0},
+  year         = {2026},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.22830201},
+  url          = {https://doi.org/10.5281/zenodo.22830201},
+  note         = {Concept DOI (always latest). Pinned zip: 10.5281/zenodo.22830202 (v0.1.0).}
+}
+```
+
+Sun’s preprint claims belong to arXiv:2609.04176v1; cite that separately from
+this Lean software archive. See also `CITATION.cff` and `ZENODO.md`.
 
 Repo: https://github.com/chokmah-me/catalan-sun-lean (public).
