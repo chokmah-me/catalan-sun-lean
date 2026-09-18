@@ -6,6 +6,7 @@
 
 Daniyel Yaacov Bilar, Chokmah LLC, chokmah-dyb@pm.me
 ORCID: [0000-0002-9040-6914](https://orcid.org/0000-0002-9040-6914)
+Licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## Abstract
 
@@ -20,8 +21,8 @@ set. Evaluating them at $B = 200, 400, 800, 1000, 1200$ gives $+1.826, +1.846,
 the argument requires a value below $-0.00966$. The discrepancy has two
 independent parts. The larger is a real-place term $v_2(F_B)\log 2 \to 2\log 2
 = 1.386$, which Remark 9.3 names and folds into a constant $c_{\rm odd} =
-0.00628$ that is 221 times too small to hold it. Subtracting it leaves $+0.468$,
-about 48 times $\delta_0$ and still the wrong sign, located in the cancellation
+0.00628$ that is 220.9 times too small to hold it. Subtracting it leaves
+$+0.468$, which is 48.5 times $\delta_0$ and still the wrong sign, in the cancellation
 that Proposition 9.5 asserts. Section 9 supplies no displayed derivation of its
 factor grouping, so the grouping is reconstructed here term by term; it
 confirms both the $B^2\log B$ cancellation the preprint relies on and the
@@ -35,9 +36,9 @@ unrefereed. Its stated result would settle a question open since the 1860s.
 
 This note reports one measurement. It takes Theorem 9.1 of [1], reduces it
 using equations drawn from the preprint itself, and evaluates the reduced form
-numerically at five values of $B$. The measurement says that the reduced
-inequality fails, by a factor of about 190 in the coefficient of $B^2$, with
-the wrong sign.
+numerically at five values of $B$. The measured coefficient of $B^2$ is
+positive where the argument requires it to be below $-0.00966$, exceeding that
+bound by a factor of 192 at $B = 1200$.
 
 Three things are outside the scope of this note. It does not claim that
 Catalan's constant is rational; nothing here bears on the truth of $G \notin
@@ -48,11 +49,43 @@ not proceed line by line. What it reports is that the quantity Theorem 9.1
 bounds, computed from the preprint's own reduction, has the wrong sign and
 roughly the wrong magnitude.
 
+Some context on why the claim drew attention. Calegari, Dimitrov and Tang
+proved the linear independence of $1$, $\zeta(2)$ and $L(2,\chi_{-3})$ [3],
+which settles the conductor-3 case, but their method does not reach Catalan's
+constant $G = L(2,\chi_{-4})$, where the even conductor changes the denominator
+arithmetic. Reference [3] is cited in [1] as well. The preprint claims to cross
+that barrier by elementary means, without arithmetic holonomy or $p$-adic
+analysis, which is what makes the final quadratic estimate worth checking
+directly.
+
 A companion Lean 4 formalization of the structural lemmas of Sections 2 to 5 of
 [1] is archived alongside this note [2]. That formalization claims no part of
 Section 9 and is unaffected by what follows.
 
-## 2. The reduction
+## 2. Notation
+
+Symbols follow [1]. $B$ is the construction parameter, $S = \lfloor B/20\rfloor$
+the number of selected rows, $N$ the dimension of the completed square matrix,
+and $\rho = S/B = 1/20$.
+
+| symbol | meaning |
+|---|---|
+| $F_B$ | $\prod_{r<2B} r!$, the factorial factor of (3.5) |
+| $\Pi_i$ | the odd-linear product $\prod_{h=1}^{B}(2(h+i)+1)^2$ of (2.1) |
+| $\mathcal{R}[A,J]$ | the residual minor on row set $A$, column set $J$ |
+| $\widehat q_B$ | the fixed scalar, $\det \mathcal{A}_B$ |
+| $H_B^{\min}$ | the minimal integerizer of $\widehat q_B$ |
+| $Q = p^\nu$ | an odd prime power, the layer index |
+| $a_{Q,B}$ | the denominator layer exponent of Section 5 of [1] |
+| $m^A_{Q,B}$ | the test residual layer exponent, a minimum over card-$S$ row sets |
+| $\delta_0$ | the claimed margin, $\delta_0 > 0.00966242652523235$ |
+| $c_{\rm odd}$ | the small-prime constant, $Q \le S$ |
+| $\Lambda_{\rm mid}$ | the middle-prime integral, $S < p < B$ |
+| $\Xi_I$ | the Cauchy-Binet summand at row set $I$, eq. (4.5) |
+| $\Psi_A(I)$ | the integer cofactor of the Pascal alternant, $|\Psi_A(I)| \ge 1$ |
+| $V(I)$, $V(J)$ | Vandermonde products over the row and column index sets |
+
+## 3. The reduction
 
 Three equations of [1] combine to eliminate everything that is not computable.
 Write $F_B = \prod_{r < 2B} r!$, let $\Pi_i$ be the odd-linear products of
@@ -86,7 +119,7 @@ exact dynamic program over residue classes, $v_2(F_B)$ from Legendre's formula,
 and $\det \mathcal{R}[A,J]$ from (2.1) with the entries as exact rationals over
 a common denominator.
 
-## 3. Measurement
+## 4. Measurement
 
 Table 1 gives $\mathrm{SCALAR}(B)/B^2$ at $S = \lfloor B/20 \rfloor$, the
 regime [1] uses.
@@ -106,14 +139,18 @@ measured. The value at $B = 1200$ was likewise predicted at $+1.855875$ against
 $+1.854615$ measured.
 
 Three independent derivations of $\mathrm{SCALAR}$ agree: the algebraic route
-of Section 2 above, a direct evaluation from (3.5), and the (5.13) identity,
+of Section 3 above, a direct evaluation from (3.5), and the (5.13) identity,
 which reproduces to $1.6 \times 10^{-16}$. The determinant was checked against
 brute-force polygamma sums at $B = 20, 40, 60$, against an exact-integer
 evaluation at $B = 200$ and $400$, and across four different row sets $A$. Each
-floating-point determinant was computed at two precisions and accepted only
-when the two agreed.
+floating-point determinant is evaluated at escalating precision, $P \mapsto
+1.6P + 8000$ bits, and accepted only when consecutive runs agree to $10^{-9}$
+relative and the observed cancellation stays under $P/2$. The accepted
+precisions were 66115 bits at $B = 200$, 82787 at $B = 400$, and 40000 at
+$B = 800$, 1000 and 1200. At $B = 200$ the largest term is $2^{70301}$ against a
+smallest entry of $2^{68817}$, so 1484 bits cancel.
 
-## 4. Two independent components
+## 5. Two independent components
 
 The gap does not reduce to a single mispriced constant. Subtracting the
 real-place term and nothing else leaves the second column of Table 2.
@@ -127,7 +164,7 @@ real-place term and nothing else leaves the second column of Table 2.
 | 1200 | +1.854615 | +0.468320 |
 
 **Table 2.** Removing the $2\log 2$ real-place term leaves a residue converging
-to about $+0.47$, roughly 48 times $\delta_0$, with the sign that Theorem 9.1
+to about $+0.47$, which is 48.5 times $\delta_0$, with the sign that Theorem 9.1
 needs to be negative.
 
 **The real-place term.** $F_B$ sits in the numerator of (3.5) and
@@ -138,7 +175,7 @@ below. Remark 9.3 of [1] names this exact quantity, calling it "the residual
 real power of $2$ from $F_D$," and states that it is included in the derivation
 of the odd small-scale expression, which is why "the applicable cost is
 $c_{\rm odd}$." But $c_{\rm odd} = 0.006276744728100983$ in [1], and
-$2\log 2 / c_{\rm odd} = 220.9$. The constant is 221 times too small to absorb
+$2\log 2 / c_{\rm odd} = 220.9$. The constant is 220.9 times too small to absorb
 the term assigned to it. Remark 6.2's $(19/200)\log 2 = 0.0658$ is 21 times too
 small. Lemma 5.4 concerns the 2-part of $H_B^{\min}$, not the real place.
 
@@ -155,11 +192,11 @@ cancellation the preprint claims. Their difference converges to $+0.475$ rather
 than to zero. The cancellation fires and does not close.
 
 The two components share a sign, so they add. Repairing Remark 9.3's constant
-alone would leave Theorem 9.1 failing by a factor of about 48.
+alone would leave Theorem 9.1 failing by a factor of 48.5.
 
-## 5. Section 9's factor grouping, reconstructed
+## 6. Section 9's factor grouping, reconstructed
 
-A reader may object that the reduction of Section 2 above mis-transcribes what
+A reader may object that the reduction of Section 3 above mis-transcribes what
 Section 9 actually does. The objection deserves a direct answer, because
 Proposition 9.5's proof in [1] contains no displayed derivation to compare
 against. Its grouping step is one sentence:
@@ -171,20 +208,27 @@ against. Its grouping step is one sentence:
 > 39/200$."
 
 Every step that could be mis-transcribed lives in that sentence. So the five
-named groups were evaluated separately from the exact identity (4.5) of [1],
+named groups were evaluated separately from the exact identity (4.5) of [1], in
+which $V(I)$ and $V(J)$ are the Vandermonde products over the row and column
+index sets and $\Psi_A(I)$ is the integer cofactor left by factoring the Pascal
+alternant, satisfying $|\Psi_A(I)| \ge 1$:
 
 $$|\Xi_I| = 2^{S(S-1)}V(J)V(I)^2|\Psi_A(I)|\frac{\prod_{a\in A}(a+2B)!}{\prod_{i\in I}i!(N-1-i)!}\prod_{i\in I}\frac{|qT_{i+1}|\Pi_i}{\prod_{j=1}^{S}(2(i+j)+1)}.$$
 
-| group | $/B^2$ at $B=1200$ |
-|---|---|
-| factorial | +0.060360 |
-| Cauchy, $2^{S(S-1)}V(J)$ | +0.004985 |
-| Vandermonde, $V(I)^2$ | +0.006562 |
-| odd-linear, $\prod\Pi_i / \prod(2(i+j)+1)$ | +0.799167 |
-| tail, $\prod T_{i+1}$ | -0.000680 |
+| $B$ | factorial | Cauchy | Vandermonde | odd-linear | tail | total |
+|---|---|---|---|---|---|---|
+| 200 | +0.059303 | +0.002784 | +0.002448 | +0.624880 | -0.003185 | +0.686229 |
+| 400 | +0.060289 | +0.003628 | +0.003964 | +0.692216 | -0.001765 | +0.758333 |
+| 800 | +0.060479 | +0.004482 | +0.005586 | +0.759675 | -0.000969 | +0.829253 |
+| 1000 | +0.060430 | +0.004759 | +0.006121 | +0.781407 | -0.000797 | +0.851919 |
+| 1200 | +0.060360 | +0.004985 | +0.006562 | +0.799167 | -0.000680 | +0.870394 |
 
-**Table 3.** The five factor groups of (4.5) evaluated separately at $B = 1200$,
-$S = 60$, at the row set maximizing the total among four candidates.
+**Table 3.** The five factor groups of (4.5) evaluated separately, each divided
+by $B^2$, at $S = \lfloor B/20\rfloor$ and the row set maximizing the total
+among four candidates. The Cauchy column is $2^{S(S-1)}V(J)$, the Vandermonde
+column $V(I)^2$, the odd-linear column $\prod\Pi_i / \prod(2(i+j)+1)$, and the
+tail column $\prod T_{i+1}$. The total column is the quantity fitted in the
+next paragraph.
 
 The $B^2\log B$ term is real and the preprint's cancellation claim is
 structurally correct. Fitting $\log|\Xi_I|/B^2$ to $c_2 + c_L\log B$ gives
@@ -199,29 +243,37 @@ overestimates $\log|\det\mathcal{R}|$ by $+0.2111$ to $+0.2163$ times $B^2$
 across the five values of $B$. Both routes therefore measure the same object,
 and the grouped one is conservative.
 
-Independently of that, the reconstruction reproduces the residue of Section 4.
+Independently of that, the reconstruction reproduces the residue of Section 5.
 Computed through the grouping, the Proposition 9.5 residue is $+0.472152$ at
 $B = 200$, matching to six decimals the value obtained from the direct route by
 a separately written script.
 
 Run end to end, the preprint's own grouping gives $+2.037, +2.060, +2.067,
-+2.070, +2.071$ for the coefficient of $B^2$. Taken at face value it is worse
-for the preprint than the direct determinant route, because it discards
-$\Psi_A$.
++2.070, +2.071$ for the coefficient of $B^2$. That is a larger positive
+coefficient than the direct determinant route gives, because discarding
+$\Psi_A(I) \ge 1$ removes a positive quantity from the bound.
 
-## 6. Caveats
+## 7. Caveats
 
-The grouped column of Section 5 drops $\Psi_A(I)$ and is therefore an upper
+The grouped column of Section 6 drops $\Psi_A(I)$ and is therefore an upper
 bound rather than an equality. It cannot by itself establish that Theorem 9.1
-is false, which is why the direct determinant route of Sections 2 and 3 carries
+is false, which is why the direct determinant route of Sections 3 and 4 carries
 the primary evidence.
 
-The maximum over $I$ in Section 5 is taken over four candidate row sets,
+The maximum over $I$ in Section 6 is taken over four candidate row sets,
 consecutive, top, centered and spread, not over all $\binom{N}{S}$. The
 centered set wins at every $B$ tested.
 
 The factor $q$ is dropped from the tail group, contributing $O(S\log q) =
 o(B^2)$.
+
+Every number here assumes the Python mirror of $a_{Q,B}$ and $m^A_{Q,B}$ is
+faithful to [1]. The regression check guards that mirror against the Lean
+definitions of [2] and asserts $a_{Q,B} \ge m^A_{Q,B}$ numerically at every
+layer tested, but the step from [1]'s prose to those definitions is human
+reading. Three transcription-class discrepancies were found during the
+formalization, so the risk is not hypothetical. This is the largest single
+dependency of the result.
 
 The measurement locates two gaps. It does not identify which line of Section 9
 is wrong, and no claim is made that either gap is irreparable.
@@ -229,14 +281,17 @@ is wrong, and no claim is made that either gap is irreparable.
 All values are computed at $S = \lfloor B/20\rfloor$, the regime of [1]. The
 behavior at other ratios was not tested.
 
-## 7. Reproduction
+## 8. Reproduction
 
 The scripts and data are in the archived repository [2], under `scripts/gates`.
-A regression check, `check.py`, asserts that the Python mirror of the layer
-definitions still agrees with the formalized Lean definitions and that
-$a_{Q,B} \ge m^A_{Q,B}$ holds numerically at every layer tested. The verdict of
-Sections 3 and 4 is produced by `gate_scalar.py`, the reconstruction of Section
-5 by `gate_grouping.py`.
+Every number in this note comes from the tree at commit `66eb131`. A regression
+check, `check.py`, asserts that the Python mirror of the layer definitions still
+agrees with the formalized Lean definitions and that $a_{Q,B} \ge m^A_{Q,B}$
+holds numerically at every layer tested. The verdict of Sections 4 and 5 is
+produced by `gate_scalar.py`, with the per-layer data in
+`data/scalar_S_B20.csv`; the reconstruction of Section 6 is produced by
+`gate_grouping.py`, whose `compare` mode regenerates Table 3 and the slack
+figures.
 
 ## AI Utilization Statement
 
@@ -254,4 +309,9 @@ Affiliation: Chokmah LLC, Norwich, VT. Contact: chokmah-dyb@pm.me.
 arXiv:2609.04176, 2026. [Online]. Available: https://arxiv.org/abs/2609.04176
 
 [2] Daniyel Yaacov Bilar, "CatalanSun: a Lean 4 slice of arXiv:2609.04176v1,"
-GitHub repository, 2026. [Online]. Available: https://github.com/chokmah-me/catalan-sun-lean
+Zenodo, 2026. doi: DOI-PENDING. [Online]. Available:
+https://github.com/chokmah-me/catalan-sun-lean
+
+[3] Frank Calegari, Vesselin Dimitrov, and Yunqing Tang, "The linear
+independence of $1$, $\zeta(2)$, and $L(2,\chi_{-3})$," *arXiv preprint*,
+arXiv:2408.15403, 2024. [Online]. Available: https://arxiv.org/abs/2408.15403
