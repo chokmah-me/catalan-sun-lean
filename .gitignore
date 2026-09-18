@@ -9,3 +9,8 @@ results/lake_build*.txt
 
 # gate scripts live in scripts/gates/ (committed); keep their bytecode out
 scripts/gates/__pycache__/
+
+# Paper drafts: markdown sources stay local; only the released PDF is tracked.
+PAPER*_DRAFT*.md
+PAPER*_DRAFT*.pdf
+!PAPER1_DRAFT_v4.pdf
