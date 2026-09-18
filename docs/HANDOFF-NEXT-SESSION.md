@@ -122,6 +122,14 @@ assigns it to `c_odd = 0.00628` — which is **221× too small**. Remark 6.2's
 `(19/200)log 2 = 0.0658` is still 21× too small. Lemma 5.4 concerns
 `H_B^min`'s 2-part, not the real place.
 
+**Outstanding when this brief was written:** a `B = 1200` run was still in
+flight (`python gate_scalar.py scalar 1200`, ~90 min on this machine; its
+layer data is already committed). It is confirmatory only — at `B = 1200`
+the two *exactly computed* components alone (`v₂(F_B) log 2` and
+`−∑ m log p`) already sum to about `+1.22`, and `log|det R|` is positive and
+rising, so no value it can return changes the sign. Add it to the tables if
+you want the fifth point; nothing depends on it.
+
 Validated three ways (algebraic, direct-from-(3.5), and the (5.13) identity
 to `1.6e-16`); `det R` checked against brute-force `polygamma` at
 `B = 20,40,60`, against an exact-integer evaluation at `B = 200,400`, and
