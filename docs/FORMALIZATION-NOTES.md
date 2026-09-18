@@ -41,6 +41,9 @@ Companion documents:
 - [**The reduced `B²` claim, measured**](#scalar-verdict) — that computation,
   run. Theorem 9.1 needs `≤ −0.0097`; it measures **`+1.85`**, converging to
   `≈ +1.86`. Dominant term: `v₂(F_B) log 2 → 2 log 2`.
+- [**Two independent components, not one**](#two-components) — repairing
+  Remark 9.3's `2 log 2` still leaves `+0.479`, ~50× `δ₀`, in Prop 9.5's
+  incomplete cancellation.
 
 ---
 
@@ -389,3 +392,56 @@ as unsupported at this level of bookkeeping.
 **This supersedes the tail-band note's open question.** The `(39/200)B²`
 coincidence noted there is not the binding issue; `SCALAR` is computed
 without reference to that band at all.
+
+<a id="two-components"></a>
+**Note (the failure has TWO independent components, not one — 2026-09-17,
+later still).** The write-up above calls `2 log 2` "the dominant term" and
+"the largest identified component". Both are true, and both invite the
+reading that Remark 9.3's mispriced constant *is* the error. It is not. Ask
+what happens if the 2-adic term is repaired and nothing else:
+
+| `B` | `SCALAR/B²` | `SCALAR/B² − 2log2` |
+|---|---|---|
+| 200 | +1.826146 | +0.439852 |
+| 400 | +1.845926 | +0.459632 |
+| 800 | +1.851237 | +0.464943 |
+| 1000 | +1.854020 | +0.467726 |
+
+If `2 log 2` were the only error this residual would have to reach `−δ₀ =
+−0.0097`. It converges to **`+0.479`**: still **~50× `δ₀`, and the wrong
+sign**. So the `B²` coefficient decomposes as
+
+```
+SCALAR/B²  →  2 log 2  +  0.479  =  1.386 + 0.479  =  1.865
+             \________/    \_____/
+              Remark 9.3    a second, independent gap
+              (221x off)    (~50x delta_0)
+```
+
+The second component needs no extrapolation to see: `log|det R|/B² −
+∑m log p/B²` is directly `+0.4722, +0.4775, +0.4748, +0.4759` at
+`B = 200, 400, 800, 1000` — flat to `±0.003` across a 5× range in `B`. The
+`c+k/B` fits on successive pairs give `+0.4794, +0.4703, +0.4789`. (The
+remaining drift in the residual column is just `v₂(F_B)log2/B² → 2log2` from
+below: `−0.0323, −0.0179, −0.0098, −0.0082`.)
+
+**Where the second gap lives.** In precisely the cancellation Proposition 9.5
+asserts. `log|det R|/B²` and `−∑m log p/B²` do move together (`+0.0692` vs
+`−0.0638` per doubling, agreeing to ~5%, as recorded above), so the mechanism
+is real; but their difference converges to `+0.475`, not to `0`. **Prop 9.5's
+cancellation fires and does not close**, leaving a positive `B²` residue about
+50× the margin.
+
+These are different failure modes. The `2 log 2` gap is a *structural
+omission*: real-place mass in the numerator of (3.5) that an odd-prime ledger
+cannot remove, named by Remark 9.3 and mispriced 221×. The `+0.479` gap is a
+*quantitative shortfall* in Prop 9.5's own cancellation. They share a sign, so
+they add rather than mask one another — but repairing only Remark 9.3's
+constant would still leave Theorem 9.1 failing by ~50×.
+
+**Consequence for anyone continuing.** The exit condition stated above ("show
+that the grouping in §9 cancels `2 log 2 · B²` some other way") is necessary
+but **not sufficient**. A repair must close both components. Caveat, same as
+above: this locates the second gap in the det-R/ledger cancellation; it does
+not identify which line of §9 is wrong, and §9's factor grouping is still not
+reproduced here term by term.

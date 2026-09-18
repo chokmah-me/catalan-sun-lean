@@ -15,9 +15,11 @@ bound (5.3)) are proved, together with Corollary 5.2's §5 content.
 > an inequality in three directly computable quantities. Evaluated at
 > `B = 200, 400, 800, 1000`, it comes out **`+1.83, +1.85, +1.85, +1.85`**
 > where it must be **`≤ −0.0097`**: wrong by `≈ 1.86` in the `B²` coefficient,
-> and converging, not drifting. The dominant term is
+> and converging, not drifting. It has **two independent components**:
 > `v₂(F_B) log 2 → 2 log 2 = 1.386`, which Remark 9.3 names and assigns to a
-> constant 221× too small to hold it.
+> constant 221× too small to hold it, plus a further `+0.479` (~50× `δ₀`)
+> left over by Prop 9.5's incomplete cancellation. Repairing Remark 9.3 alone
+> would not save Theorem 9.1.
 > Checked three independent ways; `det R` validated against brute force.
 > **This changes nothing about the Lean below**, which claims no part of §9.
 > Details, caveats and the gate: [`docs/FORMALIZATION-NOTES.md#scalar-verdict`](docs/FORMALIZATION-NOTES.md#scalar-verdict).

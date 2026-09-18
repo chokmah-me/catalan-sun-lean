@@ -46,6 +46,12 @@ Converging upward to `≈ +1.86`. The dominant term is
 `v₂(F_B) ~ 2B²`, and (5.24) sums over odd `p` only. **Remark 9.3 names this
 exact term** and folds it into `c_odd = 0.00628` — 221× too small.
 
+**The failure has two independent components, not one**
+([`#two-components`](FORMALIZATION-NOTES.md#two-components)): subtracting
+`2 log 2` leaves `+0.479`, still ~50× `δ₀` and the wrong sign, sitting in
+Prop 9.5's incomplete cancellation (`log|det R|/B² − ∑m log p/B²` is flat at
+`+0.475` across `B = 200…1000`). A repair must close both.
+
 A structural check that raises confidence: `log|det R|/B²` rises by `+0.069`
 per doubling while `−∑m log p/B²` falls by `−0.068`. They cancel to ~5%,
 which is exactly the `B² log B` cancellation Prop 9.5 asserts. **The paper's

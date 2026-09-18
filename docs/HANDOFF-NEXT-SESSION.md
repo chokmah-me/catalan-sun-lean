@@ -135,9 +135,23 @@ to `1.6e-16`); `det R` checked against brute-force `polygamma` at
 `B = 20,40,60`, against an exact-integer evaluation at `B = 200,400`, and
 across four row sets `A`.
 
+**The failure has two independent components, not one** (found the next
+session; `scripts/gates/gate_components.py`,
+`FORMALIZATION-NOTES.md#two-components`). Subtracting the `2 log 2` term
+leaves `+0.475`, flat across `B = 200…1000`, still **~50× `δ₀` and the wrong
+sign**. It sits in Prop 9.5's cancellation, which fires (the two halves track
+to ~5% per doubling) but does not close. So:
+
+```
+SCALAR/B² → 2log2 (Remark 9.3, 221× off) + 0.475 (Prop 9.5 residue) = 1.86
+```
+
+Repairing Remark 9.3's constant alone would still leave Theorem 9.1 failing
+by ~50×. Any repair must close both.
+
 **This does not impugn the Lean**, which claims nothing in §9 and is
-unaffected. If you want to continue on the paper: find where `2 log 2 · B²`
-is cancelled, or treat Theorem 9.1 as unsupported. If you want to continue on
+unaffected. If you want to continue on the paper: close **both** components,
+or treat Theorem 9.1 as unsupported. If you want to continue on
 the formalization, §5 below is unchanged and still the real work.
 
 ## 5. The bigger missing piece — start here (scope before starting)
