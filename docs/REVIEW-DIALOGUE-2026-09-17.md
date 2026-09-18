@@ -2,7 +2,7 @@
 
 A record of how the two-component decomposition
 ([`FORMALIZATION-NOTES.md#two-components`](FORMALIZATION-NOTES.md#two-components))
-was actually arrived at: four questions put to the AI agent by D. Bilar during
+was actually arrived at: four questions put to the AI agent by dyb during
 the session that followed the `B²` measurement, and the answers given.
 
 Kept because the *sequence* is the method. The first three questions test
