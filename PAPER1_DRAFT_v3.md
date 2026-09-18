@@ -1,16 +1,17 @@
 <p class="hebrew-epigraph" dir="rtl" lang="he">אִם יִרְצֶה הַשֵּׁם</p>
 
-<p class="hebrew-date" dir="rtl" lang="he">ח׳ תִשְׁרֵי ותשפ״ז</p>
-
 # A Numerical Test of the Quadratic Estimate in arXiv:2609.04176v1
 
-Daniyel Yaacov Bilar, Chokmah LLC, chokmah-dyb@pm.me
-ORCID: [0000-0002-9040-6914](https://orcid.org/0000-0002-9040-6914)
-Licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Daniyel Yaacov Bilar, Chokmah LLC, chokmah-dyb@pm.me , ORCID: [0000-0002-9040-6914](https://orcid.org/0000-0002-9040-6914)
+Sept 18, 2026 (v3)
+
+<p class="hebrew-date" dir="rtl" lang="he">ח׳ תִשְׁרֵי ותשפ״ז</p>
 
 ## Abstract
 
-Zhi-Wei Sun's preprint arXiv:2609.04176v1 claims that Catalan's constant $G$ is irrational. Its final step, Theorem 9.1, asserts that a height quantity built from a fixed scalar is bounded above by $-\delta_0 B^2 + o(B^2)$ with $\delta_0 > 0.00966$. The preprint proves that assertion along one chain, through equations (3.5), (5.13) and (5.24), and that chain passes through a quantity here called $\mathrm{SCALAR}(B)$, an upper bound on the height built from three directly computable terms. Evaluating it at $B = 200, 400, 800, 1000, 1200$ gives $+1.826, +1.846, +1.851, +1.854, +1.855$ for the coefficient of $B^2$, converging upward, where the chain needs a value below $-0.00966$. The preprint's proof of Theorem 9.1 therefore cannot deliver its conclusion. Because $\mathrm{SCALAR}$ bounds the height from above, this refutes the proof route rather than the assertion itself. The discrepancy has two independent parts. The larger is a real-place term $v_2(F_B)\log 2 \to 2\log 2 = 1.386$, which Remark 9.3 names and folds into a constant $c_{\rm odd} = 0.00628$ that is 220.9 times too small to hold it. Subtracting it leaves $+0.468$, which is 48.5 times $\delta_0$ and still the wrong sign, in the cancellation that Proposition 9.5 asserts. Section 9 supplies no displayed derivation of its factor grouping, so the grouping is reconstructed here term by term; it confirms both the $B^2\log B$ cancellation the preprint relies on and the $+0.475$ residue. All scripts and data are archived.
+Zhi-Wei Sun's preprint arXiv:2609.04176v1 claims that Catalan's constant $G$ is irrational. Its final step, Theorem 9.1, asserts that a height quantity built from a fixed scalar is bounded above by $-\delta_0 B^2 + o(B^2)$ with $\delta_0 > 0.00966$. The preprint proves that assertion along one chain, through equations (3.5), (5.13) and (5.24), and that chain passes through a quantity here called $\mathrm{SCALAR}(B)$, an upper bound on the height built from three directly computable terms. Evaluating it at $B = 200, 400, 800, 1000, 1200$ gives $+1.826, +1.846, +1.851, +1.854, +1.855$ for the coefficient of $B^2$, converging upward, where the chain needs a value below $-0.00966$. The preprint's proof of Theorem 9.1 therefore cannot deliver its conclusion. Because $\mathrm{SCALAR}$ bounds the height from above, this refutes the proof route rather than the assertion itself. 
+
+The discrepancy has two independent parts. The larger is a real-place term $v_2(F_B)\log 2 \to 2\log 2 = 1.386$, which Remark 9.3 names and folds into a constant $c_{\rm odd} = 0.00628$ that is 220.9 times too small to hold it. Subtracting it leaves $+0.468$, which is 48.5 times $\delta_0$ and still the wrong sign, in the cancellation that Proposition 9.5 asserts. Section 9 supplies no displayed derivation of its factor grouping, so the grouping is reconstructed here term by term; it confirms both the $B^2\log B$ cancellation the preprint relies on and the $+0.475$ residue. All scripts and data are archived.
 
 ## 1. What is tested, and what is not
 
@@ -18,17 +19,13 @@ The preprint under examination is Z.-W. Sun, *Catalan's constant is irrational*,
 
 This note reports one measurement. It follows the chain by which [1] proves Theorem 9.1, isolates the quantity that chain must bound, and evaluates it numerically at five values of $B$. The measured coefficient of $B^2$ is positive where the chain requires it to be below $-0.00966$: a failure of sign, with the measured value $192$ times the magnitude of the required bound at $B = 1200$.
 
-What this does and does not settle turns on one direction. Equation (5.24) of
-[1] bounds $\log H_B^{\min}$ from above, so the measured quantity is an upper
-bound on the height, not the height. A positive upper bound does not prove the height is positive. What it does prove is that the preprint's own route to Theorem 9.1 cannot reach $-\delta_0 B^2$, because that route establishes the theorem by bounding the height with exactly this quantity. The result is a refutation of the proof as given, and the distinction is kept throughout.
+What this does and does not settle turns on one direction. Equation (5.24) of [1] bounds $\log H_B^{\min}$ from above, so the measured quantity is an upper bound on the height, not the height. A positive upper bound does not prove the height is positive. What it does prove is that the preprint's own route to Theorem 9.1 cannot reach $-\delta_0 B^2$, because that route establishes the theorem by bounding the height with exactly this quantity. The result is a refutation of the proof as given, and the distinction is kept throughout.
 
 Four things are outside the scope of this note. It does not claim that Catalan's constant is rational; nothing here bears on the truth of $G \notin \mathbb{Q}$. It does not claim that the statement of Theorem 9.1 is false; only its proof is tested, for the reason given above. It does not claim that the approach of [1] cannot be repaired; whether the two gaps identified below can be closed was not tested. It does not report an error in any single line of Section 9, because Section 9's proof does not proceed line by line.
 
 Some context on why the claim drew attention. Calegari, Dimitrov and Tang proved the linear independence of $1$, $\zeta(2)$ and $L(2,\chi_{-3})$ [3], which settles the conductor-3 case, but their method does not reach Catalan's constant $G = L(2,\chi_{-4})$, where the even conductor changes the denominator arithmetic. Reference [3] is cited in [1] as well. The preprint claims to cross that barrier by elementary means, without arithmetic holonomy or $p$-adic analysis, which is what makes the final quadratic estimate worth checking directly.
 
-A companion Lean 4 formalization of the structural lemmas of Sections 2 to 5 of
-[1] is archived alongside this note [2]. That formalization claims no part of
-Section 9 and is unaffected by what follows.
+A companion Lean 4 formalization of the structural lemmas of Sections 2 to 5 of [1] is archived alongside this note [2]. That formalization claims no part of Section 9 and is unaffected by what follows.
 
 ## 2. Notation
 
@@ -92,7 +89,7 @@ Three independent derivations of $\mathrm{SCALAR}$ agree: the algebraic route of
 
 One caveat on that acceptance rule, since it is easy to misread. The implementation also tests a quantity it calls the cancellation, the spread between the largest single term and the smallest entry, 1484 bits at $B = 200$. That spread measures cancellation inside the entry sums $R_{a,j} = \sum_i \pm c_{a,i}\Pi_i u_{i+j}$, which is what the fixed-point entry construction needs to control. It does not measure cancellation in the subsequent LU determinant, and it should not be read as doing so: at $B = 200$ the largest entry term is $2^{70301}$ against $|\det\mathcal{R}| = 2^{27421}$, and at $B = 400$ the determinant is larger than any single entry term, so the difference is not a cancellation measure at all.
 
-The guarantee on $\log|\det\mathcal{R}|$ is therefore empirical rather than a bit-budget argument, and rests on two checks. Held at $B = 200$ across $P = 40000, 66115, 90000$ and $120000$, a threefold range, the value is constant at $19006.571555426$ to nine decimals. Independently, the exact-integer route, which carries $X$ and $Y$ as exact rationals over a common denominator and never forms a floating entry, returns $19006.571555$ at the same $B$. Agreement of two unrelated code paths to six decimals is the reason the value is trusted.
+The guarantee on $\log|\det\mathcal{R}|$ is therefore empirical rather than a bit-budget argument, and rests on two checks. Held at $B = 200$ across $P = 40000, 66115, 90000$ and $120000$, a threefold range, the value is constant at $19006.571555426$ to nine decimals; at $B = 400$, across $P = 82787$ and $110000$, it is constant at $87097.358615805$, the two runs differing by $2.3	imes10^{-10}$. Independently, the exact-integer route, which carries $X$ and $Y$ as exact rationals over a common denominator and never forms a floating entry, returns $19006.571555$ at $B = 200$. Agreement of two unrelated code paths to six decimals is the reason the value is trusted.
 
 ## 5. Two independent components
 
@@ -110,7 +107,7 @@ The gap does not reduce to a single mispriced constant. Subtracting the real-pla
 
 **The real-place term.** $F_B$ sits in the numerator of (3.5) and $v_2(F_B) \sim 2B^2$, while (5.24) sums over odd $p$ only, so that mass is never removed by the odd-prime ledger. Measured, $v_2(F_B)\log 2 / B^2$ runs $+1.354, +1.368, +1.376, +1.378, +1.379$, approaching $2\log 2 = 1.38629$ from below. Remark 9.3 of [1] names this exact quantity, calling it "the residual real power of $2$ from $F_D$," and states that it is included in the derivation of the odd small-scale expression, which is why "the applicable cost is $c_{\rm odd}$." But $c_{\rm odd} = 0.006276744728100983$ in [1], and $2\log 2 / c_{\rm odd} = 220.9$. The constant is 220.9 times too small to absorb the term assigned to it. Remark 6.2's $(19/200)\log 2 = 0.0658$ is 21 times too small. Lemma 5.4 concerns the 2-part of $H_B^{\min}$, not the real place.
 
-**The Proposition 9.5 residue.** What remains after that repair is visible without extrapolation. The difference $\log|\det\mathcal{R}|/B^2 - \sum m^A_{Q,B}\log p / B^2$ measures $+0.472152, +0.477515, +0.474750, +0.475949, +0.475175$ at the five values of $B$. The sequence is not monotone, rising then falling, but it oscillates at the $5\times10^{-3}$ level about a mean of $+0.4751$ across a sixfold range in $B$, with no trend toward zero. This sits in the cancellation Proposition 9.5 asserts. The mechanism is real and visible in the data: $\log|\det \mathcal{R}|/B^2$ rises by $+0.0692$ then $+0.0693$ over the first two doublings, while $-\sum m\log p/B^2$ falls by $-0.0638$ then $-0.0720$, so the two track each other to within about 8 percent. That is the $B^2\log B$ cancellation the preprint claims. Their difference converges to $+0.475$ rather than to zero. The cancellation fires and does not close.
+**The Proposition 9.5 residue.** What remains after that repair is visible without extrapolation.  The difference $\log|\det\mathcal{R}|/B^2 - \sum m^A_{Q,B}\log p / B^2$ measures $+0.472152, +0.477515, +0.474750, +0.475949, +0.475175$ at the five values of $B$. The sequence is not monotone, rising then falling, but it oscillates at the $5\times10^{-3}$ level about a mean of $+0.4751$ across a sixfold range in $B$, with no trend toward zero. This sits in the cancellation Proposition 9.5 asserts. The mechanism is real and visible in the data: $\log|\det \mathcal{R}|/B^2$ rises by $+0.0692$ then $+0.0693$ over the first two doublings, while $-\sum m\log p/B^2$ falls by $-0.0638$ then $-0.0720$, so the two track each other to within about 8 percent. That is the $B^2\log B$ cancellation the preprint claims. Their difference converges to $+0.475$ rather than to zero. The cancellation fires and does not close.
 
 The two components share a sign, so they add. Repairing Remark 9.3's constant alone would leave the residue at $48.5$ times the magnitude of $\delta_0$, and still positive where the proof needs it negative.
 
@@ -166,9 +163,7 @@ The scripts and data are in the archived repository [2], under `scripts/gates`. 
 
 ## AI Utilization Statement
 
-This work was produced with AI assistance. The author used Claude Opus 5 for drafting, editing, code generation, and mathematical checking. All substantive claims, analytical decisions, and final editorial judgments were made by the author. AI-generated content was reviewed and corrected by the author before inclusion. No AI system is listed as a co-author.
-
-Affiliation: Chokmah LLC, Norwich, VT. Contact: chokmah-dyb@pm.me.
+This work was produced with AI assistance. The author used Claude Opus 5 for drafting, editing, code generation, and mathematical checking.  Adversarial reviews were performed by Kimi 2.8. All substantive claims, analytical decisions, and final editorial judgments were made by the author. AI-generated content was reviewed and corrected by the author before inclusion. 
 
 ## References
 
