@@ -182,8 +182,13 @@ Workflow: `.github/workflows/con-leche.yml`.
 
 Sun eq. 1.4 (Catalan tail recurrence) lives in `CatalanSun/Tail.lean` (sorry-free).
 The original Downloads draft is archived as a stub under `incoming/`.
+Author-handoff status for the TailRecurrence contribution: [docs/SME-TAIL-STATUS.md](docs/SME-TAIL-STATUS.md).
 
-Paper notes: `docs/catalan-constant-irrational.md`, `docs/robustness-check-catalan.md`.
+Paper notes: [docs/catalan-constant-irrational.md](docs/catalan-constant-irrational.md), [docs/robustness-check-catalan.md](docs/robustness-check-catalan.md).
+
+## License
+
+CC BY 4.0 — see [LICENSE](LICENSE).
 
 ## Citation
 
