@@ -1,26 +1,28 @@
 # AGENTS.md — catalan-sun-lean
 
-## What this is
-Lean 4 and Mathlib slice of structural lemmas from Sun's Catalan preprint, including Theorem 5.1, Lemma 5.5, and related corollaries. Companion to the numerical test of Theorem 9.1.
+Lean 4 / Mathlib slice of structural lemmas from Sun's Catalan preprint (arXiv:2609.04176v1), including Theorem 5.1 and Lemma 5.5.
 
-## Layout (top level)
-- `CHANGELOG.md`
-- `CITATION.cff`
-- `CatalanSun.lean`
-- `CatalanSun`
-- `LICENSE`
-- `PAPER1-v1.4.0.pdf`
-- `README.md`
-- `ZENODO.md`
-- `docs`
-- `incoming`
+**This project does not claim Theorem 1.1 (G irrational).**
+
+## Commands
+
+```powershell
+python scripts/gates/check.py
+lake build
+python ..\lean-proof-forge\scripts\verify_lean_project.py --project .
+```
+
+Toolchain: Lean **4.32.2** / Mathlib **v4.32.2** (same pin as `aria-moebius`).
 
 ## Work rules
-- Work from the README first; it is the canonical description of purpose, layout, and any build or verify commands.
-- Do not change verdicts, locked data tables, or published artifacts without the user's explicit word.
-- Keep changes small and receipt-backed: name the commit or artifact a claim rests on.
 
-## Canonical docs
-- `README.md` — purpose, usage, and status.
-- `CITATION.cff` — how to cite the associated paper/record.
-- `LICENSE` — terms of use.
+- Gate a scaffolded statement numerically (`scripts/gates/check.py`) before proving it.
+- Do not pursue Props 6.3/7.4 as formalization targets; Theorem 9.1 fails the paper's own numeric test (`docs/FORMALIZATION-NOTES.md`).
+- The Lean claims no part of §9.
+
+## Pointers
+
+- `README.md` — what is proved, DOI map
+- `docs/FORMALIZATION-NOTES.md` — scalar verdict on Theorem 9.1
+- `docs/con-leche.md` — external kernel check
+- `CITATION.cff` / `ZENODO.md` — cite / DOI map
